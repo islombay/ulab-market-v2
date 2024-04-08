@@ -1,11 +1,12 @@
 package api
 
 import (
-	_ "app/api/docs"
+	"app/api/docs"
 	"app/config"
 	"app/pkg/logs"
 	"app/pkg/smtp"
 	"app/storage"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
@@ -22,18 +23,28 @@ func NewApi(
 	filestore storage.FileStorageInterface,
 ) {
 
-	// @title E-commerce project v2
-	// @host localhost:8123
 	// @securityDefinitions.apikey ApiKeyAuth
 	// @in header
 	// @name Authorization
+
+	docs.SwaggerInfo.Title = "E-commerce project v2-1"
+	docs.SwaggerInfo.Description = "This is a sample server e-commerce server."
+	docs.SwaggerInfo.Version = "1.0"
 
 	r.Use(customCORSMiddleware())
 	api := r.Group("/api")
 	NewV1(api, cfg, store, log, smtp, cache, filestore)
 
-	url := ginSwagger.URL("swagger/doc.json")
-	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
+	cfg.Env = os.Getenv("ENV")
+	if cfg.Env == config.LocalMode {
+		docs.SwaggerInfo.Host = "http://localhost:8123"
+	} else if cfg.Env == config.ProdMode {
+		docs.SwaggerInfo.Host = "https://ulab-market-backend.onrender.com/"
+	}
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(
+		swaggerFiles.Handler,
+		//ginSwagger.URL("swagger/doc.json"),
+	))
 }
 
 func customCORSMiddleware() gin.HandlerFunc {

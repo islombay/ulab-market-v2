@@ -1,15 +1,15 @@
 server:
-  host: "localhost"
+  host: "0.0.0.0"
   port: "8000"
   public_host: "https://ulab-market-backend.onrender.com"
 db:
-  host: "localhost"
+  host: "dpg-cnpt8sa1hbls738hskmg-a"
   port: "5432"
-  dbname: "ulab-market-v2"
+  dbname: "ulab_market"
   sslmode: "disable"
   migrations: "migrations"
 redis:
-  host: "localhost"
+  host: "red-cnpua0gl5elc73cvmic0"
   port: "6379"
 smtp:
   email:

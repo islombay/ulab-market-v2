@@ -328,10 +328,8 @@ definitions:
     - source
     - type
     type: object
-host: localhost:8123
 info:
   contact: {}
-  title: E-commerce project v2
 paths:
   /api/admin:
     post:

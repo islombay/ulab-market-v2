@@ -1,10 +1,8 @@
 {
     "swagger": "2.0",
     "info": {
-        "title": "E-commerce project v2",
         "contact": {}
     },
-    "host": "localhost:8123",
     "paths": {
         "/api/admin": {
             "put": {
