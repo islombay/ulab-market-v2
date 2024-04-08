@@ -1,0 +1,1456 @@
+definitions:
+  models.AttachPermission:
+    properties:
+      permission_id:
+        type: string
+      role_id:
+        type: string
+    required:
+    - permission_id
+    - role_id
+    type: object
+  models.Brand:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+  models.CategorySwagger:
+    properties:
+      id:
+        example: a2d70daf-b4ac-4198-a6a0-999447483c18
+        type: string
+      image:
+        example: https://firebasestorage.googleapis.com/v0/b/ulab-market.appspot.com/o/test%2Fcategory%2Fa2d70daf-b4ac-4198-a6a0-999447483c18?alt=media&token=test%2Fcategory%2Fa2d70daf-b4ac-4198-a6a0-999447483c18
+        type: string
+      name:
+        example: electronic
+        type: string
+      parent_id:
+        example: ""
+        type: string
+      subcategories:
+        items:
+          $ref: '#/definitions/models.SubCategorySwagger'
+        type: array
+      translations:
+        items:
+          $ref: '#/definitions/models.CategoryTranslation'
+        type: array
+    type: object
+  models.CategoryTranslation:
+    properties:
+      category_id:
+        type: string
+      language_code:
+        type: string
+      name:
+        type: string
+    type: object
+  models.PermissionModel:
+    properties:
+      description:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+  models.Product:
+    properties:
+      articul:
+        type: string
+      brand_id:
+        type: string
+      category_id:
+        type: string
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      description_ru:
+        type: string
+      description_uz:
+        type: string
+      id:
+        type: string
+      image_files:
+        items:
+          $ref: '#/definitions/models.ProductMediaFiles'
+        type: array
+      income_price:
+        type: number
+      main_image:
+        type: string
+      name_ru:
+        type: string
+      name_uz:
+        type: string
+      outcome_price:
+        type: number
+      quantity:
+        type: integer
+      rating:
+        type: number
+      status:
+        type: string
+      updated_at:
+        type: string
+      video_files:
+        items:
+          $ref: '#/definitions/models.ProductMediaFiles'
+        type: array
+    type: object
+  models.ProductMediaFiles:
+    properties:
+      id:
+        type: string
+      media_file:
+        type: string
+      product_id:
+        type: string
+    type: object
+  models.RoleModel:
+    properties:
+      description:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      permissions:
+        items:
+          $ref: '#/definitions/models.PermissionModel'
+        type: array
+    type: object
+  models.SubCategorySwagger:
+    properties:
+      id:
+        type: string
+      image:
+        type: string
+      name:
+        type: string
+      parent_id:
+        type: string
+      translations:
+        items:
+          $ref: '#/definitions/models.CategoryTranslation'
+        type: array
+    type: object
+  models_v1.CategoryTranslation:
+    properties:
+      category_id:
+        type: string
+      language_code:
+        type: string
+      name:
+        type: string
+    required:
+    - category_id
+    - language_code
+    - name
+    type: object
+  models_v1.ChangeAdminRequest:
+    properties:
+      email:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      phone_number:
+        type: string
+      role_id:
+        type: string
+    required:
+    - id
+    type: object
+  models_v1.ChangeBrand:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+    required:
+    - id
+    - name
+    type: object
+  models_v1.ChangeCategory:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      parent_id:
+        type: string
+    required:
+    - id
+    - name
+    type: object
+  models_v1.ChangePassword:
+    properties:
+      code:
+        example: "111111"
+        type: string
+      password:
+        example: password_1
+        type: string
+      source:
+        example: example@example.com
+        type: string
+      type:
+        enum:
+        - email
+        - phone_number
+        example: email
+        type: string
+    required:
+    - code
+    - password
+    - source
+    - type
+    type: object
+  models_v1.CreateBrand:
+    properties:
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  models_v1.CreateCategory:
+    properties:
+      name:
+        type: string
+      parent_id:
+        type: string
+    required:
+    - name
+    type: object
+  models_v1.LoginRequest:
+    properties:
+      login:
+        example: example@example.com
+        type: string
+      password:
+        example: password_1
+        type: string
+    required:
+    - login
+    - password
+    type: object
+  models_v1.RegisterRequest:
+    properties:
+      email:
+        example: example@example.com
+        type: string
+      name:
+        example: Islombek
+        type: string
+      password:
+        example: password_1
+        type: string
+      phone_number:
+        example: "998912345678"
+        type: string
+    required:
+    - email
+    - name
+    - password
+    - phone_number
+    type: object
+  models_v1.RequestCode:
+    properties:
+      email:
+        type: string
+      need_code:
+        type: boolean
+      phone_number:
+        type: string
+    type: object
+  models_v1.RequestCodeRequest:
+    properties:
+      source:
+        example: example@example.com
+        type: string
+      type:
+        enum:
+        - email
+        - phone_number
+        example: email
+        type: string
+    required:
+    - source
+    - type
+    type: object
+  models_v1.Response:
+    properties:
+      code:
+        type: integer
+      message:
+        type: string
+    type: object
+  models_v1.ResponseID:
+    properties:
+      id:
+        type: string
+    type: object
+  models_v1.Token:
+    properties:
+      token:
+        type: string
+    type: object
+  models_v1.UUIDResponse:
+    properties:
+      id:
+        example: 438b3f0a-126b-4085-a8e9-525dfe0941e5
+        type: string
+    type: object
+  models_v1.VerifyCodeRequest:
+    properties:
+      code:
+        example: "111111"
+        type: string
+      source:
+        example: example@example.com
+        type: string
+      type:
+        enum:
+        - email
+        - phone_number
+        example: email
+        type: string
+    required:
+    - code
+    - source
+    - type
+    type: object
+host: localhost:8123
+info:
+  contact: {}
+  title: E-commerce project v2
+paths:
+  /api/admin:
+    post:
+      consumes:
+      - application/json
+      description: Create admin.
+      operationId: createAdmin
+      parameters:
+      - description: Create admin body
+        in: body
+        name: createAdmin
+        required: true
+        schema:
+          $ref: '#/definitions/models_v1.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully created
+          schema:
+            $ref: '#/definitions/models_v1.UUIDResponse'
+        "400":
+          description: Bad request/Invalid email/Invalid phone/Invalid password
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "403":
+          description: Forbidden. Current user has no enough permissions to create
+            admin
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "409":
+          description: Already exists
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "500":
+          description: Internal error
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Create admin
+      tags:
+      - admin
+    put:
+      consumes:
+      - application/json
+      description: Change Admin, available for owners
+      operationId: changeAdmin
+      parameters:
+      - description: Change info
+        in: body
+        name: changeInfo
+        required: true
+        schema:
+          $ref: '#/definitions/models_v1.ChangeAdminRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "400":
+          description: Bad request/ invalid email/ invalid phone_number/ No update
+            provided by user / invalid password
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "404":
+          description: User/Role not found
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "500":
+          description: Internal error
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: change admin
+      tags:
+      - admin
+  /api/admin/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: delete admin
+      operationId: deleteAdmin
+      parameters:
+      - description: Admin ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "400":
+          description: Invalid UUID
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "500":
+          description: Internal error
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: delete admin
+      tags:
+      - admin
+  /api/auth/change_password:
+    post:
+      consumes:
+      - application/json
+      description: Change password works only for clients.
+      operationId: changePassword
+      parameters:
+      - description: Change password
+        in: body
+        name: change_password
+        required: true
+        schema:
+          $ref: '#/definitions/models_v1.ChangePassword'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully changed password
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "400":
+          description: Bad Request, invalid password
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "406":
+          description: Invalid verification code
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "500":
+          description: Internal error
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "501":
+          description: Not implemented"s
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+      summary: ChangePassword
+      tags:
+      - auth
+  /api/auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Login
+      operationId: login
+      parameters:
+      - description: Login request
+        in: body
+        name: login
+        required: true
+        schema:
+          $ref: '#/definitions/models_v1.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success returning token
+          schema:
+            $ref: '#/definitions/models_v1.Token'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "406":
+          description: User not verified
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "417":
+          description: Invalid credentials
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "500":
+          description: Internal
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+      summary: Login
+      tags:
+      - auth
+  /api/auth/login_admin:
+    post:
+      consumes:
+      - application/json
+      description: Login for admin. This is need to enter for admin panel
+      operationId: loginadmin
+      parameters:
+      - description: Login request
+        in: body
+        name: login_admin
+        required: true
+        schema:
+          $ref: '#/definitions/models_v1.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success returning token
+          schema:
+            $ref: '#/definitions/models_v1.Token'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "406":
+          description: User not verified
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "417":
+          description: Invalid credentials
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "500":
+          description: Internal
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+      summary: Login for admin
+      tags:
+      - auth
+  /api/auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Create Client
+      operationId: register
+      parameters:
+      - description: Register Request
+        in: body
+        name: register
+        required: true
+        schema:
+          $ref: '#/definitions/models_v1.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success Request that needs verification
+          schema:
+            $ref: '#/definitions/models_v1.RequestCode'
+        "400":
+          description: Bad Request / Invalid email / Invalid phone / Invalid password
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "409":
+          description: User already exists
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+      summary: Create Client
+      tags:
+      - auth
+  /api/auth/request_code:
+    post:
+      consumes:
+      - application/json
+      description: request code is needed when password is forgotten
+      operationId: requestCode
+      parameters:
+      - description: Request code request
+        in: body
+        name: login
+        required: true
+        schema:
+          $ref: '#/definitions/models_v1.RequestCodeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success returning token
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "400":
+          description: Bad request / Invalid email / Invalid phone
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "500":
+          description: Internal / Failed to send code
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "501":
+          description: Not implemented email/phone verification
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+      summary: Request code
+      tags:
+      - auth
+  /api/auth/verify_code:
+    post:
+      consumes:
+      - application/json
+      description: Verify client's email/phone
+      operationId: verifyCode
+      parameters:
+      - description: Verify code Request
+        in: body
+        name: verifyCode
+        required: true
+        schema:
+          $ref: '#/definitions/models_v1.VerifyCodeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "406":
+          description: Invalid verification code
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "501":
+          description: Not implemented email/phone verification
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+      summary: Verify client's email/phone
+      tags:
+      - auth
+  /api/brand:
+    get:
+      consumes:
+      - application/json
+      description: get brand
+      operationId: getAllBrand
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: brand returned
+          schema:
+            items:
+              $ref: '#/definitions/models.Brand'
+            type: array
+        "500":
+          description: Internal error
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+      summary: get brand all
+      tags:
+      - brand
+    post:
+      consumes:
+      - application/json
+      description: Create brand
+      operationId: createBrand
+      parameters:
+      - description: Create brand request
+        in: body
+        name: create_brand
+        required: true
+        schema:
+          $ref: '#/definitions/models_v1.CreateBrand'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/models.Brand'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "409":
+          description: Already exists
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "500":
+          description: internal error
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Create brand
+      tags:
+      - brand
+    put:
+      consumes:
+      - application/json
+      description: change brand name
+      operationId: changeBrand
+      parameters:
+      - description: change brand
+        in: body
+        name: changeBrand
+        required: true
+        schema:
+          $ref: '#/definitions/models_v1.ChangeBrand'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "400":
+          description: Bad request / bad uuid / no update provided
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "404":
+          description: Brand not found
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "500":
+          description: Internal error
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: change brand
+      tags:
+      - brand
+  /api/brand/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: delete brand
+      operationId: deleteBrand
+      parameters:
+      - description: brand id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: deleted successfully
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "400":
+          description: bad uuid
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "404":
+          description: brand not found
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "500":
+          description: Internal error
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: delete brand
+      tags:
+      - brand
+    get:
+      consumes:
+      - application/json
+      description: get brand by id
+      operationId: getBrandById
+      parameters:
+      - description: brand id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: brand returned
+          schema:
+            $ref: '#/definitions/models.Brand'
+        "400":
+          description: Bad UUID
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "404":
+          description: Brand not found
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "500":
+          description: Internal error
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+      summary: get brand by id
+      tags:
+      - brand
+  /api/category:
+    get:
+      consumes:
+      - application/json
+      description: get category, returns translations, and subcategories for all category
+      operationId: getAllCategory
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: category returned
+          schema:
+            items:
+              $ref: '#/definitions/models.CategorySwagger'
+            type: array
+        "500":
+          description: Internal error
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+      summary: get category all
+      tags:
+      - category
+    post:
+      consumes:
+      - application/json
+      description: Create category
+      operationId: createCategory
+      parameters:
+      - description: Create category request
+        in: body
+        name: create_category
+        required: true
+        schema:
+          $ref: '#/definitions/models_v1.CreateCategory'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/models_v1.ResponseID'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "409":
+          description: Already exists
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "500":
+          description: internal error
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Create category
+      tags:
+      - category
+    put:
+      consumes:
+      - application/json
+      description: change category name and parent
+      operationId: changeCategory
+      parameters:
+      - description: change category
+        in: body
+        name: changeCategory
+        required: true
+        schema:
+          $ref: '#/definitions/models_v1.ChangeCategory'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "400":
+          description: Bad request / bad uuid
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "404":
+          description: Category not found/ parent category not found
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "500":
+          description: Internal error
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: change category
+      tags:
+      - category
+  /api/category/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: delete category & delete category translations
+      operationId: deleteCategory
+      parameters:
+      - description: category id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: deleted successfully
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "400":
+          description: bad uuid
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "404":
+          description: category not found
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "500":
+          description: Internal error
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: delete category
+      tags:
+      - category
+    get:
+      consumes:
+      - application/json
+      description: get category by id, returns translations, and subcategories for
+        specified category
+      operationId: getCategoryById
+      parameters:
+      - description: category id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: category returned
+          schema:
+            $ref: '#/definitions/models.CategorySwagger'
+        "400":
+          description: Bad UUID
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "404":
+          description: Category not found
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "500":
+          description: Internal error
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+      summary: get category by id
+      tags:
+      - category
+  /api/category/add_translation:
+    post:
+      consumes:
+      - application/json
+      description: Create category translation
+      operationId: AddCategoryTranslation
+      parameters:
+      - description: Create category translation request
+        in: body
+        name: create_category_translation
+        required: true
+        schema:
+          $ref: '#/definitions/models_v1.CategoryTranslation'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "400":
+          description: Bad request/ Bad id
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "404":
+          description: Category not found
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "409":
+          description: Already exists
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "500":
+          description: internal error
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Create category translation
+      tags:
+      - category
+  /api/category/change_image:
+    post:
+      consumes:
+      - application/json
+      description: change category image
+      operationId: ChangeCategoryImage
+      parameters:
+      - in: formData
+        name: category_id
+        required: true
+        type: string
+      - description: picture file
+        in: formData
+        name: image
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "400":
+          description: Bad request / bad uuid
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "404":
+          description: Category not found
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "413":
+          description: Image size is big
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "415":
+          description: Image type is not supported
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "500":
+          description: Internal error
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: change category image
+      tags:
+      - category
+  /api/owner:
+    post:
+      consumes:
+      - application/json
+      description: Create owner. Will return error "Already exists" if the owner is
+        already there.
+      operationId: createOwner
+      parameters:
+      - description: Create owner body
+        in: body
+        name: createowner
+        required: true
+        schema:
+          $ref: '#/definitions/models_v1.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully created
+          schema:
+            $ref: '#/definitions/models_v1.Token'
+        "400":
+          description: Bad request/Invalid email/Invalid phone/Invalid password
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "403":
+          description: Forbidden. If currect user is not super, this endpoint will
+            return forbidden(403)
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "409":
+          description: Already exists
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "500":
+          description: Internal error
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Create owner
+      tags:
+      - owner
+    put:
+      consumes:
+      - application/json
+      description: Change owner, available for super
+      operationId: changeOwner
+      parameters:
+      - description: Change info
+        in: body
+        name: changeInfo
+        required: true
+        schema:
+          $ref: '#/definitions/models_v1.ChangeAdminRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "400":
+          description: Bad request/ invalid email/ invalid phone_number/ No update
+            provided by user / invalid password
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "404":
+          description: User/Role not found
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "500":
+          description: Internal error
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: change owner
+      tags:
+      - owner
+  /api/owner/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: delete owner
+      operationId: deleteOwner
+      parameters:
+      - description: Owner ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "400":
+          description: Invalid UUID
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "500":
+          description: Internal error
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: delete owner
+      tags:
+      - owner
+  /api/product:
+    post:
+      consumes:
+      - multipart/form-data
+      description: create product
+      operationId: createProduct
+      parameters:
+      - in: formData
+        name: articul
+        required: true
+        type: string
+      - in: formData
+        name: brand_id
+        type: string
+      - in: formData
+        name: category_id
+        type: string
+      - in: formData
+        name: description_ru
+        required: true
+        type: string
+      - in: formData
+        name: description_uz
+        required: true
+        type: string
+      - in: formData
+        name: income_price
+        type: number
+      - in: formData
+        name: name_ru
+        required: true
+        type: string
+      - in: formData
+        name: name_uz
+        type: string
+      - in: formData
+        name: outcome_price
+        required: true
+        type: number
+      - in: formData
+        name: quantity
+        type: integer
+      - in: formData
+        name: status
+        required: true
+        type: string
+      - description: Main image
+        in: formData
+        name: main_image
+        type: file
+      - collectionFormat: csv
+        description: Image files (multiple)
+        in: formData
+        items:
+          type: file
+        name: image_files
+        type: array
+      - collectionFormat: csv
+        description: Video files (multiple)
+        in: formData
+        items:
+          type: file
+        name: video_files
+        type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/models.Product'
+        "400":
+          description: Bad request / bad uuid / status invalid
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "404":
+          description: Category not found / Brand not found
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "409":
+          description: Articul already found
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "413":
+          description: Image size is big / Video size is big / Image count too many
+            / Video count too many
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "415":
+          description: Image type is not supported / Video type is not supported
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "500":
+          description: Internal error
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: create product
+      tags:
+      - product
+  /api/roles/attach:
+    delete:
+      consumes:
+      - application/json
+      description: DisAttach Permission To Role
+      operationId: DisAttachPermissionToRole
+      parameters:
+      - description: disattach body
+        in: body
+        name: disattach_body
+        required: true
+        schema:
+          $ref: '#/definitions/models.AttachPermission'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Disattach Permission To Role
+          schema:
+            $ref: '#/definitions/models.AttachPermission'
+        "400":
+          description: Bad request / bad UUID
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "500":
+          description: Internal
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: DisAttach Permission To Role
+      tags:
+      - role
+    post:
+      consumes:
+      - application/json
+      description: attach permission to role
+      operationId: AttachPermissionToRole
+      parameters:
+      - description: attach body
+        in: body
+        name: attach_body
+        required: true
+        schema:
+          $ref: '#/definitions/models.AttachPermission'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Attach Permission To Role
+          schema:
+            $ref: '#/definitions/models.AttachPermission'
+        "400":
+          description: Bad request / bad UUID
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "404":
+          description: Role not found/ Permission not found
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "409":
+          description: Already exists
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "500":
+          description: Internal
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: attach permission to role
+      tags:
+      - role
+  /api/roles/permission:
+    get:
+      consumes:
+      - application/json
+      description: get all permissions in db
+      operationId: getAllPermissions
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Permissions list
+          schema:
+            items:
+              $ref: '#/definitions/models.PermissionModel'
+            type: array
+        "500":
+          description: Internal
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: get all permissions
+      tags:
+      - role
+  /api/roles/role:
+    get:
+      consumes:
+      - application/json
+      description: get all roles in db
+      operationId: getAllRoles
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Roles list
+          schema:
+            items:
+              $ref: '#/definitions/models.RoleModel'
+            type: array
+        "500":
+          description: Internal
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: get all roles
+      tags:
+      - role
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

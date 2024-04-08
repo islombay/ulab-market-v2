@@ -1,0 +1,27 @@
+server:
+  host: "localhost"
+  port: "8000"
+  public_host: "https://ulab-market-backend.onrender.com"
+db:
+  host: "localhost"
+  port: "5432"
+  dbname: "ulab-market-v2"
+  sslmode: "disable"
+  migrations: "migrations"
+redis:
+  host: "localhost"
+  port: "6379"
+smtp:
+  email:
+    host: "smtp.gmail.com"
+    port: "587"
+    sender: "ecommerce.ulab@gmail.com"
+filestorage:
+  url: "ulab-market.appspot.com"
+media:
+    category_photo_max_size: 2 # mb
+    product_photo_max_size: 3 # mb
+    product_max_photo_count: 10 # 10 photos maximum
+
+    product_video_max_size: 3 # mb
+    product_max_video_count: 3
