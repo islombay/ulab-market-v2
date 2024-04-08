@@ -32,7 +32,7 @@ func main() {
 	case config.LocalMode:
 		loggerLevel = logs.LevelDebug
 	default:
-		loggerLevel = logs.LevelInfo
+		loggerLevel = logs.LevelDebug
 	}
 
 	log := logs.NewLogger("app", loggerLevel)
