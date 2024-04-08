@@ -37,9 +37,9 @@ func NewApi(
 
 	cfg.Env = os.Getenv("ENV")
 	if cfg.Env == config.LocalMode {
-		docs.SwaggerInfo.Host = "http://localhost:8123"
+		docs.SwaggerInfo.Host = "localhost:8123"
 	} else if cfg.Env == config.ProdMode {
-		docs.SwaggerInfo.Host = "https://ulab-market-backend.onrender.com/"
+		docs.SwaggerInfo.Host = "ulab-market-backend.onrender.com/"
 	}
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(
 		swaggerFiles.Handler,
