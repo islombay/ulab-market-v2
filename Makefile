@@ -7,9 +7,13 @@ run-server:
 swag-install:
 	go get -u github.com/swaggo/swag/cmd/swag
 	go install github.com/swaggo/swag/cmd/swag@v1.16.3
-run: swag run-server
+
+binary-start:
+	./app
 
 build:
 	go build -o app cmd/main.go
 
+run: swag run-server
+run-prod: swag binary-start
 install: swag-install build
