@@ -4,4 +4,7 @@ swag:
 run-server:
 	go run cmd/main.go
 
-run: swag run-server
+swag-install:
+	go get -u github.com/swaggo/swag/cmd/swag
+	go install github.com/swaggo/swag/cmd/swag@v1.16.3
+run: swag-install swag run-server
