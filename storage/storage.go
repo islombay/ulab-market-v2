@@ -62,15 +62,12 @@ type UserInterface interface {
 
 	DeleteStaff(ctx context.Context, id string) error
 	ChangeStaff(ctx context.Context, m models.Staff) error
+	ChangeStaffPassword(ctx context.Context, id, pwd string) error
 
 	CreateClient(ctx context.Context, m models.Client) error
 	GetClientByEmail(ctx context.Context, e string) (*models.Client, error)
 	GetClientByPhone(ctx context.Context, p string) (*models.Client, error)
 	GetClientByLogin(ctx context.Context, l string) (*models.Client, error)
-	ChangeClientPassword(ctx context.Context, id, pwd string) error
-
-	// VerifyClient used only for clients
-	VerifyClient(ctx context.Context, id string) error
 }
 
 type CategoryInterface interface {

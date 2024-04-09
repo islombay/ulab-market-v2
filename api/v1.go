@@ -30,12 +30,11 @@ func NewV1(
 	{
 		auth.POST("/login", handler.Login)
 		auth.POST("/login_admin", handler.LoginAdmin)
-
-		auth.POST("/register", handler.RegisterClient)
-		auth.POST("/change_password", handler.ChangePassword)
-
 		auth.POST("/verify_code", handler.VerifyCode)
-		auth.POST("/request_code", handler.RequestCode)
+
+		//auth.POST("/register", handler.RegisterClient)
+		//auth.POST("/change_password", handler.ChangePassword)
+		//auth.POST("/request_code", handler.RequestCode)
 	}
 
 	owner := v1.Group("/owner")

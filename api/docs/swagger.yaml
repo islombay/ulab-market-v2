@@ -232,15 +232,15 @@ definitions:
     type: object
   models_v1.LoginRequest:
     properties:
-      login:
-        example: example@example.com
+      source:
+        example: "998912345678"
         type: string
-      password:
-        example: password_1
+      type:
+        example: phone_number
         type: string
     required:
-    - login
-    - password
+    - source
+    - type
     type: object
   models_v1.RegisterRequest:
     properties:
@@ -454,6 +454,7 @@ paths:
     post:
       consumes:
       - application/json
+      deprecated: true
       description: Change password works only for clients.
       operationId: changePassword
       parameters:
@@ -510,23 +511,23 @@ paths:
       - application/json
       responses:
         "200":
-          description: Success returning token
+          description: Success. Now needs to verify verification code /api/verify_code
           schema:
-            $ref: '#/definitions/models_v1.Token'
+            $ref: '#/definitions/models_v1.RequestCode'
         "400":
-          description: Bad request
-          schema:
-            $ref: '#/definitions/models_v1.Response'
-        "406":
-          description: User not verified
+          description: Bad request / Bad Email / Bad Phone
           schema:
             $ref: '#/definitions/models_v1.Response'
         "417":
-          description: Invalid credentials
+          description: Invalid type
           schema:
             $ref: '#/definitions/models_v1.Response'
         "500":
           description: Internal
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "501":
+          description: Not implemented (phone verification)
           schema:
             $ref: '#/definitions/models_v1.Response'
       summary: Login
@@ -575,6 +576,7 @@ paths:
     post:
       consumes:
       - application/json
+      deprecated: true
       description: Create Client
       operationId: register
       parameters:
@@ -610,6 +612,7 @@ paths:
     post:
       consumes:
       - application/json
+      deprecated: true
       description: request code is needed when password is forgotten
       operationId: requestCode
       parameters:
@@ -664,7 +667,7 @@ paths:
         "200":
           description: Success
           schema:
-            $ref: '#/definitions/models_v1.Response'
+            $ref: '#/definitions/models_v1.Token'
         "400":
           description: Bad Request
           schema:

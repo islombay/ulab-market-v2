@@ -20,8 +20,13 @@ type VerifyCodeRequest struct {
 }
 
 type LoginRequest struct {
-	Login    string `json:"login" binding:"required"  example:"example@example.com"`
-	Password string `json:"password" binding:"required"  example:"password_1"`
+	Source string `json:"source" binding:"required"  example:"998912345678"`
+	Type   string `json:"type" binding:"required"  example:"phone_number"`
+}
+
+type LoginAdminRequest struct {
+	Login    string `json:"login" binding:"required"`
+	Password string `json:"password" binding:"required"`
 }
 
 type Token struct {

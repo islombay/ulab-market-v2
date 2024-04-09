@@ -54,6 +54,12 @@ var (
 		Code:        http.StatusNotImplemented,
 	}
 
+	StatusVerificationTypeNotFound = Status{
+		Message:     "Verification type not found",
+		Description: "verification type not found",
+		Code:        http.StatusExpectationFailed,
+	}
+
 	StatusUserNotFound = Status{
 		Message:     "User not found",
 		Description: "user not found",

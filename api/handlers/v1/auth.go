@@ -28,7 +28,7 @@ var (
 
 // ChangePassword godoc
 // @ID changePassword
-// @Router /api/auth/change_password [POST]
+// @deprecatedrouter /api/auth/change_password [POST]
 // @Summary ChangePassword
 // @Description Change password works only for clients.
 // @Tags auth
@@ -67,7 +67,7 @@ func (v1 *Handlers) ChangePassword(c *gin.Context) {
 		)
 		return
 	}
-	if err := v1.verifyCode(model, m.Code, true); err != nil {
+	if err := v1.verifyCode(model, m.Code, true, m.Type); err != nil {
 		if errors.Is(err, ErrInvalidCode) {
 			v1.error(c, status.StatusInvalidVerificationCode)
 			return
@@ -85,7 +85,7 @@ func (v1 *Handlers) ChangePassword(c *gin.Context) {
 		v1.log.Error("could not generate hash password", logs.Error(err))
 		return
 	}
-	if err := v1.storage.User().ChangeClientPassword(context.Background(), model.ID, pwd); err != nil {
+	if err := v1.storage.User().ChangeStaffPassword(context.Background(), model.ID, pwd); err != nil {
 		if errors.Is(err, storage.ErrNotAffected) {
 			v1.log.Debug("change client password returned not affected", logs.String("uid", model.ID))
 		} else {
@@ -116,7 +116,7 @@ func (v1 *Handlers) ChangePassword(c *gin.Context) {
 // @Response 417 {object} models_v1.Response "Invalid credentials"
 // @Failure 500 {object} models_v1.Response "Internal"
 func (v1 *Handlers) LoginAdmin(c *gin.Context) {
-	var m models_v1.LoginRequest
+	var m models_v1.LoginAdminRequest
 	if c.BindJSON(&m) != nil {
 		v1.error(c, status.StatusBadRequest)
 		return
@@ -174,7 +174,7 @@ func (v1 *Handlers) LoginAdmin(c *gin.Context) {
 
 // RegisterClient godoc
 // @ID register
-// @Router /api/auth/register [POST]
+// @deprecatedrouter /api/auth/register [POST]
 // @Summary Create Client
 // @Description Create Client
 // @Tags auth
@@ -204,20 +204,11 @@ func (v1 *Handlers) RegisterClient(c *gin.Context) {
 		return
 	}
 
-	h, err := auth_lib.GetHashPassword(model.Password)
-	if err != nil {
-		v1.log.Error("could not generate hash password", logs.Error(err))
-		v1.error(c, status.StatusInternal)
-		return
-	}
-
 	m := models.Client{
 		ID:          uuid.New().String(),
 		Name:        model.Name,
 		PhoneNumber: sql.NullString{Valid: true, String: model.Phone},
 		Email:       sql.NullString{Valid: true, String: model.Email},
-		Password:    h,
-		Verified:    false,
 		CreatedAt:   time.Now(),
 		UpdatedAt:   time.Now(),
 		DeletedAt:   sql.NullTime{Valid: false},
@@ -270,7 +261,7 @@ func (v1 *Handlers) RegisterClient(c *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param verifyCode body models_v1.VerifyCodeRequest true "Verify code Request"
-// @Success 200 {object} models_v1.Response "Success"
+// @Success 200 {object} models_v1.Token "Success"
 // @Response 400 {object} models_v1.Response "Bad Request"
 // @Response 404 {object} models_v1.Response "User not found"
 // @Response 406 {object} models_v1.Response "Invalid verification code"
@@ -302,7 +293,7 @@ func (v1 *Handlers) VerifyCode(c *gin.Context) {
 		)
 		return
 	}
-	if err := v1.verifyCode(model, m.Code, false); err != nil {
+	if err := v1.verifyCode(model, m.Code, false, m.Type); err != nil {
 		if errors.Is(err, ErrInvalidCode) {
 			v1.error(c, status.StatusInvalidVerificationCode)
 			return
@@ -310,14 +301,25 @@ func (v1 *Handlers) VerifyCode(c *gin.Context) {
 		v1.error(c, status.StatusInternal)
 		return
 	}
-	v1.response(c, http.StatusOK, models_v1.Response{
-		Code:    http.StatusOK,
-		Message: "Ok",
-	})
+
+	dur := time.Hour * auth_lib.TokenExpireLife
+	token, err := auth_lib.GenerateToken(model.ID, dur, TokenClient)
+	if err != nil {
+		v1.log.Error("could not generate token", logs.Error(err))
+		v1.error(c, status.StatusInternal)
+		return
+	}
+	v1.response(c, http.StatusOK, models_v1.Token{Token: token})
 }
 
-func (v1 *Handlers) verifyCode(model *models.Client, reqCode string, deleteAfterCheck bool) error {
-	code, exp, err := v1.cache.Code().GetCode(context.Background(), model.Email.String)
+func (v1 *Handlers) verifyCode(model *models.Client, reqCode string, deleteAfterCheck bool, vType string) error {
+	var src string
+	if vType == auth_lib.VerificationEmail {
+		src = model.Email.String
+	} else if vType == auth_lib.VerificationPhone {
+		src = model.PhoneNumber.String
+	}
+	code, exp, err := v1.cache.Code().GetCode(context.Background(), src)
 	if err != nil {
 		if errors.Is(err, redis_service.ErrKeyNotFound) {
 			v1.log.Debug("verification code key not found")
@@ -337,14 +339,6 @@ func (v1 *Handlers) verifyCode(model *models.Client, reqCode string, deleteAfter
 		return ErrInvalidCode
 	}
 
-	if err := v1.storage.User().VerifyClient(context.Background(), model.ID); err != nil {
-		if errors.Is(err, storage.ErrNotAffected) {
-			v1.log.Debug("rows affected is invalid for verifyClient", logs.String("uid", model.ID))
-		} else {
-			v1.log.Error("could not verify client in db", logs.Error(err), logs.String("uid", model.ID))
-			return nil
-		}
-	}
 	if deleteAfterCheck {
 		v1.log.Debug("deleting verification code", logs.String("code", code))
 		v1.cache.Code().DeleteCode(context.Background(), model.Email.String)
@@ -361,56 +355,98 @@ func (v1 *Handlers) verifyCode(model *models.Client, reqCode string, deleteAfter
 // @Accept json
 // @Produce json
 // @Param login body models_v1.LoginRequest true "Login request"
-// @Success 200 {object} models_v1.Token "Success returning token"
-// @Response 400 {object} models_v1.Response "Bad request"
-// @Response 406 {object} models_v1.Response "User not verified"
-// @Response 417 {object} models_v1.Response "Invalid credentials"
+// @Success 200 {object} models_v1.RequestCode "Success. Now needs to verify verification code /api/verify_code"
+// @Response 400 {object} models_v1.Response "Bad request / Bad Email / Bad Phone"
+// @Response 417 {object} models_v1.Response "Invalid type"
 // @Failure 500 {object} models_v1.Response "Internal"
+// @failure 501 {object} models_v1.Response "Not implemented (phone verification)"
 func (v1 *Handlers) Login(c *gin.Context) {
 	var m models_v1.LoginRequest
 	if c.BindJSON(&m) != nil {
 		v1.error(c, status.StatusBadRequest)
 		return
 	}
-	user, err := v1.storage.User().GetClientByLogin(context.Background(), m.Login)
-	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			v1.error(c, status.StatusInvalidCredentials)
+
+	var identityFunc func(ctx context.Context, l string) (*models.Client, error)
+	if m.Type == auth_lib.VerificationEmail {
+		if !helper.IsValidEmail(m.Source) {
+			v1.error(c, status.StatusBadEmail)
 			return
 		}
-		v1.error(c, status.StatusInternal)
-		v1.log.Error("could not get user", logs.Error(err), logs.String("login", m.Login))
+		identityFunc = v1.storage.User().GetClientByEmail
+	} else if m.Type == auth_lib.VerificationPhone {
+		if !helper.IsValidPhone(m.Source) {
+			v1.error(c, status.StatusBadPhone)
+			return
+		}
+		v1.error(c, status.StatusNotImplemented)
 		return
-	}
-	if !user.Verified {
-		v1.error(c, status.StatusUserNotVerified)
+	} else {
+		v1.error(c, status.StatusVerificationTypeNotFound)
 		return
 	}
 
-	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(m.Password))
+	user, err := identityFunc(context.Background(), m.Source)
 	if err != nil {
-		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
-			v1.log.Debug("password does not match", logs.Error(err))
-			v1.error(c, status.StatusInvalidCredentials)
+		if errors.Is(err, pgx.ErrNoRows) {
+			user = &models.Client{
+				ID:          uuid.NewString(),
+				Name:        "",
+				PhoneNumber: sql.NullString{Valid: m.Type == auth_lib.VerificationPhone, String: m.Source},
+				Email:       sql.NullString{Valid: m.Type == auth_lib.VerificationEmail, String: m.Source},
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+				DeletedAt:   sql.NullTime{Valid: false},
+			}
+			if err := v1.storage.User().CreateClient(context.Background(), *user); err != nil {
+				v1.log.Error("could not register client", logs.Error(err))
+				v1.error(c, status.StatusInternal)
+				return
+			}
+		} else {
+			v1.error(c, status.StatusInternal)
+			v1.log.Error("could not get user", logs.Error(err), logs.String("login", m.Source))
 			return
 		}
-		v1.log.Debug("could not compare hash and password", logs.Error(err))
-		v1.error(c, status.StatusInternal)
+	}
+
+	verificationType := m.Type
+	verificationSource := m.Source
+
+	oneTimeCodeDuration := time.Hour
+
+	if err := auth_lib.SendVerificationCode(verificationSource, verificationType,
+		auth_lib.CodeLength,
+		v1.cache, v1.smtp,
+		oneTimeCodeDuration,
+	); err != nil {
+		if errors.Is(err, helper.ErrInvalidEmail) {
+			v1.error(c, status.StatusBadEmail)
+		} else {
+			v1.error(c, status.StatusFailedSendCode)
+		}
+		v1.log.Error("could not send verification code",
+			logs.Error(err),
+			logs.String("source", verificationSource),
+		)
 		return
 	}
-	dur := time.Hour * auth_lib.TokenExpireLife
-	token, err := auth_lib.GenerateToken(user.ID, dur, TokenClient)
-	if err != nil {
-		v1.log.Error("could not generate token", logs.Error(err))
-		v1.error(c, status.StatusInternal)
-		return
+
+	res := models_v1.RequestCode{
+		NeedCode: true,
 	}
-	v1.response(c, http.StatusOK, models_v1.Token{Token: token})
+	if verificationType == auth_lib.VerificationPhone {
+		res.Phone = verificationSource
+	} else if verificationType == auth_lib.VerificationEmail {
+		res.Email = verificationSource
+	}
+
+	v1.response(c, http.StatusOK, res)
 }
 
 // RequestCode godoc
 // @ID requestCode
-// @Router /api/auth/request_code [POST]
+// @deprecatedrouter /api/auth/request_code [POST]
 // @Summary Request code
 // @Description request code is needed when password is forgotten
 // @Tags auth

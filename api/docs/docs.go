@@ -211,6 +211,7 @@ const docTemplate = `{
                 ],
                 "summary": "ChangePassword",
                 "operationId": "changePassword",
+                "deprecated": true,
                 "parameters": [
                     {
                         "description": "Change password",
@@ -289,31 +290,31 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Success returning token",
+                        "description": "Success. Now needs to verify verification code /api/verify_code",
                         "schema": {
-                            "$ref": "#/definitions/models_v1.Token"
+                            "$ref": "#/definitions/models_v1.RequestCode"
                         }
                     },
                     "400": {
-                        "description": "Bad request",
-                        "schema": {
-                            "$ref": "#/definitions/models_v1.Response"
-                        }
-                    },
-                    "406": {
-                        "description": "User not verified",
+                        "description": "Bad request / Bad Email / Bad Phone",
                         "schema": {
                             "$ref": "#/definitions/models_v1.Response"
                         }
                     },
                     "417": {
-                        "description": "Invalid credentials",
+                        "description": "Invalid type",
                         "schema": {
                             "$ref": "#/definitions/models_v1.Response"
                         }
                     },
                     "500": {
                         "description": "Internal",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    },
+                    "501": {
+                        "description": "Not implemented (phone verification)",
                         "schema": {
                             "$ref": "#/definitions/models_v1.Response"
                         }
@@ -394,6 +395,7 @@ const docTemplate = `{
                 ],
                 "summary": "Create Client",
                 "operationId": "register",
+                "deprecated": true,
                 "parameters": [
                     {
                         "description": "Register Request",
@@ -447,6 +449,7 @@ const docTemplate = `{
                 ],
                 "summary": "Request code",
                 "operationId": "requestCode",
+                "deprecated": true,
                 "parameters": [
                     {
                         "description": "Request code request",
@@ -521,7 +524,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Success",
                         "schema": {
-                            "$ref": "#/definitions/models_v1.Response"
+                            "$ref": "#/definitions/models_v1.Token"
                         }
                     },
                     "400": {
@@ -2072,17 +2075,17 @@ const docTemplate = `{
         "models_v1.LoginRequest": {
             "type": "object",
             "required": [
-                "login",
-                "password"
+                "source",
+                "type"
             ],
             "properties": {
-                "login": {
+                "source": {
                     "type": "string",
-                    "example": "example@example.com"
+                    "example": "998912345678"
                 },
-                "password": {
+                "type": {
                     "type": "string",
-                    "example": "password_1"
+                    "example": "phone_number"
                 }
             }
         },

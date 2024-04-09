@@ -19,11 +19,9 @@ create table if not exists permission_to_role (
 
 create table if not exists clients (
     id uuid primary key,
-    name varchar(30) not null,
+    name varchar(30) default null,
     phone_number varchar(12) unique,
     email varchar(255) unique,
-    password varchar(255),
-    verified bool default false,
 
     created_at timestamp,
     updated_at timestamp,

@@ -10,8 +10,6 @@ type Client struct {
 	Name        string         `json:"name" obj:""`
 	PhoneNumber sql.NullString `json:"phone_number"`
 	Email       sql.NullString `json:"email"`
-	Password    string         `json:"password"`
-	Verified    bool           `json:"verified" obj:"verified"`
 
 	CreatedAt time.Time    `json:"created_at" obj:"created_at"`
 	UpdatedAt time.Time    `json:"updated_at"`

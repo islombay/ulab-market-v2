@@ -27,19 +27,15 @@ func (db *UserRepo) CreateClient(ctx context.Context, m models.Client) error {
                      name,
                      phone_number,
                      email,
-                     password,
-                     verified,
                      created_at,
                      updated_at, 
                      deleted_at
-            ) values ($1,$2,$3,$4,$5,$6,$7,$8,$9)`
+            ) values ($1,$2,$3,$4,$5,$6,$7)`
 	if _, err := db.db.Exec(ctx, q,
 		m.ID,
 		m.Name,
 		m.PhoneNumber,
 		m.Email,
-		m.Password,
-		m.Verified,
 		m.CreatedAt,
 		m.UpdatedAt,
 		m.DeletedAt,
@@ -100,8 +96,8 @@ func (db *UserRepo) GetClientByEmail(ctx context.Context, e string) (*models.Cli
 
 	if err := db.db.QueryRow(ctx, q, e).Scan(
 		&m.ID,
-		&m.Name, &m.PhoneNumber, &m.Email, &m.Password,
-		&m.Verified, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt,
+		&m.Name, &m.PhoneNumber, &m.Email,
+		&m.CreatedAt, &m.UpdatedAt, &m.DeletedAt,
 	); err != nil {
 		return nil, err
 	}
@@ -114,8 +110,8 @@ func (db *UserRepo) GetClientByPhone(ctx context.Context, p string) (*models.Cli
 
 	if err := db.db.QueryRow(ctx, q, p).Scan(
 		&m.ID,
-		&m.Name, &m.PhoneNumber, &m.Email, &m.Password,
-		&m.Verified, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt,
+		&m.Name, &m.PhoneNumber, &m.Email,
+		&m.CreatedAt, &m.UpdatedAt, &m.DeletedAt,
 	); err != nil {
 		return nil, err
 	}
@@ -128,8 +124,8 @@ func (db *UserRepo) GetClientByLogin(ctx context.Context, l string) (*models.Cli
 
 	if err := db.db.QueryRow(ctx, q, l).Scan(
 		&m.ID,
-		&m.Name, &m.PhoneNumber, &m.Email, &m.Password,
-		&m.Verified, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt,
+		&m.Name, &m.PhoneNumber, &m.Email,
+		&m.CreatedAt, &m.UpdatedAt, &m.DeletedAt,
 	); err != nil {
 		return nil, err
 	}
@@ -150,8 +146,8 @@ func (db *UserRepo) GetStaffByID(ctx context.Context, id string) (*models.Staff,
 	return &m, nil
 }
 
-func (db *UserRepo) ChangeClientPassword(ctx context.Context, id, pwd string) error {
-	q := `update clients set password = $1 where id = $2`
+func (db *UserRepo) ChangeStaffPassword(ctx context.Context, id, pwd string) error {
+	q := `update staff set password = $1 where id = $2`
 	r, err := db.db.Exec(ctx, q, pwd, id)
 	if err != nil {
 		return err
@@ -159,19 +155,6 @@ func (db *UserRepo) ChangeClientPassword(ctx context.Context, id, pwd string) er
 	if r.RowsAffected() != 1 {
 		return storage.ErrNotAffected
 	}
-	return nil
-}
-
-func (db *UserRepo) VerifyClient(ctx context.Context, id string) error {
-	q := `update clients set verified = true where id = $1`
-	t, err := db.db.Exec(ctx, q, id)
-	if err != nil {
-		return err
-	}
-	if t.RowsAffected() != 1 {
-		return storage.ErrNotAffected
-	}
-
 	return nil
 }
 
