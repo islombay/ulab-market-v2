@@ -49,7 +49,7 @@ func NewApi(
 
 func customCORSMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		c.Header("Acces-Control-Allow-Origin", "*")
+		c.Header("Access-Control-Allow-Origin", "*")
 		c.Header("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT, PATCH, DELETE, HEAD")
 		c.Header("Access-Control-Allow-Headers", "Platform-Id, Content-Type, Content-Length, Accept-Encoding, X-CSF-TOKEN, Authorization, Cache-Control")
 
