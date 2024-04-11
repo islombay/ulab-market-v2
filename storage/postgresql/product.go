@@ -299,3 +299,12 @@ func (db *ProductRepo) GetProductVideoFilesByID(ctx context.Context, id string) 
 
 	return res, nil
 }
+
+func (db *ProductRepo) ChangeMainImage(ctx context.Context, id, url string) error {
+	q := `update products set main_image = $1 where id = $2`
+	_, err := db.db.Exec(ctx, q, url, id)
+	if err != nil {
+		return err
+	}
+	return nil
+}

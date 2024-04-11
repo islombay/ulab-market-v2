@@ -37,15 +37,15 @@ func NewHandler(
 	}
 }
 
-func (h *Handlers) error(c *gin.Context, status status.Status) {
+func (v1 *Handlers) error(c *gin.Context, status status.Status) {
 	switch code := status.Code; {
 	case code >= 500:
-		h.log.Error("[-Server Error-]:",
+		v1.log.Error("[-Server Error-]:",
 			logs.Int("code", status.Code),
 			logs.String("status", status.Message),
 		)
 	case code >= 400:
-		h.log.Error("[-Response-]:",
+		v1.log.Error("[-Response-]:",
 			logs.Int("code", status.Code),
 			logs.String("status", status.Message),
 		)
@@ -56,8 +56,8 @@ func (h *Handlers) error(c *gin.Context, status status.Status) {
 	})
 }
 
-func (h *Handlers) response(c *gin.Context, code int, data interface{}) {
-	h.log.Info("[-Response-]:",
+func (v1 *Handlers) response(c *gin.Context, code int, data interface{}) {
+	v1.log.Info("[-Response-]:",
 		logs.Int("code", code),
 		logs.Any("url", c.Request.URL),
 	)

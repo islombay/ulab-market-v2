@@ -33,6 +33,7 @@ type ProductInterface interface {
 	GetByID(ctx context.Context, id string) (*models.Product, error)
 
 	DeleteProductByID(ctx context.Context, id string) error
+	ChangeMainImage(ctx context.Context, id, url string) error
 
 	CreateProductImageFile(ctx context.Context, id, pid, url string) error
 	CreateProductVideoFile(ctx context.Context, id, pid, url string) error

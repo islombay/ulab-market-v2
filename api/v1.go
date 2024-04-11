@@ -129,6 +129,12 @@ func NewV1(
 			handler.MiddlewareStaffPermissionCheck(auth_lib.PermissionCanAddProduct),
 			handler.CreateProduct,
 		)
+
+		product.POST("/change_image",
+			handler.MiddlewareStaffPermissionCheck(auth_lib.PermissionCanEditProduct),
+			handler.ChangeProductMainImage,
+		)
+
 		product.GET("", handler.GetAllProducts)
 		product.GET("/:id", handler.GetProductByID)
 	}

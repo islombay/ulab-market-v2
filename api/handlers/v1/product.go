@@ -13,6 +13,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v4"
+	"mime/multipart"
 	"net/http"
 	"strings"
 	"time"
@@ -46,6 +47,7 @@ func (v1 *Handlers) CreateProduct(c *gin.Context) {
 		return
 	}
 
+	// check whether the same articul exists
 	_, err := v1.storage.Product().GetByArticul(context.Background(), m.Articul)
 	if err != nil {
 		if !errors.Is(err, pgx.ErrNoRows) {
@@ -58,6 +60,7 @@ func (v1 *Handlers) CreateProduct(c *gin.Context) {
 		return
 	}
 
+	// is valid status provided
 	m.Status = strings.ToLower(m.Status)
 	if !(m.Status == helper.ProductStatusActive || m.Status == helper.ProductStatusInactive) {
 		v1.error(c, status.StatusProductStatusInvalid)
@@ -282,14 +285,6 @@ func (v1 *Handlers) CreateProduct(c *gin.Context) {
 	v1.response(c, http.StatusOK, pr)
 }
 
-type GetAllProductsQueryParams struct {
-	CategoryID *string `form:"cid"`
-	Query      *string `form:"q"`
-	BrandID    *string `form:"bid"`
-	Offset     int     `form:"offset"`
-	Limit      int     `form:"limit"`
-}
-
 // GetAllProducts
 // @id getAllProducts
 // @router /api/product [get]
@@ -307,7 +302,7 @@ type GetAllProductsQueryParams struct {
 // @Failure 404 {object} models_v1.Response "Category not found / Brand not found"
 // @Failure 500 {object} models_v1.Response "Internal error"
 func (v1 *Handlers) GetAllProducts(c *gin.Context) {
-	var m GetAllProductsQueryParams
+	var m models_v1.GetAllProductsQueryParams
 	if err := c.ShouldBind(&m); err != nil {
 		v1.error(c, status.StatusInternal)
 		v1.log.Error("bad request", logs.Error(err))
@@ -390,4 +385,83 @@ func (v1 *Handlers) GetProductByID(c *gin.Context) {
 	product.VideoFiles = vdFiles
 
 	v1.response(c, http.StatusOK, product)
+}
+
+// ChangeProductMainImage
+// @id ChangeProductMainImage
+// @router /api/product/change_image [post]
+// @summary change image of a product
+// @description change image of a product
+// @tags product
+// @security ApiKeyAuth
+// @param changeProductMainImage formData models_v1.ChangeProductMainImage true "body"
+// @param image formData file true "image"
+// @produce json
+// @Success 200 {object} models_v1.Response "Success"
+// @Failure 400 {object} models_v1.Response "Bad request / bad uuid"
+// @Failure 404 {object} models_v1.Response "Product not found"
+// @failure 413 {object} models_v1.Response "Main image size exceeds the limit"
+// @failure 415 {object} models_v1.Response "Unsupported media type"
+// @Failure 500 {object} models_v1.Response "Internal error"
+func (v1 *Handlers) ChangeProductMainImage(c *gin.Context) {
+	var m models_v1.ChangeProductMainImage
+	if err := c.Bind(&m); err != nil {
+		v1.error(c, status.StatusBadRequest)
+		return
+	}
+	if !helper.IsValidUUID(m.ProductID) {
+		v1.error(c, status.StatusBadUUID)
+		return
+	}
+
+	product, err := v1.storage.Product().GetByID(context.Background(), m.ProductID)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			v1.error(c, status.StatusProductNotFount)
+			return
+		}
+		v1.error(c, status.StatusInternal)
+		v1.log.Error("could not get product by id", logs.Error(err),
+			logs.String("product_id", m.ProductID))
+		return
+	}
+	if product.MainImage != nil {
+		defer v1.filestore.DeleteFile(*product.MainImage)
+	}
+
+	if st := v1.ValidateImage(m.Image); st != nil {
+		v1.error(c, *st)
+		return
+	}
+	internalURL, err := v1.filestore.Create(m.Image, filestore.FolderProduct, m.ProductID)
+	if err != nil {
+		v1.error(c, status.StatusInternal)
+		return
+	}
+
+	if err := v1.storage.Product().ChangeMainImage(context.Background(), m.ProductID, internalURL); err != nil {
+		v1.error(c, status.StatusInternal)
+		v1.log.Error("could not change main image", logs.Error(err),
+			logs.String("product_id", m.ProductID))
+		return
+	}
+	v1.response(c, http.StatusOK, models_v1.Response{
+		Code:    200,
+		Message: "Ok",
+	})
+}
+
+func (v1 *Handlers) ValidateImage(img *multipart.FileHeader) *status.Status {
+	if _, err, msg := helper.IsValidImage(img); err != nil {
+		if errors.Is(err, helper.ErrInvalidImageType) {
+			v1.log.Error("got invalid image extension", logs.String("got", msg))
+			return &status.StatusImageTypeUnkown
+		}
+		v1.log.Error("could not check file for validity")
+		return &status.StatusInternal
+	}
+	if img.Size > v1.cfg.Media.ProductPhotoMaxSize {
+		return &status.StatusProductMainImageMaxSizeExceed
+	}
+	return nil
 }

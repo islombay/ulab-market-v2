@@ -25,3 +25,16 @@ type CreateProduct struct {
 	ImageFiles []*multipart.FileHeader `form:"image_files" swaggerignore:"true"`
 	VideoFiles []*multipart.FileHeader `form:"video_files" swaggerignore:"true"`
 }
+
+type GetAllProductsQueryParams struct {
+	CategoryID *string `form:"cid"`
+	Query      *string `form:"q"`
+	BrandID    *string `form:"bid"`
+	Offset     int     `form:"offset"`
+	Limit      int     `form:"limit"`
+}
+
+type ChangeProductMainImage struct {
+	ProductID string                `form:"product_id" binding:"required"`
+	Image     *multipart.FileHeader `form:"image" binding:"required" swaggerignore:"true"`
+}

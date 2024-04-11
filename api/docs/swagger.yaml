@@ -1418,6 +1418,52 @@ paths:
       summary: get product by id
       tags:
       - product
+  /api/product/change_image:
+    post:
+      description: change image of a product
+      operationId: ChangeProductMainImage
+      parameters:
+      - in: formData
+        name: product_id
+        required: true
+        type: string
+      - description: image
+        in: formData
+        name: image
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "400":
+          description: Bad request / bad uuid
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "404":
+          description: Product not found
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "413":
+          description: Main image size exceeds the limit
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "415":
+          description: Unsupported media type
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "500":
+          description: Internal error
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: change image of a product
+      tags:
+      - product
   /api/roles/attach:
     delete:
       consumes:
