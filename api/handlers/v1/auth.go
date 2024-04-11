@@ -109,7 +109,7 @@ func (v1 *Handlers) ChangePassword(c *gin.Context) {
 // @Tags auth
 // @Accept json
 // @Produce json
-// @Param login_admin body models_v1.LoginRequest true "Login request"
+// @Param login_admin body models_v1.LoginAdminRequest true "Login request"
 // @Success 200 {object} models_v1.Token "Success returning token"
 // @Response 400 {object} models_v1.Response "Bad request"
 // @Response 406 {object} models_v1.Response "User not verified"

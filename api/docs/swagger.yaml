@@ -230,6 +230,16 @@ definitions:
     required:
     - name
     type: object
+  models_v1.LoginAdminRequest:
+    properties:
+      login:
+        type: string
+      password:
+        type: string
+    required:
+    - login
+    - password
+    type: object
   models_v1.LoginRequest:
     properties:
       source:
@@ -545,7 +555,7 @@ paths:
         name: login_admin
         required: true
         schema:
-          $ref: '#/definitions/models_v1.LoginRequest'
+          $ref: '#/definitions/models_v1.LoginAdminRequest'
       produces:
       - application/json
       responses:
