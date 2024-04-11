@@ -1370,6 +1370,66 @@
             }
         },
         "/api/product": {
+            "get": {
+                "description": "get all products",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "product"
+                ],
+                "summary": "get all products",
+                "operationId": "getAllProducts",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Category ID to search in",
+                        "name": "cid",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Query to search product",
+                        "name": "q",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Brand ID to search in",
+                        "name": "bid",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Product"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request / bad uuid / status invalid",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Category not found / Brand not found",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal error",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    }
+                }
+            },
             "post": {
                 "security": [
                     {

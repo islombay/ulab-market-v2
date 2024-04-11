@@ -29,6 +29,8 @@ type ProductInterface interface {
 	GetByArticul(ctx context.Context, articul string) (*models.Product, error)
 	CreateProduct(ctx context.Context, m models.Product) error
 
+	GetAll(ctx context.Context, query, catid, bid *string) ([]*models.Product, error)
+
 	DeleteProductByID(ctx context.Context, id string) error
 
 	CreateProductImageFile(ctx context.Context, id, pid, url string) error

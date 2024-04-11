@@ -5,7 +5,9 @@ import (
 	"app/pkg/logs"
 	"app/storage"
 	"context"
+	"fmt"
 	"github.com/jackc/pgx/v4/pgxpool"
+	"strings"
 )
 
 type ProductRepo struct {
@@ -109,4 +111,115 @@ func (db *ProductRepo) DeleteProductByID(ctx context.Context, id string) error {
 		return err
 	}
 	return nil
+}
+
+func (db *ProductRepo) GetProductImageFiles(ctx context.Context, id string) ([]models.ProductMediaFiles, error) {
+	q := `select * from product_image_files where id = $1`
+	rows, _ := db.db.Query(ctx, q, id)
+	if rows.Err() != nil {
+		return nil, rows.Err()
+	}
+	defer rows.Close()
+	var all []models.ProductMediaFiles
+	for rows.Next() {
+		var tmp models.ProductMediaFiles
+		if err := rows.Scan(
+			&tmp.ID,
+			&tmp.ProductID,
+			&tmp.MediaFile,
+		); err != nil {
+			return nil, err
+		}
+		all = append(all, tmp)
+	}
+	return all, nil
+}
+
+func (db *ProductRepo) GetProductVideoFiles(ctx context.Context, id string) ([]models.ProductMediaFiles, error) {
+	q := `select * from product_video_files where id = $1`
+	rows, _ := db.db.Query(ctx, q, id)
+	if rows.Err() != nil {
+		return nil, rows.Err()
+	}
+	defer rows.Close()
+
+	var all []models.ProductMediaFiles
+	for rows.Next() {
+		var tmp models.ProductMediaFiles
+		if err := rows.Scan(
+			&tmp.ID,
+			&tmp.ProductID,
+			&tmp.MediaFile,
+		); err != nil {
+			return nil, err
+		}
+		all = append(all, tmp)
+	}
+	return all, nil
+}
+
+func (db *ProductRepo) GetAll(ctx context.Context, query, catid, bid *string) ([]*models.Product, error) {
+	q := `select * from products`
+	var args []interface{}
+	var whereClause []string
+
+	if catid != nil {
+		whereClause = append(whereClause, fmt.Sprintf("category_id = $%d", len(args)+1))
+		args = append(args, *catid)
+	}
+	if bid != nil {
+		whereClause = append(whereClause, fmt.Sprintf("brand_id = $%d", len(args)+1))
+		args = append(args, *bid)
+	}
+	if query != nil {
+		whereClause = append(whereClause, fmt.Sprintf("(name_uz ilike $%d or name_ru ilike $%d or description_ru ilike $%d or description_uz ilike $%d)", len(args)+1, len(args)+1, len(args)+1, len(args)+1))
+		args = append(args, "%"+*query+"%")
+	}
+
+	if len(whereClause) > 0 {
+		q += " where " + strings.Join(whereClause, " and ")
+	}
+
+	fmt.Println(q)
+
+	var products []*models.Product
+	rows, _ := db.db.Query(ctx, q, args...)
+	if rows.Err() != nil {
+		return nil, rows.Err()
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var m models.Product
+		if err := rows.Scan(
+			&m.ID, &m.Articul,
+			&m.NameUz, &m.NameRu,
+			&m.DescriptionUz, &m.DescriptionRu,
+			&m.IncomePrice, &m.OutcomePrice,
+			&m.Quantity,
+			&m.CategoryID, &m.BrandID,
+			&m.Rating, &m.Status, &m.MainImage,
+			&m.CreatedAt, &m.UpdatedAt, &m.DeletedAt,
+		); err != nil {
+			return nil, err
+		}
+		imgFiles, err := db.GetProductImageFiles(ctx, m.ID)
+		if err != nil {
+			db.log.Error("could not load image files for product", logs.Error(err),
+				logs.String("product_id", m.ID))
+		} else {
+			m.ImageFiles = imgFiles
+		}
+
+		vdFiles, err := db.GetProductVideoFiles(ctx, m.ID)
+		if err != nil {
+			db.log.Error("could not load video files for product", logs.Error(err),
+				logs.String("product_id", m.ID))
+		} else {
+			m.VideoFiles = vdFiles
+		}
+
+		products = append(products, &m)
+	}
+	return products, nil
 }

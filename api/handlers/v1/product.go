@@ -281,3 +281,43 @@ func (v1 *Handlers) CreateProduct(c *gin.Context) {
 
 	v1.response(c, http.StatusOK, pr)
 }
+
+type GetAllProductsQueryParams struct {
+	CategoryID string `form:"cid"`
+	Query      string `form:"q"`
+	BrandID    string `form:"bid"`
+}
+
+// GetAllProducts
+// @id getAllProducts
+// @router /api/product [get]
+// @summary get all products
+// @description get all products
+// @tags product
+// @param cid query string false "Category ID to search in"
+// @param q query string false "Query to search product"
+// @param bid query string false "Brand ID to search in"
+// @produce json
+// @Success 200 {object} []models.Product "Success"
+// @Failure 400 {object} models_v1.Response "Bad request / bad uuid / status invalid"
+// @Failure 404 {object} models_v1.Response "Category not found / Brand not found"
+// @Failure 500 {object} models_v1.Response "Internal error"
+func (v1 *Handlers) GetAllProducts(c *gin.Context) {
+	var m GetAllProductsQueryParams
+	if err := c.ShouldBind(&m); err != nil {
+		v1.error(c, status.StatusInternal)
+		v1.log.Error("bad request", logs.Error(err))
+		return
+	}
+	products, err := v1.storage.Product().GetAll(context.Background(),
+		models.GetStringAddress(m.Query),
+		models.GetStringAddress(m.CategoryID),
+		models.GetStringAddress(m.BrandID))
+	if err != nil {
+		v1.error(c, status.StatusInternal)
+		v1.log.Error("could not get all products", logs.Error(err))
+		return
+	}
+
+	v1.response(c, http.StatusOK, products)
+}

@@ -1238,6 +1238,46 @@ paths:
       tags:
       - owner
   /api/product:
+    get:
+      description: get all products
+      operationId: getAllProducts
+      parameters:
+      - description: Category ID to search in
+        in: query
+        name: cid
+        type: string
+      - description: Query to search product
+        in: query
+        name: q
+        type: string
+      - description: Brand ID to search in
+        in: query
+        name: bid
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            items:
+              $ref: '#/definitions/models.Product'
+            type: array
+        "400":
+          description: Bad request / bad uuid / status invalid
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "404":
+          description: Category not found / Brand not found
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "500":
+          description: Internal error
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+      summary: get all products
+      tags:
+      - product
     post:
       consumes:
       - multipart/form-data

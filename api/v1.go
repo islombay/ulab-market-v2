@@ -129,6 +129,7 @@ func NewV1(
 			handler.MiddlewareStaffPermissionCheck(auth_lib.PermissionCanAddProduct),
 			handler.CreateProduct,
 		)
+		product.GET("", handler.GetAllProducts)
 	}
 
 	v1.GET("/ping", func(c *gin.Context) {
