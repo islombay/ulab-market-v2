@@ -39,3 +39,8 @@ type ProductMediaFiles struct {
 	ProductID string `db:"product_id" json:"product_id,omitempty"`
 	MediaFile string `db:"media_file" json:"media_file,omitempty"`
 }
+
+type GetProductAllLimits struct {
+	Limit  int `json:"limit"`
+	Offset int `json:"offset"`
+}

@@ -130,6 +130,7 @@ func NewV1(
 			handler.CreateProduct,
 		)
 		product.GET("", handler.GetAllProducts)
+		product.GET("/:id", handler.GetProductByID)
 	}
 
 	v1.GET("/ping", func(c *gin.Context) {

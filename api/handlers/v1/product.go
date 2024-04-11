@@ -283,9 +283,11 @@ func (v1 *Handlers) CreateProduct(c *gin.Context) {
 }
 
 type GetAllProductsQueryParams struct {
-	CategoryID string `form:"cid"`
-	Query      string `form:"q"`
-	BrandID    string `form:"bid"`
+	CategoryID *string `form:"cid"`
+	Query      *string `form:"q"`
+	BrandID    *string `form:"bid"`
+	Offset     int     `form:"offset"`
+	Limit      int     `form:"limit"`
 }
 
 // GetAllProducts
@@ -297,6 +299,8 @@ type GetAllProductsQueryParams struct {
 // @param cid query string false "Category ID to search in"
 // @param q query string false "Query to search product"
 // @param bid query string false "Brand ID to search in"
+// @param offset query int false "Offset value. Default 0"
+// @param limit query int false "Limit value. Default 10"
 // @produce json
 // @Success 200 {object} []models.Product "Success"
 // @Failure 400 {object} models_v1.Response "Bad request / bad uuid / status invalid"
@@ -309,10 +313,26 @@ func (v1 *Handlers) GetAllProducts(c *gin.Context) {
 		v1.log.Error("bad request", logs.Error(err))
 		return
 	}
+	if m.CategoryID != nil {
+		if !helper.IsValidUUID(*m.CategoryID) {
+			v1.error(c, status.StatusBadUUID)
+			return
+		}
+	}
+	if m.BrandID != nil {
+		if !helper.IsValidUUID(*m.BrandID) {
+			v1.error(c, status.StatusBadUUID)
+			return
+		}
+	}
 	products, err := v1.storage.Product().GetAll(context.Background(),
-		models.GetStringAddress(m.Query),
-		models.GetStringAddress(m.CategoryID),
-		models.GetStringAddress(m.BrandID))
+		m.Query,
+		m.CategoryID,
+		m.BrandID,
+		models.GetProductAllLimits{
+			Limit:  m.Limit,
+			Offset: m.Offset,
+		})
 	if err != nil {
 		v1.error(c, status.StatusInternal)
 		v1.log.Error("could not get all products", logs.Error(err))
@@ -320,4 +340,54 @@ func (v1 *Handlers) GetAllProducts(c *gin.Context) {
 	}
 
 	v1.response(c, http.StatusOK, products)
+}
+
+// GetProductByID
+// @id getProductByID
+// @router /api/product/{id} [get]
+// @summary get product by id
+// @description get product by id
+// @tags product
+// @param id path string true "product id"
+// @produce json
+// @Success 200 {object} models.Product "Success"
+// @Failure 400 {object} models_v1.Response "Bad request / bad uuid"
+// @Failure 404 {object} models_v1.Response "Product not found"
+// @Failure 500 {object} models_v1.Response "Internal error"
+func (v1 *Handlers) GetProductByID(c *gin.Context) {
+	id := c.Param("id")
+	if !helper.IsValidUUID(id) {
+		v1.error(c, status.StatusBadUUID)
+		return
+	}
+	product, err := v1.storage.Product().GetByID(context.Background(), id)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			v1.error(c, status.StatusProductNotFount)
+			return
+		}
+		v1.error(c, status.StatusInternal)
+		v1.log.Error("could not find product by id", logs.String("product_id", id),
+			logs.Error(err))
+		return
+	}
+	if product.DeletedAt != nil {
+		v1.error(c, status.StatusProductNotFount)
+		return
+	}
+	imgFiles, err := v1.storage.Product().GetProductImageFilesByID(context.Background(), id)
+	if err != nil {
+		v1.error(c, status.StatusInternal)
+		v1.log.Error("could not get image files for a product", logs.Error(err), logs.String("product_id", id))
+	}
+	product.ImageFiles = imgFiles
+
+	vdFiles, err := v1.storage.Product().GetProductVideoFilesByID(context.Background(), id)
+	if err != nil {
+		v1.error(c, status.StatusInternal)
+		v1.log.Error("could not get video files for a product", logs.Error(err), logs.String("product_id", id))
+	}
+	product.VideoFiles = vdFiles
+
+	v1.response(c, http.StatusOK, product)
 }

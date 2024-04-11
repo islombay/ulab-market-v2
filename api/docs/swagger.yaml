@@ -1254,6 +1254,14 @@ paths:
         in: query
         name: bid
         type: string
+      - description: Offset value. Default 0
+        in: query
+        name: offset
+        type: integer
+      - description: Limit value. Default 10
+        in: query
+        name: limit
+        type: integer
       produces:
       - application/json
       responses:
@@ -1376,6 +1384,38 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: create product
+      tags:
+      - product
+  /api/product/{id}:
+    get:
+      description: get product by id
+      operationId: getProductByID
+      parameters:
+      - description: product id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/models.Product'
+        "400":
+          description: Bad request / bad uuid
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "404":
+          description: Product not found
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "500":
+          description: Internal error
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+      summary: get product by id
       tags:
       - product
   /api/roles/attach:

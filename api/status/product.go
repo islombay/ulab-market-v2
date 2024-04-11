@@ -31,4 +31,9 @@ var (
 		Description: "product status invalid",
 		Code:        http.StatusBadRequest,
 	}
+	StatusProductNotFount = Status{
+		Message:     "Product not found",
+		Description: "product not found",
+		Code:        http.StatusNotFound,
+	}
 )

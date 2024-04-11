@@ -71,6 +71,24 @@ func (db *ProductRepo) GetByArticul(ctx context.Context, articul string) (*model
 	return &m, nil
 }
 
+func (db *ProductRepo) GetByID(ctx context.Context, id string) (*models.Product, error) {
+	q := `select * from products where id = $1 and deleted_at is null`
+	var m models.Product
+	if err := db.db.QueryRow(ctx, q, id).Scan(
+		&m.ID, &m.Articul,
+		&m.NameUz, &m.NameRu,
+		&m.DescriptionUz, &m.DescriptionRu,
+		&m.IncomePrice, &m.OutcomePrice,
+		&m.Quantity,
+		&m.CategoryID, &m.BrandID,
+		&m.Rating, &m.Status, &m.MainImage,
+		&m.CreatedAt, &m.UpdatedAt, &m.DeletedAt,
+	); err != nil {
+		return nil, err
+	}
+	return &m, nil
+}
+
 func (db *ProductRepo) CreateProductImageFile(ctx context.Context, id, pid, url string) error {
 	q := `insert into
 	product_image_files (id, product_id, media_file)
@@ -158,10 +176,15 @@ func (db *ProductRepo) GetProductVideoFiles(ctx context.Context, id string) ([]m
 	return all, nil
 }
 
-func (db *ProductRepo) GetAll(ctx context.Context, query, catid, bid *string) ([]*models.Product, error) {
+func (db *ProductRepo) GetAll(ctx context.Context, query, catid, bid *string, req models.GetProductAllLimits) ([]*models.Product, error) {
 	q := `select * from products`
 	var args []interface{}
 	var whereClause []string
+
+	var (
+		offset = " offset 0"
+		limit  = " limit 10"
+	)
 
 	if catid != nil {
 		whereClause = append(whereClause, fmt.Sprintf("category_id = $%d", len(args)+1))
@@ -175,14 +198,25 @@ func (db *ProductRepo) GetAll(ctx context.Context, query, catid, bid *string) ([
 		whereClause = append(whereClause, fmt.Sprintf("(name_uz ilike $%d or name_ru ilike $%d or description_ru ilike $%d or description_uz ilike $%d)", len(args)+1, len(args)+1, len(args)+1, len(args)+1))
 		args = append(args, "%"+*query+"%")
 	}
+	whereClause = append(whereClause, "deleted_at is null")
+
+	if req.Offset > 0 {
+		offset = fmt.Sprintf(" offset %d", req.Offset)
+	}
+
+	if req.Limit > 0 {
+		limit = fmt.Sprintf(" limit %d", req.Limit)
+	}
 
 	if len(whereClause) > 0 {
 		q += " where " + strings.Join(whereClause, " and ")
 	}
 
+	q += offset + limit
+
 	fmt.Println(q)
 
-	var products []*models.Product
+	products := []*models.Product{}
 	rows, _ := db.db.Query(ctx, q, args...)
 	if rows.Err() != nil {
 		return nil, rows.Err()
@@ -222,4 +256,46 @@ func (db *ProductRepo) GetAll(ctx context.Context, query, catid, bid *string) ([
 		products = append(products, &m)
 	}
 	return products, nil
+}
+
+func (db *ProductRepo) GetProductImageFilesByID(ctx context.Context, id string) ([]models.ProductMediaFiles, error) {
+	q := `select * from product_image_files where product_id = $1`
+	res := []models.ProductMediaFiles{}
+	rows, _ := db.db.Query(ctx, q, id)
+	if rows.Err() != nil {
+		return nil, rows.Err()
+	}
+
+	for rows.Next() {
+		var tmp models.ProductMediaFiles
+		if err := rows.Scan(
+			&tmp.ID, &tmp.ProductID, &tmp.MediaFile,
+		); err != nil {
+			return nil, err
+		}
+		res = append(res, tmp)
+	}
+
+	return res, nil
+}
+
+func (db *ProductRepo) GetProductVideoFilesByID(ctx context.Context, id string) ([]models.ProductMediaFiles, error) {
+	q := `select * from product_video_files where product_id = $1`
+	res := []models.ProductMediaFiles{}
+	rows, _ := db.db.Query(ctx, q, id)
+	if rows.Err() != nil {
+		return nil, rows.Err()
+	}
+
+	for rows.Next() {
+		var tmp models.ProductMediaFiles
+		if err := rows.Scan(
+			&tmp.ID, &tmp.ProductID, &tmp.MediaFile,
+		); err != nil {
+			return nil, err
+		}
+		res = append(res, tmp)
+	}
+
+	return res, nil
 }

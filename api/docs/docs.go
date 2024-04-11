@@ -1409,6 +1409,18 @@ const docTemplate = `{
                         "description": "Brand ID to search in",
                         "name": "bid",
                         "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset value. Default 0",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Limit value. Default 10",
+                        "name": "limit",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -1581,6 +1593,54 @@ const docTemplate = `{
                     },
                     "415": {
                         "description": "Image type is not supported / Video type is not supported",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal error",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/product/{id}": {
+            "get": {
+                "description": "get product by id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "product"
+                ],
+                "summary": "get product by id",
+                "operationId": "getProductByID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "product id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/models.Product"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request / bad uuid",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Product not found",
                         "schema": {
                             "$ref": "#/definitions/models_v1.Response"
                         }
