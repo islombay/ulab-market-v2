@@ -361,7 +361,9 @@ func (v1 *Handlers) GetAllCategory(c *gin.Context) {
 			v1.log.Error("could not get translations", logs.Error(err), logs.String("cid", e.ID))
 		}
 		e.Translations = tr
-		e.Image = models.GetStringAddress(v1.filestore.GetURL(*e.Image))
+		if e.Image != nil {
+			e.Image = models.GetStringAddress(v1.filestore.GetURL(*e.Image))
+		}
 
 		subs, err := v1.storage.Category().GetSubcategories(context.Background(), e.ID)
 		if err != nil {
