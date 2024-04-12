@@ -1,6 +1,7 @@
 package models_v1
 
 import (
+	"app/api/models"
 	"mime/multipart"
 	"time"
 )
@@ -60,8 +61,8 @@ type Product struct {
 	MainImage string  `json:"main_image" obj:"main_image"`
 	Rating    float32 `json:"rating" obj:"rating"`
 
-	ImageFiles []string `json:"image_files" obj:"image_files"`
-	VideoFiles []string `json:"video_files" obj:"video_files"`
+	ImageFiles []models.ProductMediaFiles `json:"image_files" obj:"image_files"`
+	VideoFiles []models.ProductMediaFiles `json:"video_files" obj:"video_files"`
 
 	CreatedAt time.Time `db:"created_at" json:"created_at" obj:"created_at"`
 	UpdatedAt time.Time `db:"updated_at" json:"updated_at" obj:"updated_at"`

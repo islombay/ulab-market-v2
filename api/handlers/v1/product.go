@@ -390,6 +390,9 @@ func (v1 *Handlers) GetProductByID(c *gin.Context) {
 		v1.error(c, status.StatusInternal)
 		v1.log.Error("could not get image files for a product", logs.Error(err), logs.String("product_id", id))
 	}
+	for i, _ := range imgFiles {
+		imgFiles[i].MediaFile = v1.filestore.GetURL(imgFiles[i].MediaFile)
+	}
 	product.ImageFiles = imgFiles
 
 	vdFiles, err := v1.storage.Product().GetProductVideoFilesByID(context.Background(), id)
@@ -397,13 +400,25 @@ func (v1 *Handlers) GetProductByID(c *gin.Context) {
 		v1.error(c, status.StatusInternal)
 		v1.log.Error("could not get video files for a product", logs.Error(err), logs.String("product_id", id))
 	}
+	for i, _ := range vdFiles {
+		vdFiles[i].MediaFile = v1.filestore.GetURL(vdFiles[i].MediaFile)
+	}
+
 	product.VideoFiles = vdFiles
 
 	if product.MainImage != nil {
 		product.MainImage = models.GetStringAddress(v1.filestore.GetURL(*product.MainImage))
 	}
 
-	v1.response(c, http.StatusOK, product)
+	var tmp models_v1.Product
+
+	if err := helper.Reobject(*product, &tmp, "obj"); err != nil {
+		v1.error(c, status.StatusInternal)
+		v1.log.Error("could not reobject", logs.Error(err))
+		return
+	}
+
+	v1.response(c, http.StatusOK, tmp)
 }
 
 // ChangeProductMainImage
