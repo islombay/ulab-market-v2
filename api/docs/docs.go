@@ -1723,6 +1723,51 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "delete product",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "product"
+                ],
+                "summary": "delete product",
+                "operationId": "DeleteProduct",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "product id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad ID",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal error",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    }
+                }
             }
         },
         "/api/roles/attach": {

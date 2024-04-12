@@ -119,10 +119,10 @@ func (v1 *Handlers) MiddlewareStaffPermissionCheck(permission models.PermissionM
 				found = true
 			}
 		}
-		if found {
-			c.Next()
-		} else {
+		if !found {
 			v1.error(c, status.StatusForbidden)
+			return
 		}
+		c.Next()
 	}
 }

@@ -499,3 +499,34 @@ func (v1 *Handlers) ValidateImage(img *multipart.FileHeader) *status.Status {
 	}
 	return nil
 }
+
+// DeleteProduct
+// @id DeleteProduct
+// @router /api/product/{id} [delete]
+// @summary delete product
+// @description delete product
+// @tags product
+// @security ApiKeyAuth
+// @param id path string true "product id"
+// @produce json
+// @Success 200 {object} models_v1.Response "Success"
+// @Failure 400 {object} models_v1.Response "Bad ID"
+// @Failure 500 {object} models_v1.Response "Internal error"
+func (v1 *Handlers) DeleteProduct(c *gin.Context) {
+	id := c.Param("id")
+	if !helper.IsValidUUID(id) {
+		v1.error(c, status.StatusBadUUID)
+		return
+	}
+
+	if err := v1.storage.Product().DeleteProduct(context.Background(), id); err != nil {
+		v1.error(c, status.StatusInternal)
+		v1.log.Error("could not delete product", logs.Error(err), logs.String("product_id", id))
+		return
+	}
+
+	v1.response(c, http.StatusOK, models_v1.Response{
+		Code:    200,
+		Message: "Ok",
+	})
+}

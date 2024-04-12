@@ -1387,6 +1387,35 @@ paths:
       tags:
       - product
   /api/product/{id}:
+    delete:
+      description: delete product
+      operationId: DeleteProduct
+      parameters:
+      - description: product id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "400":
+          description: Bad ID
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "500":
+          description: Internal error
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: delete product
+      tags:
+      - product
     get:
       description: get product by id
       operationId: getProductByID

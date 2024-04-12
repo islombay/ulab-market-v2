@@ -135,6 +135,11 @@ func NewV1(
 			handler.ChangeProductMainImage,
 		)
 
+		product.DELETE("/:id",
+			handler.MiddlewareStaffPermissionCheck(auth_lib.PermissionCanDeleteProduct),
+			handler.DeleteProduct,
+		)
+
 		product.GET("", handler.GetAllProducts)
 		product.GET("/:id", handler.GetProductByID)
 	}

@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"strings"
+	"time"
 )
 
 type ProductRepo struct {
@@ -304,6 +305,14 @@ func (db *ProductRepo) ChangeMainImage(ctx context.Context, id, url string) erro
 	q := `update products set main_image = $1 where id = $2`
 	_, err := db.db.Exec(ctx, q, url, id)
 	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (db *ProductRepo) DeleteProduct(ctx context.Context, id string) error {
+	q := `update products set deleted_at = $1 where id = $2`
+	if _, err := db.db.Exec(ctx, q, time.Now(), id); err != nil {
 		return err
 	}
 	return nil

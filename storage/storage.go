@@ -35,6 +35,8 @@ type ProductInterface interface {
 	DeleteProductByID(ctx context.Context, id string) error
 	ChangeMainImage(ctx context.Context, id, url string) error
 
+	DeleteProduct(ctx context.Context, id string) error
+
 	CreateProductImageFile(ctx context.Context, id, pid, url string) error
 	CreateProductVideoFile(ctx context.Context, id, pid, url string) error
 	GetProductVideoFilesByID(ctx context.Context, id string) ([]models.ProductMediaFiles, error)
