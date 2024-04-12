@@ -129,7 +129,7 @@ func (v1 *Handlers) CreateProduct(c *gin.Context) {
 				return
 			}
 			v1.error(c, status.StatusInternal)
-			v1.log.Error("could not check file for validity")
+			v1.log.Error("could not check file for validity", logs.Error(err))
 			return
 		}
 		if m.MainImage.Size > v1.cfg.Media.ProductPhotoMaxSize {
@@ -175,7 +175,7 @@ func (v1 *Handlers) CreateProduct(c *gin.Context) {
 				break
 			}
 			imageFilesStopped.Status = &status.StatusInternal
-			v1.log.Error("could not check file for validity")
+			v1.log.Error("could not check file for validity", logs.Error(err))
 			break
 		}
 		if i.Size > v1.cfg.Media.ProductPhotoMaxSize {
@@ -229,7 +229,7 @@ func (v1 *Handlers) CreateProduct(c *gin.Context) {
 				break
 			}
 			imageFilesStopped.Status = &status.StatusInternal
-			v1.log.Error("could not check file for validity")
+			v1.log.Error("could not check file for validity", logs.Error(err))
 			break
 		}
 		id := uuid.NewString()
@@ -334,6 +334,12 @@ func (v1 *Handlers) GetAllProducts(c *gin.Context) {
 		return
 	}
 
+	for _, p := range products {
+		if p.MainImage != nil {
+			p.MainImage = models.GetStringAddress(v1.filestore.GetURL(*p.MainImage))
+		}
+	}
+
 	v1.response(c, http.StatusOK, products)
 }
 
@@ -383,6 +389,10 @@ func (v1 *Handlers) GetProductByID(c *gin.Context) {
 		v1.log.Error("could not get video files for a product", logs.Error(err), logs.String("product_id", id))
 	}
 	product.VideoFiles = vdFiles
+
+	if product.MainImage != nil {
+		product.MainImage = models.GetStringAddress(v1.filestore.GetURL(*product.MainImage))
+	}
 
 	v1.response(c, http.StatusOK, product)
 }
@@ -457,7 +467,7 @@ func (v1 *Handlers) ValidateImage(img *multipart.FileHeader) *status.Status {
 			v1.log.Error("got invalid image extension", logs.String("got", msg))
 			return &status.StatusImageTypeUnkown
 		}
-		v1.log.Error("could not check file for validity")
+		v1.log.Error("could not check file for validity", logs.Error(err))
 		return &status.StatusInternal
 	}
 	if img.Size > v1.cfg.Media.ProductPhotoMaxSize {

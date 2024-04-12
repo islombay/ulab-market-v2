@@ -332,7 +332,9 @@ func (v1 *Handlers) GetCategoryByID(c *gin.Context) {
 	}
 	cat.Sub = subs
 
-	cat.Image = models.GetStringAddress(v1.filestore.GetURL(*cat.Image))
+	if cat.Image != nil {
+		cat.Image = models.GetStringAddress(v1.filestore.GetURL(*cat.Image))
+	}
 
 	v1.response(c, http.StatusOK, cat)
 }
@@ -376,7 +378,9 @@ func (v1 *Handlers) GetAllCategory(c *gin.Context) {
 			}
 			sub.Translations = trSub
 
-			sub.Image = models.GetStringAddress(v1.filestore.GetURL(*sub.Image))
+			if sub.Image != nil {
+				sub.Image = models.GetStringAddress(v1.filestore.GetURL(*sub.Image))
+			}
 		}
 		e.Sub = subs
 	}
