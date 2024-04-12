@@ -1,6 +1,9 @@
 package models_v1
 
-import "mime/multipart"
+import (
+	"mime/multipart"
+	"time"
+)
 
 type CreateProduct struct {
 	Articul string `json:"articul" form:"articul" binding:"required"`
@@ -37,4 +40,29 @@ type GetAllProductsQueryParams struct {
 type ChangeProductMainImage struct {
 	ProductID string                `form:"product_id" binding:"required"`
 	Image     *multipart.FileHeader `form:"image" binding:"required" swaggerignore:"true"`
+}
+
+type Product struct {
+	ID     string `json:"id" obj:"id"`
+	NameUz string `json:"name_uz" obj:"name_uz"`
+	NameRu string `json:"name_ru" obj:"name_ru"`
+
+	DescriptionUz string `json:"description_uz" obj:"description_uz"`
+	DescriptionRu string `json:"description_ru" obj:"description_ru"`
+
+	Price float64 `json:"price" obj:"price"`
+
+	Quantity int `json:"quantity" obj:"quantity"`
+
+	CategoryID string `json:"category_id" obj:"category_id"`
+	BrandID    string `json:"brand_id" obj:"brand_id"`
+
+	MainImage string  `json:"main_image" obj:"main_image"`
+	Rating    float32 `json:"rating" obj:"rating"`
+
+	ImageFiles []string `json:"image_files" obj:"image_files"`
+	VideoFiles []string `json:"video_files" obj:"video_files"`
+
+	CreatedAt time.Time `db:"created_at" json:"created_at" obj:"created_at"`
+	UpdatedAt time.Time `db:"updated_at" json:"updated_at" obj:"updated_at"`
 }

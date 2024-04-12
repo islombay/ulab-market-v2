@@ -334,13 +334,22 @@ func (v1 *Handlers) GetAllProducts(c *gin.Context) {
 		return
 	}
 
-	for _, p := range products {
+	res := make([]models_v1.Product, len(products))
+
+	for i, p := range products {
 		if p.MainImage != nil {
 			p.MainImage = models.GetStringAddress(v1.filestore.GetURL(*p.MainImage))
 		}
+		tmp := models_v1.Product{}
+		if err := helper.Reobject(*p, &tmp, "obj"); err != nil {
+			v1.error(c, status.StatusInternal)
+			v1.log.Error("could not reobject", logs.Error(err))
+			return
+		}
+		res[i] = tmp
 	}
 
-	v1.response(c, http.StatusOK, products)
+	v1.response(c, http.StatusOK, res)
 }
 
 // GetProductByID
