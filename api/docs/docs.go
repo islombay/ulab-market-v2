@@ -862,7 +862,7 @@ const docTemplate = `{
                 "operationId": "changeCategory",
                 "parameters": [
                     {
-                        "description": "change category",
+                        "description": "change category. all old values must be also given",
                         "name": "changeCategory",
                         "in": "body",
                         "required": true,

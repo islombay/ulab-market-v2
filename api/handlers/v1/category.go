@@ -226,7 +226,7 @@ func (v1 *Handlers) ChangeCategoryImage(c *gin.Context) {
 // @security ApiKeyAuth
 // @accept json
 // @produce json
-// @param changeCategory body models_v1.ChangeCategory true "change category"
+// @param changeCategory body models_v1.ChangeCategory true "change category. all old values must be also given"
 // @Success 200 {object} models_v1.Response "Success"
 // @Failure 400 {object} models_v1.Response "Bad request / bad uuid"
 // @Failure 404 {object} models_v1.Response "Category not found/ parent category not found"
