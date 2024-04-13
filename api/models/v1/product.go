@@ -67,3 +67,8 @@ type Product struct {
 	CreatedAt time.Time `db:"created_at" json:"created_at" obj:"created_at"`
 	UpdatedAt time.Time `db:"updated_at" json:"updated_at" obj:"updated_at"`
 }
+
+type AddProductMediaFiles struct {
+	ProductID  string                  `form:"product_id" binding:"required"`
+	MediaFiles []*multipart.FileHeader `form:"media_files" swaggerignore:"true" binding:"required"`
+}

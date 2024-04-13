@@ -1447,6 +1447,108 @@ paths:
       summary: get product by id
       tags:
       - product
+  /api/product/add_image_files:
+    post:
+      consumes:
+      - multipart/form-data
+      description: add image files to product
+      operationId: AddProductImageFiles
+      parameters:
+      - in: formData
+        name: product_id
+        required: true
+        type: string
+      - collectionFormat: csv
+        description: image files
+        in: formData
+        items:
+          type: file
+        name: media_files
+        required: true
+        type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "400":
+          description: Bad request / bad uuid
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "404":
+          description: Product not found
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "413":
+          description: Image size is big / Image count too many
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "415":
+          description: Image type is not supported
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "500":
+          description: Internal error
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: add image files to product
+      tags:
+      - product
+  /api/product/add_video_files:
+    post:
+      consumes:
+      - multipart/form-data
+      description: add video files to product
+      operationId: AddProductVideoFiles
+      parameters:
+      - in: formData
+        name: product_id
+        required: true
+        type: string
+      - collectionFormat: csv
+        description: video files
+        in: formData
+        items:
+          type: file
+        name: media_files
+        required: true
+        type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "400":
+          description: Bad request / bad uuid
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "404":
+          description: Product not found
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "413":
+          description: Video size is big / Video count too many
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "415":
+          description: Video type is not supported
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "500":
+          description: Internal error
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: add video files to product
+      tags:
+      - product
   /api/product/change_image:
     post:
       description: change image of a product

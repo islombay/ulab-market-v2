@@ -140,6 +140,16 @@ func NewV1(
 			handler.DeleteProduct,
 		)
 
+		product.POST("/add_image_files",
+			handler.MiddlewareStaffPermissionCheck(auth_lib.PermissionCanEditProduct),
+			handler.AddProductImageFiles,
+		)
+
+		product.POST("/add_video_files",
+			handler.MiddlewareStaffPermissionCheck(auth_lib.PermissionCanEditProduct),
+			handler.AddProductVideoFiles,
+		)
+
 		product.GET("", handler.GetAllProducts)
 		product.GET("/:id", handler.GetProductByID)
 	}
