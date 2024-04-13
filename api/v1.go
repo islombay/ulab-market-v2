@@ -58,10 +58,14 @@ func NewV1(
 			handler.MiddlewareStaffPermissionCheck(auth_lib.PermissionCategoryAdd),
 			handler.CreateCategory,
 		)
-		category.POST("/add_translation",
+		category.POST("/translation",
 			handler.MiddlewareStaffPermissionCheck(auth_lib.PermissionCategoryAdd),
 			handler.AddCategoryTranslation,
 		)
+
+		category.DELETE("/translation",
+			handler.MiddlewareStaffPermissionCheck(auth_lib.PermissionCategoryDelete),
+			handler.DeleteCategoryTranslation)
 
 		category.POST("/change_image",
 			handler.MiddlewareStaffPermissionCheck(auth_lib.PermissionCategoryEdit),

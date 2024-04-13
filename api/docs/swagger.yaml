@@ -1028,47 +1028,6 @@ paths:
       summary: get category by id
       tags:
       - category
-  /api/category/add_translation:
-    post:
-      consumes:
-      - application/json
-      description: Create category translation
-      operationId: AddCategoryTranslation
-      parameters:
-      - description: Create category translation request
-        in: body
-        name: create_category_translation
-        required: true
-        schema:
-          $ref: '#/definitions/models_v1.CategoryTranslation'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: success
-          schema:
-            $ref: '#/definitions/models_v1.Response'
-        "400":
-          description: Bad request/ Bad id
-          schema:
-            $ref: '#/definitions/models_v1.Response'
-        "404":
-          description: Category not found
-          schema:
-            $ref: '#/definitions/models_v1.Response'
-        "409":
-          description: Already exists
-          schema:
-            $ref: '#/definitions/models_v1.Response'
-        "500":
-          description: internal error
-          schema:
-            $ref: '#/definitions/models_v1.Response'
-      security:
-      - ApiKeyAuth: []
-      summary: Create category translation
-      tags:
-      - category
   /api/category/change_image:
     post:
       consumes:
@@ -1115,6 +1074,83 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: change category image
+      tags:
+      - category
+  /api/category/translation:
+    delete:
+      consumes:
+      - application/json
+      description: delete category translation
+      operationId: DeleteCategoryTranslation
+      parameters:
+      - description: category id
+        in: query
+        name: category_id
+        required: true
+        type: string
+      - description: language code
+        in: query
+        name: language
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: deleted successfully
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "400":
+          description: bad uuid
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "500":
+          description: Internal error
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: delete category translation
+      tags:
+      - category
+    post:
+      consumes:
+      - application/json
+      description: Create category translation
+      operationId: AddCategoryTranslation
+      parameters:
+      - description: Create category translation request
+        in: body
+        name: create_category_translation
+        required: true
+        schema:
+          $ref: '#/definitions/models_v1.CategoryTranslation'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "400":
+          description: Bad request/ Bad id
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "404":
+          description: Category not found
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "409":
+          description: Already exists
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "500":
+          description: internal error
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Create category translation
       tags:
       - category
   /api/owner:

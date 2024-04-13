@@ -95,6 +95,14 @@ func (db *CategoryRepo) AddTranslation(ctx context.Context, m models.CategoryTra
 	return nil
 }
 
+func (db *CategoryRepo) DeleteTranslation(ctx context.Context, cid, lang string) error {
+	q := `delete from category_translation where category_id = $1 and language = $2`
+	if _, err := db.db.Exec(ctx, q, cid, lang); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (db *CategoryRepo) ChangeImage(ctx context.Context, cid, imageUrl string) error {
 	q := `update category set image = $1 where id = $2`
 	ra, err := db.db.Exec(ctx, q, imageUrl, cid)

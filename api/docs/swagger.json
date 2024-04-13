@@ -944,70 +944,6 @@
                 }
             }
         },
-        "/api/category/add_translation": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Create category translation",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "category"
-                ],
-                "summary": "Create category translation",
-                "operationId": "AddCategoryTranslation",
-                "parameters": [
-                    {
-                        "description": "Create category translation request",
-                        "name": "create_category_translation",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models_v1.CategoryTranslation"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "success",
-                        "schema": {
-                            "$ref": "#/definitions/models_v1.Response"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad request/ Bad id",
-                        "schema": {
-                            "$ref": "#/definitions/models_v1.Response"
-                        }
-                    },
-                    "404": {
-                        "description": "Category not found",
-                        "schema": {
-                            "$ref": "#/definitions/models_v1.Response"
-                        }
-                    },
-                    "409": {
-                        "description": "Already exists",
-                        "schema": {
-                            "$ref": "#/definitions/models_v1.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "internal error",
-                        "schema": {
-                            "$ref": "#/definitions/models_v1.Response"
-                        }
-                    }
-                }
-            }
-        },
         "/api/category/change_image": {
             "post": {
                 "security": [
@@ -1069,6 +1005,125 @@
                     },
                     "415": {
                         "description": "Image type is not supported",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal error",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/category/translation": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Create category translation",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "category"
+                ],
+                "summary": "Create category translation",
+                "operationId": "AddCategoryTranslation",
+                "parameters": [
+                    {
+                        "description": "Create category translation request",
+                        "name": "create_category_translation",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.CategoryTranslation"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request/ Bad id",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Category not found",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    },
+                    "409": {
+                        "description": "Already exists",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "internal error",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "delete category translation",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "category"
+                ],
+                "summary": "delete category translation",
+                "operationId": "DeleteCategoryTranslation",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "category id",
+                        "name": "category_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "language code",
+                        "name": "language",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "deleted successfully",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "bad uuid",
                         "schema": {
                             "$ref": "#/definitions/models_v1.Response"
                         }

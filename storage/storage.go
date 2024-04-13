@@ -92,6 +92,7 @@ type CategoryInterface interface {
 	GetAll(ctx context.Context) ([]*models.Category, error)
 
 	DeleteCategory(ctx context.Context, id string) error
+	DeleteTranslation(ctx context.Context, cid, lang string) error
 }
 
 type BrandInterface interface {

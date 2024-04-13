@@ -23,3 +23,8 @@ type ChangeCategory struct {
 	Name     string `json:"name" binding:"required"`
 	ParentID string `json:"parent_id"`
 }
+
+type DeleteCategoryRequest struct {
+	CategoryID string `form:"category_id" binding:"required"`
+	Language   string `form:"language" binding:"required"`
+}

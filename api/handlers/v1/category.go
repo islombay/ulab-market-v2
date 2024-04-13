@@ -77,7 +77,7 @@ func (v1 *Handlers) CreateCategory(c *gin.Context) {
 
 // AddCategoryTranslation godoc
 // @ID AddCategoryTranslation
-// @Router /api/category/add_translation [post]
+// @Router /api/category/translation [post]
 // @Summary Create category translation
 // @Description Create category translation
 // @Tags category
@@ -419,6 +419,45 @@ func (v1 *Handlers) DeleteCategory(c *gin.Context) {
 	if err := v1.storage.Category().DeleteCategory(context.Background(), id); err != nil {
 		v1.log.Error("could not delete category", logs.Error(err), logs.String("cid", id))
 		v1.error(c, status.StatusInternal)
+		return
+	}
+
+	v1.response(c, http.StatusOK, models_v1.Response{
+		Code:    200,
+		Message: "Ok",
+	})
+}
+
+// DeleteCategoryTranslation
+// @id DeleteCategoryTranslation
+// @router /api/category/translation [delete]
+// @tags category
+// @accept json
+// @security ApiKeyAuth
+// @produce json
+// @summary delete category translation
+// @param category_id query string true "category id"
+// @param language query string true "language code"
+// @description delete category translation
+// @success 200 {object} models_v1.Response "deleted successfully"
+// @failure 400 {object} models_v1.Response "bad uuid"
+// @failure 500 {object} models_v1.Response "Internal error"
+func (v1 *Handlers) DeleteCategoryTranslation(c *gin.Context) {
+	var m models_v1.DeleteCategoryRequest
+	if err := c.Bind(&m); err != nil {
+		v1.error(c, status.StatusBadRequest)
+		v1.log.Debug("bad request from client", logs.Error(err))
+		return
+	}
+
+	if !helper.IsValidUUID(m.CategoryID) {
+		v1.error(c, status.StatusBadUUID)
+		return
+	}
+
+	if err := v1.storage.Category().DeleteTranslation(context.Background(), m.CategoryID, m.Language); err != nil {
+		v1.error(c, status.StatusInternal)
+		v1.log.Error("could not delete category translation", logs.Error(err), logs.String("cid", m.CategoryID))
 		return
 	}
 
