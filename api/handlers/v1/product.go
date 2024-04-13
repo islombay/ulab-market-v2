@@ -346,6 +346,9 @@ func (v1 *Handlers) GetAllProducts(c *gin.Context) {
 			v1.log.Error("could not reobject", logs.Error(err))
 			return
 		}
+		if p.MainImage != nil {
+			tmp.MainImage = *p.MainImage
+		}
 		res[i] = tmp
 	}
 
@@ -416,6 +419,10 @@ func (v1 *Handlers) GetProductByID(c *gin.Context) {
 		v1.error(c, status.StatusInternal)
 		v1.log.Error("could not reobject", logs.Error(err))
 		return
+	}
+
+	if product.MainImage != nil {
+		tmp.MainImage = *product.MainImage
 	}
 
 	v1.response(c, http.StatusOK, tmp)
