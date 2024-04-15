@@ -4,6 +4,7 @@ import (
 	"app/api/models"
 	"context"
 	"fmt"
+	"time"
 )
 
 var (
@@ -33,7 +34,7 @@ type ProductInterface interface {
 	GetByID(ctx context.Context, id string) (*models.Product, error)
 
 	DeleteProductByID(ctx context.Context, id string) error
-	ChangeMainImage(ctx context.Context, id, url string) error
+	ChangeMainImage(ctx context.Context, id, url string, now time.Time) error
 
 	DeleteProduct(ctx context.Context, id string) error
 

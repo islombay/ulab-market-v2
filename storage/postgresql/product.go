@@ -301,9 +301,9 @@ func (db *ProductRepo) GetProductVideoFilesByID(ctx context.Context, id string) 
 	return res, nil
 }
 
-func (db *ProductRepo) ChangeMainImage(ctx context.Context, id, url string) error {
-	q := `update products set main_image = $1 where id = $2`
-	_, err := db.db.Exec(ctx, q, url, id)
+func (db *ProductRepo) ChangeMainImage(ctx context.Context, id, url string, now time.Time) error {
+	q := `update products set main_image = $1, updated_at = $3 where id = $2`
+	_, err := db.db.Exec(ctx, q, url, id, now)
 	if err != nil {
 		return err
 	}

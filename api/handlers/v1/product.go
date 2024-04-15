@@ -10,11 +10,13 @@ import (
 	"app/storage/filestore"
 	"context"
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v4"
 	"mime/multipart"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -466,26 +468,36 @@ func (v1 *Handlers) ChangeProductMainImage(c *gin.Context) {
 			logs.String("product_id", m.ProductID))
 		return
 	}
-	if product.MainImage != nil {
-		defer v1.filestore.DeleteFile(*product.MainImage)
-	}
 
 	if st := v1.ValidateImage(m.Image); st != nil {
+		fmt.Println(st.Code)
 		v1.error(c, *st)
 		return
 	}
-	internalURL, err := v1.filestore.Create(m.Image, filestore.FolderProduct, m.ProductID)
+
+	now := time.Now()
+	imageURL := product.ID + "-" + strconv.FormatInt(now.Unix(), 10)
+	internalURL, err := v1.filestore.Create(m.Image, filestore.FolderProduct, imageURL)
 	if err != nil {
 		v1.error(c, status.StatusInternal)
 		return
 	}
 
-	if err := v1.storage.Product().ChangeMainImage(context.Background(), m.ProductID, internalURL); err != nil {
+	if err := v1.storage.Product().ChangeMainImage(context.Background(), product.ID, internalURL, now); err != nil {
 		v1.error(c, status.StatusInternal)
 		v1.log.Error("could not change main image", logs.Error(err),
 			logs.String("product_id", m.ProductID))
 		return
 	}
+
+	if product.MainImage != nil {
+		defer func() {
+			if err := v1.filestore.DeleteFile(*product.MainImage); err != nil {
+				v1.log.Debug("could not delete image file", logs.Error(err))
+			}
+		}()
+	}
+
 	v1.response(c, http.StatusOK, models_v1.Response{
 		Code:    200,
 		Message: "Ok",
@@ -736,4 +748,14 @@ func (v1 *Handlers) AddProductVideoFiles(c *gin.Context) {
 		Code:    200,
 		Message: "Ok",
 	})
+}
+
+func (v1 *Handlers) EditProduct(c *gin.Context) {
+	var m models_v1.ChangeProductRequest
+	if err := c.BindJSON(&m); err != nil {
+		v1.error(c, status.StatusBadRequest)
+		v1.log.Debug("bad request: editproduct", logs.Error(err))
+		return
+	}
+
 }

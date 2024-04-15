@@ -72,3 +72,23 @@ type AddProductMediaFiles struct {
 	ProductID  string                  `form:"product_id" binding:"required"`
 	MediaFiles []*multipart.FileHeader `form:"media_files" swaggerignore:"true" binding:"required"`
 }
+
+type ChangeProductRequest struct {
+	ID      string `json:"id" binding:"required"`
+	Articul string `json:"articul" binding:"required"`
+	NameUz  string `json:"name_uz"`
+	NameRu  string `json:"name_ru"`
+
+	DescriptionUz string `json:"description_uz" binding:"required"`
+	DescriptionRu string `json:"description_ru" binding:"required"`
+
+	IncomePrice  float32 `json:"income_price"`
+	OutcomePrice float64 `json:"outcome_price"binding:"required"`
+
+	Quantity int `json:"quantity"`
+
+	CategoryID string `json:"category_id"`
+	BrandID    string `json:"brand_id"`
+
+	Status string `json:"status" binding:"required"`
+}

@@ -103,7 +103,6 @@ func (fs *Filestore) Create(model *multipart.FileHeader, imageFolder appStorage.
 		idPath = "test/" + idPath
 	}
 
-	fmt.Println(idPath)
 	wc := fs.bucket.Object(idPath).NewWriter(context.Background())
 
 	wc.ObjectAttrs.Metadata = map[string]string{
