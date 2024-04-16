@@ -1,5 +1,7 @@
 package models
 
+import "time"
+
 type Category struct {
 	ID           string                `json:"id" db:"id"`
 	Name         string                `json:"name" db:"name"`
@@ -7,6 +9,8 @@ type Category struct {
 	ParentID     *string               `json:"parent_id,omitempty" db:"parent_id"`
 	Sub          []*Category           `json:"subcategories,omitempty"`
 	Translations []CategoryTranslation `json:"translations"`
+
+	CreatedAt time.Time `db:"created_at" json:"created_at"`
 }
 
 type CategoryTranslation struct {
@@ -22,6 +26,7 @@ type CategorySwagger struct {
 	ParentID     *string               `json:"parent_id,omitempty" example:""`
 	Sub          []*SubCategorySwagger `json:"subcategories,omitempty"`
 	Translations []CategoryTranslation `json:"translations"`
+	CreatedAt    time.Time             `json:"created_at"`
 }
 
 type SubCategorySwagger struct {

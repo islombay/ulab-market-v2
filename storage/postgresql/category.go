@@ -21,9 +21,9 @@ func NewCategoryRepo(db *pgxpool.Pool, log logs.LoggerInterface) *CategoryRepo {
 }
 
 func (db *CategoryRepo) Create(ctx context.Context, m models.Category) error {
-	q := `insert into category (id, name, parent_id) values ($1, $2, $3)`
+	q := `insert into category (id, name, parent_id, created_at) values ($1, $2, $3, $4)`
 	fmt.Println(m.ParentID == nil)
-	ra, err := db.db.Exec(ctx, q, m.ID, m.Name, m.ParentID)
+	ra, err := db.db.Exec(ctx, q, m.ID, m.Name, m.ParentID, m.CreatedAt)
 	if err != nil {
 		var pgcon *pgconn.PgError
 		if errors.As(err, &pgcon) {
@@ -48,6 +48,7 @@ func (db *CategoryRepo) GetByID(ctx context.Context, id string) (*models.Categor
 		&m.Name,
 		&m.Image,
 		&m.ParentID,
+		&m.CreatedAt,
 	); err != nil {
 		return nil, err
 	}
@@ -69,6 +70,7 @@ func (db *CategoryRepo) GetAll(ctx context.Context) ([]*models.Category, error) 
 			&tmp.Name,
 			&tmp.Image,
 			&tmp.ParentID,
+			&tmp.CreatedAt,
 		); err != nil {
 			db.log.Error("could not scan category", logs.Error(err))
 		}

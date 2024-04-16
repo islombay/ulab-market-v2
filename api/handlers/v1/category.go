@@ -14,6 +14,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v4"
 	"net/http"
+	"time"
 )
 
 // CreateCategory godoc
@@ -55,9 +56,10 @@ func (v1 *Handlers) CreateCategory(c *gin.Context) {
 	var pn = models.GetStringAddress(m.ParentID)
 
 	ct := models.Category{
-		ID:       uuid.New().String(),
-		Name:     m.Name,
-		ParentID: pn,
+		ID:        uuid.New().String(),
+		Name:      m.Name,
+		ParentID:  pn,
+		CreatedAt: time.Now(),
 	}
 	if err := v1.storage.Category().Create(context.Background(), ct); err != nil {
 		if errors.Is(err, storage.ErrNotAffected) {

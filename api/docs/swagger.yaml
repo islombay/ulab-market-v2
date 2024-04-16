@@ -18,6 +18,8 @@ definitions:
     type: object
   models.CategorySwagger:
     properties:
+      created_at:
+        type: string
       id:
         example: a2d70daf-b4ac-4198-a6a0-999447483c18
         type: string

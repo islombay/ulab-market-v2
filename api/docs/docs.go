@@ -2202,6 +2202,9 @@ const docTemplate = `{
         "models.CategorySwagger": {
             "type": "object",
             "properties": {
+                "created_at": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "string",
                     "example": "a2d70daf-b4ac-4198-a6a0-999447483c18"
