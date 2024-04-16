@@ -1,6 +1,7 @@
 package handlersv1
 
 import (
+	"app/api/models"
 	models_v1 "app/api/models/v1"
 	"app/api/status"
 	"app/pkg/helper"
@@ -126,5 +127,66 @@ func (v1 *Handlers) GetBasket(c *gin.Context) {
 		)
 		return
 	}
+	if res == nil {
+		res = []models.BasketModel{}
+	}
 	v1.response(c, http.StatusOK, res)
+}
+
+// DeleteFromBasket
+// @id DeleteFromBasket
+// @router /api/basket [delete]
+// @summary delete from basket
+// @description delete from basket
+// @tags basket
+// @accept json
+// @produce json
+// @security ApiKeyAuth
+// @param delete_from_basket body models_v1.RemoveFromBasket true "Remove from basket information"
+// @success 200 {object} models_v1.Response "Success"
+// @failure 400 {object} models_v1.Response "Bad request / invalid product id"
+// @failure 500 {object} models_v1.Response "Internal error"
+func (v1 *Handlers) DeleteFromBasket(c *gin.Context) {
+	var m models_v1.RemoveFromBasket
+	if err := c.BindJSON(&m); err != nil {
+		v1.error(c, status.StatusBadRequest)
+		return
+	}
+
+	if !helper.IsValidUUID(m.ProductID) {
+		v1.error(c, status.StatusBadUUID)
+		return
+	}
+
+	val, ok := c.Get(UserIDContext)
+	if !ok {
+		v1.error(c, status.StatusUnauthorized)
+		return
+	}
+
+	str, ok := val.(string)
+	if !ok {
+		v1.error(c, status.StatusUnauthorized)
+		return
+	}
+
+	if !helper.IsValidUUID(str) {
+		v1.error(c, status.StatusInternal)
+		return
+	}
+
+	if err := v1.storage.Basket().Delete(context.Background(), str, m.ProductID); err != nil {
+		v1.error(c, status.StatusInternal)
+		v1.log.Error("could not delete from basket",
+			logs.Error(err),
+			logs.String("uid", str),
+			logs.String("pid", m.ProductID),
+		)
+		return
+	}
+
+	v1.response(c, http.StatusOK, models_v1.Response{
+		Code:    200,
+		Message: "Ok",
+	})
 }

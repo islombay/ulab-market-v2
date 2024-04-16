@@ -159,6 +159,11 @@ func NewV1(
 			handler.AddProductVideoFiles,
 		)
 
+		product.PUT("",
+			handler.MiddlewareStaffPermissionCheck(auth_lib.PermissionCanEditProduct),
+			handler.EditProduct,
+		)
+
 		product.GET("", handler.GetAllProducts)
 		product.GET("/:id", handler.GetProductByID)
 	}
@@ -173,6 +178,11 @@ func NewV1(
 		basket.GET("",
 			handler.MiddlewareIsClient(),
 			handler.GetBasket,
+		)
+
+		basket.DELETE("",
+			handler.MiddlewareIsClient(),
+			handler.DeleteFromBasket,
 		)
 	}
 

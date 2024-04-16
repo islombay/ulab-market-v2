@@ -31,6 +31,7 @@ type BasketInterface interface {
 	Add(ctx context.Context, user_id, product_id string, quantity int, created_at time.Time) error
 	Get(ctx context.Context, user_id, product_id string) (*models.BasketModel, error)
 	GetAll(ctx context.Context, user_id string) ([]models.BasketModel, error)
+	Delete(ctx context.Context, user_id, product_id string) error
 }
 
 type ProductInterface interface {

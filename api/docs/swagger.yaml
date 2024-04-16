@@ -154,6 +154,9 @@ definitions:
         type: string
       quantity:
         type: integer
+    required:
+    - product_id
+    - quantity
     type: object
   models_v1.CategoryTranslation:
     properties:
@@ -299,6 +302,13 @@ definitions:
     - name
     - password
     - phone_number
+    type: object
+  models_v1.RemoveFromBasket:
+    properties:
+      product_id:
+        type: string
+    required:
+    - product_id
     type: object
   models_v1.RequestCode:
     properties:
@@ -730,6 +740,38 @@ paths:
       tags:
       - auth
   /api/basket:
+    delete:
+      consumes:
+      - application/json
+      description: delete from basket
+      operationId: DeleteFromBasket
+      parameters:
+      - description: Remove from basket information
+        in: body
+        name: delete_from_basket
+        required: true
+        schema:
+          $ref: '#/definitions/models_v1.RemoveFromBasket'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "400":
+          description: Bad request / invalid product id
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "500":
+          description: Internal error
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: delete from basket
+      tags:
+      - basket
     get:
       consumes:
       - application/json

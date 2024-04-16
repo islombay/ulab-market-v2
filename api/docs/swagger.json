@@ -641,6 +641,56 @@
                         }
                     }
                 }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "delete from basket",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "basket"
+                ],
+                "summary": "delete from basket",
+                "operationId": "DeleteFromBasket",
+                "parameters": [
+                    {
+                        "description": "Remove from basket information",
+                        "name": "delete_from_basket",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.RemoveFromBasket"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request / invalid product id",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal error",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    }
+                }
             }
         },
         "/api/brand": {
@@ -2534,6 +2584,10 @@
         },
         "models_v1.AddToBasket": {
             "type": "object",
+            "required": [
+                "product_id",
+                "quantity"
+            ],
             "properties": {
                 "product_id": {
                     "type": "string"
@@ -2751,6 +2805,17 @@
                 "phone_number": {
                     "type": "string",
                     "example": "998912345678"
+                }
+            }
+        },
+        "models_v1.RemoveFromBasket": {
+            "type": "object",
+            "required": [
+                "product_id"
+            ],
+            "properties": {
+                "product_id": {
+                    "type": "string"
                 }
             }
         },

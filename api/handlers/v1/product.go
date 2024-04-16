@@ -757,5 +757,4 @@ func (v1 *Handlers) EditProduct(c *gin.Context) {
 		v1.log.Debug("bad request: editproduct", logs.Error(err))
 		return
 	}
-
 }
