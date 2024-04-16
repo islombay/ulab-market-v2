@@ -8,7 +8,7 @@ create table if not exists products (
     description_uz text not null default '',
     description_ru text not null default '',
 
-    income_price numeric not null default 0,
+--     income_price numeric not null default 0,
     outcome_price numeric not null,
 
     quantity int not null default 0,

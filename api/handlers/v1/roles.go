@@ -10,6 +10,7 @@ import (
 	"context"
 	"errors"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v4"
 	"net/http"
 )
@@ -196,4 +197,44 @@ func (v1 *Handlers) DisAttachPermissionToRole(c *gin.Context) {
 		Code:    200,
 		Message: "Ok",
 	})
+}
+
+// CreateNewRole
+// @id CreateNewRole
+// @router /api/roles/role [post]
+// @summary create new role
+// @description create new role
+// @security ApiKeyAuth
+// @tags role
+// @accept json
+// @produce json
+// @param create_new_role body models_v1.CreateNewRole true "create new role body"
+// @success 200 {object} models.RoleModel "New role body"
+// @failure 400 {object} models_v1.Response "Bad request"
+// @failure 500 {object} models_v1.Response "Internal"
+func (v1 *Handlers) CreateNewRole(c *gin.Context) {
+	var m models_v1.CreateNewRole
+	if err := c.BindJSON(&m); err != nil {
+		v1.error(c, status.StatusBadRequest)
+		return
+	}
+
+	tmp := models.RoleModel{
+		ID:          uuid.NewString(),
+		Name:        m.Name,
+		Description: models.GetStringAddress(m.Description),
+		Permissions: nil,
+	}
+
+	if err := v1.storage.Role().CreateRole(context.Background(), tmp); err != nil {
+		if errors.Is(err, storage.ErrAlreadyExists) {
+			v1.error(c, status.StatusAlreadyExists)
+			return
+		}
+		v1.error(c, status.StatusInternal)
+		v1.log.Error("could not create role", logs.Error(err))
+		return
+	}
+
+	v1.response(c, http.StatusOK, tmp)
 }

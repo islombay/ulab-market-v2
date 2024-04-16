@@ -53,7 +53,10 @@ var (
 		ID:          uuid.New().String(),
 		Name:        "client",
 		Description: models.GetStringAddress("client model for any other role"),
-		Permissions: []models.PermissionModel{},
+		Permissions: []models.PermissionModel{
+			PermissionAddToBasket,
+			PermissionCanAddRole,
+		},
 	}
 	RoleAdmin = models.RoleModel{
 		ID:          uuid.New().String(),
@@ -87,6 +90,11 @@ var (
 			PermissionCanAttachRole,
 		},
 	}
+)
+
+var (
+	PermissionAddToBasket      = models.PermissionModel{ID: uuid.NewString(), Name: "can_add_to_basket"}
+	PermissionRemoveFromBasket = models.PermissionModel{ID: uuid.NewString(), Name: "can_remove_from_basket"}
 )
 
 var (
@@ -135,6 +143,9 @@ var (
 
 var PermissionsList = []*models.PermissionModel{
 	&PermissionCanMigrateDown,
+
+	&PermissionAddToBasket,
+	&PermissionRemoveFromBasket,
 
 	&PermissionCanAddRole,
 	&PermissionCanEditRole,

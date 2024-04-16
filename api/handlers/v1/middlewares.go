@@ -37,6 +37,23 @@ func (v1 *Handlers) MiddlewareIsStaff() gin.HandlerFunc {
 	}
 }
 
+func (v1 *Handlers) MiddlewareIsClient() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		token, st := v1.middlewareToken(c)
+		if st != nil {
+			v1.error(c, *st)
+			return
+		}
+		if token.Type != TokenClient {
+			v1.error(c, status.StatusForbidden)
+			v1.log.Debug("forbidden operation", logs.String("need", TokenClient), logs.String("have", token.Type))
+			return
+		}
+		c.Set(UserIDContext, token.UID)
+		c.Next()
+	}
+}
+
 func (v1 *Handlers) MiddlewareIsSuper() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token, st := v1.middlewareToken(c)

@@ -24,6 +24,13 @@ type StoreInterface interface {
 	Category() CategoryInterface
 	Brand() BrandInterface
 	Product() ProductInterface
+	Basket() BasketInterface
+}
+
+type BasketInterface interface {
+	Add(ctx context.Context, user_id, product_id string, quantity int, created_at time.Time) error
+	Get(ctx context.Context, user_id, product_id string) (*models.BasketModel, error)
+	GetAll(ctx context.Context, user_id string) ([]models.BasketModel, error)
 }
 
 type ProductInterface interface {
@@ -77,6 +84,7 @@ type UserInterface interface {
 	GetClientByEmail(ctx context.Context, e string) (*models.Client, error)
 	GetClientByPhone(ctx context.Context, p string) (*models.Client, error)
 	GetClientByLogin(ctx context.Context, l string) (*models.Client, error)
+	GetClientByID(ctx context.Context, id string) (*models.Client, error)
 }
 
 type CategoryInterface interface {

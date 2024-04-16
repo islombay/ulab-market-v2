@@ -167,6 +167,7 @@ func (db *CategoryRepo) GetSubcategories(ctx context.Context, id string) ([]*mod
 			&tmp.Name,
 			&tmp.Image,
 			&tmp.ParentID,
+			&tmp.CreatedAt,
 		); err != nil {
 			db.log.Error("could not subcategory", logs.Error(err), logs.String("cid", id))
 		} else {

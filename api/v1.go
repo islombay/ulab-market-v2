@@ -125,6 +125,11 @@ func NewV1(
 			handler.MiddlewareStaffPermissionCheck(auth_lib.PermissionCanAttachRole),
 			handler.DisAttachPermissionToRole,
 		)
+
+		role.POST("/role",
+			handler.MiddlewareStaffPermissionCheck(auth_lib.PermissionCanAddRole),
+			handler.CreateNewRole,
+		)
 	}
 
 	product := v1.Group("/product")
@@ -156,6 +161,19 @@ func NewV1(
 
 		product.GET("", handler.GetAllProducts)
 		product.GET("/:id", handler.GetProductByID)
+	}
+
+	basket := v1.Group("/basket")
+	{
+		basket.POST("",
+			handler.MiddlewareIsClient(),
+			handler.AddToBasket,
+		)
+
+		basket.GET("",
+			handler.MiddlewareIsClient(),
+			handler.GetBasket,
+		)
 	}
 
 	v1.GET("/ping", func(c *gin.Context) {

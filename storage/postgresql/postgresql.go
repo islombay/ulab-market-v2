@@ -18,6 +18,7 @@ type Store struct {
 	category storage.CategoryInterface
 	brand    storage.BrandInterface
 	product  storage.ProductInterface
+	basket   storage.BasketInterface
 
 	log logs.LoggerInterface
 }
@@ -92,4 +93,11 @@ func (s *Store) Product() storage.ProductInterface {
 		s.product = NewProductRepo(s.db, s.log)
 	}
 	return s.product
+}
+
+func (s *Store) Basket() storage.BasketInterface {
+	if s.basket == nil {
+		s.basket = NewBasketRepo(s.db)
+	}
+	return s.basket
 }

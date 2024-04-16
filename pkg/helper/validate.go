@@ -13,6 +13,20 @@ var (
 	ErrInvalidVideoType = fmt.Errorf("invalid_video_type")
 )
 
+var (
+	validImageTypes = []string{
+		"image/jpg",
+		"image/webp",
+		"image/png",
+		"image/jpeg",
+	}
+	validVideoTypes = []string{
+		"video/mp4",
+		"video/x-msvideo",
+		"video/quicktime",
+	}
+)
+
 func IsValidPhone(phone string) bool {
 	r := regexp.MustCompile(`^998[0-9]{2}[0-9]{7}$`)
 	return r.MatchString(phone)
@@ -54,7 +68,15 @@ func IsValidImage(header *multipart.FileHeader) (bool, error, string) {
 	}
 
 	contentType := http.DetectContentType(buffer)
-	if contentType != "image/jpg" && contentType != "image/png" && contentType != "image/jpeg" {
+	found := false
+	for _, s := range validImageTypes {
+		if s == contentType {
+			found = true
+			break
+		}
+	}
+
+	if !found {
 		return false, ErrInvalidImageType, contentType
 	}
 	return true, nil, contentType
@@ -74,7 +96,6 @@ func IsValidVideo(header *multipart.FileHeader) (bool, error, string) {
 	}
 
 	contentType := http.DetectContentType(buffer)
-	validVideoTypes := []string{"video/mp4", "video/x-msvideo", "video/quicktime"}
 	for _, validType := range validVideoTypes {
 		if contentType == validType {
 			return true, nil, contentType

@@ -146,6 +146,20 @@ func (db *UserRepo) GetStaffByID(ctx context.Context, id string) (*models.Staff,
 	return &m, nil
 }
 
+func (db *UserRepo) GetClientByID(ctx context.Context, id string) (*models.Client, error) {
+	q := `select * from clients where id = $1 and deleted_at is null;`
+	var m models.Client
+
+	if err := db.db.QueryRow(ctx, q, id).Scan(
+		&m.ID,
+		&m.Name, &m.PhoneNumber, &m.Email,
+		&m.CreatedAt, &m.UpdatedAt, &m.DeletedAt,
+	); err != nil {
+		return nil, err
+	}
+	return &m, nil
+}
+
 func (db *UserRepo) ChangeStaffPassword(ctx context.Context, id, pwd string) error {
 	q := `update staff set password = $1 where id = $2`
 	r, err := db.db.Exec(ctx, q, pwd, id)

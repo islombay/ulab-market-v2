@@ -9,6 +9,13 @@ definitions:
     - permission_id
     - role_id
     type: object
+  models.BasketModel:
+    properties:
+      product_id:
+        type: string
+      quantity:
+        type: integer
+    type: object
   models.Brand:
     properties:
       id:
@@ -141,6 +148,13 @@ definitions:
           $ref: '#/definitions/models.CategoryTranslation'
         type: array
     type: object
+  models_v1.AddToBasket:
+    properties:
+      product_id:
+        type: string
+      quantity:
+        type: integer
+    type: object
   models_v1.CategoryTranslation:
     properties:
       category_id:
@@ -230,6 +244,18 @@ definitions:
       parent_id:
         type: string
     required:
+    - name
+    type: object
+  models_v1.CreateNewRole:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+      title:
+        type: string
+    required:
+    - description
     - name
     type: object
   models_v1.LoginAdminRequest:
@@ -703,6 +729,66 @@ paths:
       summary: Verify client's email/phone
       tags:
       - auth
+  /api/basket:
+    get:
+      consumes:
+      - application/json
+      description: get all products from basket
+      operationId: GetBasket
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            items:
+              $ref: '#/definitions/models.BasketModel'
+            type: array
+        "500":
+          description: internal error
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: get all products from basket
+      tags:
+      - basket
+    post:
+      consumes:
+      - application/json
+      description: add product to basket
+      operationId: AddToBasket
+      parameters:
+      - description: Add product to basket
+        in: body
+        name: add_to_basket
+        required: true
+        schema:
+          $ref: '#/definitions/models_v1.AddToBasket'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "400":
+          description: bad request / bad uuid
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "409":
+          description: already found
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "500":
+          description: internal error
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: add product to basket
+      tags:
+      - basket
   /api/brand:
     get:
       consumes:
@@ -1752,6 +1838,38 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: get all roles
+      tags:
+      - role
+    post:
+      consumes:
+      - application/json
+      description: create new role
+      operationId: CreateNewRole
+      parameters:
+      - description: create new role body
+        in: body
+        name: create_new_role
+        required: true
+        schema:
+          $ref: '#/definitions/models_v1.CreateNewRole'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: New role body
+          schema:
+            $ref: '#/definitions/models.RoleModel'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "500":
+          description: Internal
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: create new role
       tags:
       - role
 securityDefinitions:
