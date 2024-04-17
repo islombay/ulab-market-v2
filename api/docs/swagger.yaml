@@ -22,6 +22,19 @@ definitions:
       quantity:
         type: integer
     type: object
+  models.BranchModel:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
   models.Brand:
     properties:
       created_at:
@@ -226,6 +239,16 @@ definitions:
     required:
     - id
     type: object
+  models_v1.ChangeBranch:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+    required:
+    - id
+    - name
+    type: object
   models_v1.ChangeBrand:
     properties:
       id:
@@ -273,6 +296,13 @@ definitions:
     - password
     - source
     - type
+    type: object
+  models_v1.CreateBranch:
+    properties:
+      name:
+        type: string
+    required:
+    - name
     type: object
   models_v1.CreateBrand:
     properties:
@@ -875,6 +905,169 @@ paths:
       summary: add product to basket
       tags:
       - basket
+  /api/branch:
+    get:
+      consumes:
+      - application/json
+      description: get branch
+      operationId: GetAllBranches
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: branch returned
+          schema:
+            items:
+              $ref: '#/definitions/models.BranchModel'
+            type: array
+        "500":
+          description: Internal error
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+      summary: get branch all
+      tags:
+      - branch
+    post:
+      consumes:
+      - application/json
+      description: Create branch
+      operationId: AddBranch
+      parameters:
+      - description: Create branch request
+        in: body
+        name: create_brand
+        required: true
+        schema:
+          $ref: '#/definitions/models_v1.CreateBranch'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/models.BranchModel'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "409":
+          description: Already exists
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "500":
+          description: internal error
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Create branch
+      tags:
+      - branch
+    put:
+      consumes:
+      - application/json
+      description: change branch name
+      operationId: ChangeBranch
+      parameters:
+      - description: change branch
+        in: body
+        name: changeBrand
+        required: true
+        schema:
+          $ref: '#/definitions/models_v1.ChangeBranch'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "400":
+          description: Bad request / bad uuid / no update provided
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "404":
+          description: Brand not found
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "500":
+          description: Internal error
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: change branch
+      tags:
+      - branch
+  /api/branch/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: delete branch
+      operationId: DeleteBranch
+      parameters:
+      - description: branch id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: deleted successfully
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "400":
+          description: bad uuid
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "404":
+          description: brand not found
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "500":
+          description: Internal error
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: delete branch
+      tags:
+      - branch
+    get:
+      consumes:
+      - application/json
+      description: get branch by id
+      operationId: GetBranchByID
+      parameters:
+      - description: branch id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: branch returned
+          schema:
+            $ref: '#/definitions/models.BranchModel'
+        "400":
+          description: Bad UUID
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "404":
+          description: Branch not found
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "500":
+          description: Internal error
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+      summary: get branch by id
+      tags:
+      - branch
   /api/brand:
     get:
       consumes:

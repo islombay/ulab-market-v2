@@ -704,6 +704,256 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/branch": {
+            "get": {
+                "description": "get branch",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "branch"
+                ],
+                "summary": "get branch all",
+                "operationId": "GetAllBranches",
+                "responses": {
+                    "200": {
+                        "description": "branch returned",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.BranchModel"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal error",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "change branch name",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "branch"
+                ],
+                "summary": "change branch",
+                "operationId": "ChangeBranch",
+                "parameters": [
+                    {
+                        "description": "change branch",
+                        "name": "changeBrand",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.ChangeBranch"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request / bad uuid / no update provided",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Brand not found",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal error",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Create branch",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "branch"
+                ],
+                "summary": "Create branch",
+                "operationId": "AddBranch",
+                "parameters": [
+                    {
+                        "description": "Create branch request",
+                        "name": "create_brand",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.CreateBranch"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "$ref": "#/definitions/models.BranchModel"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    },
+                    "409": {
+                        "description": "Already exists",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "internal error",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/branch/{id}": {
+            "get": {
+                "description": "get branch by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "branch"
+                ],
+                "summary": "get branch by id",
+                "operationId": "GetBranchByID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "branch id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "branch returned",
+                        "schema": {
+                            "$ref": "#/definitions/models.BranchModel"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad UUID",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Branch not found",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal error",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "delete branch",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "branch"
+                ],
+                "summary": "delete branch",
+                "operationId": "DeleteBranch",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "branch id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "deleted successfully",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "bad uuid",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "brand not found",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal error",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/api/brand": {
             "get": {
                 "description": "get brand",
@@ -2505,6 +2755,26 @@ const docTemplate = `{
                 }
             }
         },
+        "models.BranchModel": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
         "models.Brand": {
             "type": "object",
             "properties": {
@@ -2812,6 +3082,21 @@ const docTemplate = `{
                 }
             }
         },
+        "models_v1.ChangeBranch": {
+            "type": "object",
+            "required": [
+                "id",
+                "name"
+            ],
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "models_v1.ChangeBrand": {
             "type": "object",
             "required": [
@@ -2877,6 +3162,17 @@ const docTemplate = `{
                         "phone_number"
                     ],
                     "example": "email"
+                }
+            }
+        },
+        "models_v1.CreateBranch": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string"
                 }
             }
         },

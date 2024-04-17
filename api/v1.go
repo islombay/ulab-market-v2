@@ -45,6 +45,27 @@ func NewV1(
 		//auth.POST("/request_code", handler.RequestCode)
 	}
 
+	branches := v1.Group("/branch")
+	{
+		branches.POST("",
+			handler.MiddlewareStaffPermissionCheck(auth_lib.PermissionAddBranch),
+			handler.AddBranch,
+		)
+
+		branches.PUT("",
+			handler.MiddlewareStaffPermissionCheck(auth_lib.PermissionEditBranch),
+			handler.ChangeBranch,
+		)
+
+		branches.DELETE("/:id",
+			handler.MiddlewareStaffPermissionCheck(auth_lib.PermissionDeleteBranch),
+			handler.DeleteBranch,
+		)
+
+		branches.GET("/:id", handler.GetBranchByID)
+		branches.GET("", handler.GetAllBranches)
+	}
+
 	owner := v1.Group("/owner")
 	{
 		ownerSuper := owner.Group("/").Use(handler.MiddlewareIsSuper())

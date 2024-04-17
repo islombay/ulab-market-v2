@@ -50,6 +50,10 @@ var (
 
 			PermissionCanViewRole,
 			PermissionCanAttachRole,
+
+			PermissionAddBranch,
+			PermissionEditBranch,
+			PermissionDeleteBranch,
 		},
 	}
 	RoleClient = models.RoleModel{
@@ -136,6 +140,12 @@ var (
 )
 
 var (
+	PermissionAddBranch    = models.PermissionModel{ID: uuid.NewString(), Name: "add_branch"}
+	PermissionEditBranch   = models.PermissionModel{ID: uuid.NewString(), Name: "edit_branch"}
+	PermissionDeleteBranch = models.PermissionModel{ID: uuid.NewString(), Name: "delete_branch"}
+)
+
+var (
 	PermissionAddAdmin    = models.PermissionModel{ID: uuid.New().String(), Name: "add_admin"}
 	PermissionEditAdmin   = models.PermissionModel{ID: uuid.New().String(), Name: "edit_admin"}
 	PermissionDeleteAdmin = models.PermissionModel{ID: uuid.New().String(), Name: "delete_admin"}
@@ -186,6 +196,10 @@ var PermissionsList = []*models.PermissionModel{
 	&PermissionBrandEdit,
 	&PermissionBrandDelete,
 	&PermissionBrandAdd,
+
+	&PermissionAddBranch,
+	&PermissionEditBranch,
+	&PermissionDeleteBranch,
 }
 
 var RolesList = []*models.RoleModel{

@@ -26,6 +26,17 @@ type StoreInterface interface {
 	Product() ProductInterface
 	Basket() BasketInterface
 	Icon() IconInterface
+	Branch() BranchInterface
+}
+
+type BranchInterface interface {
+	Create(ctx context.Context, m models.BranchModel) error
+	GetByID(ctx context.Context, id string) (*models.BranchModel, error)
+	GetByName(ctx context.Context, name string) (*models.BranchModel, error)
+	GetAll(ctx context.Context) ([]*models.BranchModel, error)
+
+	Change(ctx context.Context, m models.BranchModel) error
+	Delete(ctx context.Context, id string) error
 }
 
 type IconInterface interface {
