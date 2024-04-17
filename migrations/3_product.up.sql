@@ -37,7 +37,11 @@ create table if not exists products (
 create table if not exists product_image_files (
     id uuid primary key ,
     product_id uuid not null,
-    media_file varchar(255) not null ,
+    media_file varchar(255) not null,
+
+    created_at timestamp default now() not null,
+    updated_at timestamp default now() not null,
+    deleted_at timestamp default null,
     foreign key (product_id) references products(id) on delete cascade
 );
 
@@ -45,5 +49,10 @@ create table if not exists product_video_files (
     id uuid primary key ,
     product_id uuid not null,
     media_file varchar(255) not null,
+
+    created_at timestamp default now() not null,
+    updated_at timestamp default now() not null,
+    deleted_at timestamp default null,
+
     foreign key (product_id) references products(id) on delete cascade
 );

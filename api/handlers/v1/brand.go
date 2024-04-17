@@ -103,7 +103,7 @@ func (v1 *Handlers) GetBrandByID(c *gin.Context) {
 // @Failure 404 {object} models_v1.Response "Brand not found"
 // @Failure 500 {object} models_v1.Response "Internal error"
 func (v1 *Handlers) ChangeBrand(c *gin.Context) {
-	var m models_v1.ChangeCategory
+	var m models_v1.ChangeBrand
 	if c.BindJSON(&m) != nil {
 		v1.error(c, status.StatusBadRequest)
 		return

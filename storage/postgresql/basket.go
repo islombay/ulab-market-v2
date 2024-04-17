@@ -28,7 +28,7 @@ func (db *BasketRepo) Add(ctx context.Context, user_id, product_id string, quant
 }
 
 func (db *BasketRepo) Get(ctx context.Context, user_id, product_id string) (*models.BasketModel, error) {
-	q := `select * from basket where user_id = $1 and product_id = $2`
+	q := `select * from basket where user_id = $1 and product_id = $2 and deleted_at is null`
 
 	var tmp models.BasketModel
 	err := db.db.QueryRow(ctx, q, user_id, product_id).Scan(
@@ -45,7 +45,7 @@ func (db *BasketRepo) Get(ctx context.Context, user_id, product_id string) (*mod
 }
 
 func (db *BasketRepo) GetAll(ctx context.Context, user_id string) ([]models.BasketModel, error) {
-	q := `select * from basket where user_id = $1`
+	q := `select * from basket where user_id = $1 and deleted_at is null`
 
 	var res []models.BasketModel
 	rows, _ := db.db.Query(ctx, q, user_id)
@@ -60,6 +60,7 @@ func (db *BasketRepo) GetAll(ctx context.Context, user_id string) ([]models.Bask
 			&tmp.ProductID,
 			&tmp.Quantity,
 			&tmp.CreatedAt,
+			&tmp.UpdatedAt,
 			&tmp.DeletedAt,
 		); err != nil {
 			return nil, err
@@ -71,7 +72,8 @@ func (db *BasketRepo) GetAll(ctx context.Context, user_id string) ([]models.Bask
 }
 
 func (db *BasketRepo) Delete(ctx context.Context, user_id, product_id string) error {
-	q := `delete from basket where user_id = $1 and product_id = $2`
+	//q := `delete from basket where user_id = $1 and product_id = $2`
+	q := `update basket set deleted_at = now() where user_id = $1 and product_id = $2`
 	_, err := db.db.Exec(ctx, q, user_id, product_id)
 	if err != nil {
 		return err

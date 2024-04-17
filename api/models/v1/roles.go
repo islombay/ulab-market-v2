@@ -5,3 +5,8 @@ type CreateNewRole struct {
 	Title       string `json:"title"`
 	Description string `json:"description" binding:"required"`
 }
+
+type AttachRoleToPermission struct {
+	RoleID       string `json:"role_id" binding:"required"`
+	PermissionID string `json:"permission_id" binding:"required"`
+}

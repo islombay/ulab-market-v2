@@ -81,14 +81,14 @@ func (v1 *Handlers) GetAllPermissions(c *gin.Context) {
 // @tags role
 // @accept json
 // @produce json
-// @param attach_body body models.AttachPermission true "attach body"
+// @param attach_body body models_v1.AttachRoleToPermission true "attach body"
 // @success 200 {object} models.AttachPermission "Attach Permission To Role"
 // @failure 400 {object} models_v1.Response "Bad request / bad UUID"
 // @failure 404 {object} models_v1.Response "Role not found/ Permission not found"
 // @failure 409 {object} models_v1.Response "Already exists"
 // @failure 500 {object} models_v1.Response "Internal"
 func (v1 *Handlers) AttachPermissionToRole(c *gin.Context) {
-	var m models.AttachPermission
+	var m models_v1.AttachRoleToPermission
 	if err := c.BindJSON(&m); err != nil {
 		v1.error(c, status.StatusBadRequest)
 		return
@@ -168,12 +168,12 @@ func (v1 *Handlers) AttachPermissionToRole(c *gin.Context) {
 // @tags role
 // @accept json
 // @produce json
-// @param disattach_body body models.AttachPermission true "disattach body"
+// @param disattach_body body models_v1.AttachRoleToPermission true "disattach body"
 // @success 200 {object} models.AttachPermission "Disattach Permission To Role"
 // @failure 400 {object} models_v1.Response "Bad request / bad UUID"
 // @failure 500 {object} models_v1.Response "Internal"
 func (v1 *Handlers) DisAttachPermissionToRole(c *gin.Context) {
-	var m models.AttachPermission
+	var m models_v1.AttachRoleToPermission
 	if err := c.BindJSON(&m); err != nil {
 		v1.error(c, status.StatusBadRequest)
 		return

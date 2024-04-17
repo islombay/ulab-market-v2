@@ -41,10 +41,16 @@ func (s *RoleRepo) CreateRole(ctx context.Context, m models.RoleModel) error {
 }
 
 func (s *RoleRepo) GetRoleByID(ctx context.Context, id string) (*models.RoleModel, error) {
-	q := `select * from roles where id = $1 limit 1;`
+	q := `select * from roles
+         where id = $1 and deleted_at is null
+		 limit 1;`
 	m := models.RoleModel{}
 
-	err := s.db.QueryRow(ctx, q, id).Scan(&m.ID, &m.Name, &m.Description)
+	err := s.db.QueryRow(ctx, q, id).Scan(&m.ID, &m.Name, &m.Description,
+		&m.CreatedAt,
+		&m.UpdatedAt,
+		&m.DeletedAt,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -52,10 +58,16 @@ func (s *RoleRepo) GetRoleByID(ctx context.Context, id string) (*models.RoleMode
 }
 
 func (s *RoleRepo) GetRoleByName(ctx context.Context, name string) (*models.RoleModel, error) {
-	q := `select * from roles where name = $1 limit 1;`
+	q := `select * from roles
+         where name = $1 and deleted_at is null
+         limit 1;`
 	m := models.RoleModel{}
 
-	err := s.db.QueryRow(ctx, q, name).Scan(&m.ID, &m.Name, &m.Description)
+	err := s.db.QueryRow(ctx, q, name).Scan(&m.ID, &m.Name, &m.Description,
+		&m.CreatedAt,
+		&m.UpdatedAt,
+		&m.DeletedAt,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -82,7 +94,11 @@ func (s *RoleRepo) GetPermissionByID(ctx context.Context, id string) (*models.Pe
 	q := `select * from permissions where id = $1 limit 1;`
 	m := models.PermissionModel{}
 
-	err := s.db.QueryRow(ctx, q, id).Scan(&m.ID, &m.Name, &m.Description)
+	err := s.db.QueryRow(ctx, q, id).Scan(&m.ID, &m.Name, &m.Description,
+		&m.CreatedAt,
+		&m.UpdatedAt,
+		&m.DeletedAt,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -93,7 +109,11 @@ func (s *RoleRepo) GetPermissionByName(ctx context.Context, name string) (*model
 	q := `select * from permissions where name = $1 limit 1;`
 	var m models.PermissionModel
 
-	if err := s.db.QueryRow(ctx, q, name).Scan(&m.ID, &m.Name, &m.Description); err != nil {
+	if err := s.db.QueryRow(ctx, q, name).Scan(&m.ID, &m.Name, &m.Description,
+		&m.CreatedAt,
+		&m.UpdatedAt,
+		&m.DeletedAt,
+	); err != nil {
 		fmt.Println(err)
 		return nil, err
 	}
@@ -115,9 +135,14 @@ func (s *RoleRepo) Attach(ctx context.Context, rId, pId string) error {
 }
 
 func (s *RoleRepo) IsRolePermissionAttachExists(ctx context.Context, rId, pId string) (bool, error) {
-	q := `select * from permission_to_role where role_id = $1 and permission_id = $2`
+	q := `select * from permission_to_role
+         where role_id = $1 and permission_id = $2 and deleted_at is null`
 	var m models.AttachPermission
-	if err := s.db.QueryRow(ctx, q, rId, pId).Scan(&m.RoleID, &m.PermissionID); err != nil {
+	if err := s.db.QueryRow(ctx, q, rId, pId).Scan(&m.RoleID, &m.PermissionID,
+		&m.CreatedAt,
+		&m.UpdatedAt,
+		&m.DeletedAt,
+	); err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return false, nil
 		}
@@ -127,7 +152,7 @@ func (s *RoleRepo) IsRolePermissionAttachExists(ctx context.Context, rId, pId st
 }
 
 func (s *RoleRepo) GetRolePermissions(ctx context.Context, role_id string) ([]models.PermissionModel, error) {
-	q := `select * from permission_to_role where role_id = $1`
+	q := `select * from permission_to_role where role_id = $1 and deleted_at is null`
 	var res []*models.AttachPermission
 	rows, err := s.db.Query(ctx, q, role_id)
 	if err != nil {
@@ -136,7 +161,11 @@ func (s *RoleRepo) GetRolePermissions(ctx context.Context, role_id string) ([]mo
 
 	for rows.Next() {
 		f := models.AttachPermission{}
-		if err := rows.Scan(&f.RoleID, &f.PermissionID); err != nil {
+		if err := rows.Scan(&f.RoleID, &f.PermissionID,
+			&f.CreatedAt,
+			&f.UpdatedAt,
+			&f.DeletedAt,
+		); err != nil {
 			return nil, err
 		}
 		res = append(res, &f)
@@ -151,6 +180,9 @@ func (s *RoleRepo) GetRolePermissions(ctx context.Context, role_id string) ([]mo
 			&tmp.ID,
 			&tmp.Name,
 			&tmp.Description,
+			&tmp.CreatedAt,
+			&tmp.UpdatedAt,
+			&tmp.DeletedAt,
 		); err != nil {
 			s.log.Error(
 				"permission which occured in attach, not found in permissions",
@@ -166,7 +198,7 @@ func (s *RoleRepo) GetRolePermissions(ctx context.Context, role_id string) ([]mo
 }
 
 func (db *RoleRepo) GetRoles(ctx context.Context) ([]*models.RoleModel, error) {
-	q := `select * from roles`
+	q := `select * from roles where deleted_at is null`
 	var res []*models.RoleModel
 
 	rows, _ := db.db.Query(ctx, q)
@@ -179,6 +211,9 @@ func (db *RoleRepo) GetRoles(ctx context.Context) ([]*models.RoleModel, error) {
 			&tmp.ID,
 			&tmp.Name,
 			&tmp.Description,
+			&tmp.CreatedAt,
+			&tmp.UpdatedAt,
+			&tmp.DeletedAt,
 		); err != nil {
 			return nil, err
 		} else {
@@ -189,7 +224,7 @@ func (db *RoleRepo) GetRoles(ctx context.Context) ([]*models.RoleModel, error) {
 }
 
 func (db *RoleRepo) GetPermissions(ctx context.Context) ([]*models.PermissionModel, error) {
-	q := `select * from permissions`
+	q := `select * from permissions where deleted_at is null`
 	var res []*models.PermissionModel
 
 	rows, _ := db.db.Query(ctx, q)
@@ -202,6 +237,9 @@ func (db *RoleRepo) GetPermissions(ctx context.Context) ([]*models.PermissionMod
 			&tmp.ID,
 			&tmp.Name,
 			&tmp.Description,
+			&tmp.CreatedAt,
+			&tmp.UpdatedAt,
+			&tmp.DeletedAt,
 		); err != nil {
 			return nil, err
 		} else {
@@ -212,7 +250,7 @@ func (db *RoleRepo) GetPermissions(ctx context.Context) ([]*models.PermissionMod
 }
 
 func (db *RoleRepo) Disattach(ctx context.Context, rId, pId string) error {
-	q := `delete from permission_to_role where role_id = $1 and permission_id = $2`
+	q := `update permission_to_role set deleted_at = now() where role_id = $1 and permission_id = $2`
 	if _, err := db.db.Exec(ctx, q, rId, pId); err != nil {
 		return err
 	}

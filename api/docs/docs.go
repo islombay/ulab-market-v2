@@ -1173,125 +1173,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/category/translation": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Create category translation",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "category"
-                ],
-                "summary": "Create category translation",
-                "operationId": "AddCategoryTranslation",
-                "parameters": [
-                    {
-                        "description": "Create category translation request",
-                        "name": "create_category_translation",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models_v1.CategoryTranslation"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "success",
-                        "schema": {
-                            "$ref": "#/definitions/models_v1.Response"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad request/ Bad id",
-                        "schema": {
-                            "$ref": "#/definitions/models_v1.Response"
-                        }
-                    },
-                    "404": {
-                        "description": "Category not found",
-                        "schema": {
-                            "$ref": "#/definitions/models_v1.Response"
-                        }
-                    },
-                    "409": {
-                        "description": "Already exists",
-                        "schema": {
-                            "$ref": "#/definitions/models_v1.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "internal error",
-                        "schema": {
-                            "$ref": "#/definitions/models_v1.Response"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "delete category translation",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "category"
-                ],
-                "summary": "delete category translation",
-                "operationId": "DeleteCategoryTranslation",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "category id",
-                        "name": "category_id",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "language code",
-                        "name": "language",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "deleted successfully",
-                        "schema": {
-                            "$ref": "#/definitions/models_v1.Response"
-                        }
-                    },
-                    "400": {
-                        "description": "bad uuid",
-                        "schema": {
-                            "$ref": "#/definitions/models_v1.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal error",
-                        "schema": {
-                            "$ref": "#/definitions/models_v1.Response"
-                        }
-                    }
-                }
-            }
-        },
         "/api/category/{id}": {
             "get": {
                 "description": "get category by id, returns translations, and subcategories for specified category",
@@ -1700,11 +1581,6 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "type": "number",
-                        "name": "income_price",
-                        "in": "formData"
-                    },
-                    {
                         "type": "string",
                         "name": "name_ru",
                         "in": "formData",
@@ -1720,11 +1596,6 @@ const docTemplate = `{
                         "name": "outcome_price",
                         "in": "formData",
                         "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "name": "quantity",
-                        "in": "formData"
                     },
                     {
                         "type": "string",
@@ -2151,7 +2022,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.AttachPermission"
+                            "$ref": "#/definitions/models_v1.AttachRoleToPermission"
                         }
                     }
                 ],
@@ -2213,7 +2084,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.AttachPermission"
+                            "$ref": "#/definitions/models_v1.AttachRoleToPermission"
                         }
                     }
                 ],
@@ -2374,10 +2245,19 @@ const docTemplate = `{
                 "role_id"
             ],
             "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
                 "permission_id": {
                     "type": "string"
                 },
                 "role_id": {
+                    "type": "string"
+                },
+                "updated_at": {
                     "type": "string"
                 }
             }
@@ -2396,10 +2276,19 @@ const docTemplate = `{
         "models.Brand": {
             "type": "object",
             "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "string"
                 },
                 "name": {
+                    "type": "string"
+                },
+                "updated_at": {
                     "type": "string"
                 }
             }
@@ -2410,6 +2299,9 @@ const docTemplate = `{
                 "created_at": {
                     "type": "string"
                 },
+                "deleted_at": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "string",
                     "example": "a2d70daf-b4ac-4198-a6a0-999447483c18"
@@ -2418,7 +2310,11 @@ const docTemplate = `{
                     "type": "string",
                     "example": "https://firebasestorage.googleapis.com/v0/b/ulab-market.appspot.com/o/test%2Fcategory%2Fa2d70daf-b4ac-4198-a6a0-999447483c18?alt=media\u0026token=test%2Fcategory%2Fa2d70daf-b4ac-4198-a6a0-999447483c18"
                 },
-                "name": {
+                "name_ru": {
+                    "type": "string",
+                    "example": "электроника"
+                },
+                "name_uz": {
                     "type": "string",
                     "example": "electronic"
                 },
@@ -2432,24 +2328,7 @@ const docTemplate = `{
                         "$ref": "#/definitions/models.SubCategorySwagger"
                     }
                 },
-                "translations": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.CategoryTranslation"
-                    }
-                }
-            }
-        },
-        "models.CategoryTranslation": {
-            "type": "object",
-            "properties": {
-                "category_id": {
-                    "type": "string"
-                },
-                "language_code": {
-                    "type": "string"
-                },
-                "name": {
+                "updated_at": {
                     "type": "string"
                 }
             }
@@ -2457,6 +2336,12 @@ const docTemplate = `{
         "models.PermissionModel": {
             "type": "object",
             "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
                 "description": {
                     "type": "string"
                 },
@@ -2464,6 +2349,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "name": {
+                    "type": "string"
+                },
+                "updated_at": {
                     "type": "string"
                 }
             }
@@ -2501,9 +2389,6 @@ const docTemplate = `{
                         "$ref": "#/definitions/models.ProductMediaFiles"
                     }
                 },
-                "income_price": {
-                    "type": "number"
-                },
                 "main_image": {
                     "type": "string"
                 },
@@ -2539,6 +2424,12 @@ const docTemplate = `{
         "models.ProductMediaFiles": {
             "type": "object",
             "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "string"
                 },
@@ -2547,12 +2438,21 @@ const docTemplate = `{
                 },
                 "product_id": {
                     "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
                 }
             }
         },
         "models.RoleModel": {
             "type": "object",
             "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
                 "description": {
                     "type": "string"
                 },
@@ -2567,29 +2467,40 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/models.PermissionModel"
                     }
+                },
+                "updated_at": {
+                    "type": "string"
                 }
             }
         },
         "models.SubCategorySwagger": {
             "type": "object",
             "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "string"
                 },
                 "image": {
                     "type": "string"
                 },
-                "name": {
-                    "type": "string"
+                "name_ru": {
+                    "type": "string",
+                    "example": "электроника"
+                },
+                "name_uz": {
+                    "type": "string",
+                    "example": "electronic"
                 },
                 "parent_id": {
                     "type": "string"
                 },
-                "translations": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.CategoryTranslation"
-                    }
+                "updated_at": {
+                    "type": "string"
                 }
             }
         },
@@ -2608,21 +2519,17 @@ const docTemplate = `{
                 }
             }
         },
-        "models_v1.CategoryTranslation": {
+        "models_v1.AttachRoleToPermission": {
             "type": "object",
             "required": [
-                "category_id",
-                "language_code",
-                "name"
+                "permission_id",
+                "role_id"
             ],
             "properties": {
-                "category_id": {
+                "permission_id": {
                     "type": "string"
                 },
-                "language_code": {
-                    "type": "string"
-                },
-                "name": {
+                "role_id": {
                     "type": "string"
                 }
             }
@@ -2672,13 +2579,17 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "id",
-                "name"
+                "name_ru",
+                "name_uz"
             ],
             "properties": {
                 "id": {
                     "type": "string"
                 },
-                "name": {
+                "name_ru": {
+                    "type": "string"
+                },
+                "name_uz": {
                     "type": "string"
                 },
                 "parent_id": {
@@ -2731,10 +2642,14 @@ const docTemplate = `{
         "models_v1.CreateCategory": {
             "type": "object",
             "required": [
-                "name"
+                "name_ru",
+                "name_uz"
             ],
             "properties": {
-                "name": {
+                "name_ru": {
+                    "type": "string"
+                },
+                "name_uz": {
                     "type": "string"
                 },
                 "parent_id": {

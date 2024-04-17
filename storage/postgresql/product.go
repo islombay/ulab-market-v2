@@ -28,17 +28,17 @@ func (db *ProductRepo) CreateProduct(ctx context.Context, m models.Product) erro
                      id, articul,
                      name_uz, name_ru,
                      description_uz, description_ru,
-                     income_price, outcome_price,
+                     outcome_price,
                      quantity, main_image,
                      category_id, brand_id,
                      status, created_at, updated_at
 	) values(
-	         $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15
+	         $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14
 	);`
 	rows, err := db.db.Exec(ctx, q,
 		m.ID, &m.Articul, m.NameUz, m.NameRu,
 		m.DescriptionUz, m.DescriptionRu,
-		m.IncomePrice, m.OutcomePrice,
+		m.OutcomePrice,
 		m.Quantity, m.MainImage,
 		m.CategoryID, m.BrandID,
 		m.Status, m.CreatedAt, m.UpdatedAt,
@@ -61,7 +61,7 @@ func (db *ProductRepo) GetByArticul(ctx context.Context, articul string) (*model
 		&m.ID, &m.Articul,
 		&m.NameUz, &m.NameRu,
 		&m.DescriptionUz, &m.DescriptionRu,
-		&m.IncomePrice, &m.OutcomePrice,
+		&m.OutcomePrice,
 		&m.Quantity,
 		&m.CategoryID, &m.BrandID,
 		&m.Rating, &m.Status, &m.MainImage,
@@ -79,7 +79,7 @@ func (db *ProductRepo) GetByID(ctx context.Context, id string) (*models.Product,
 		&m.ID, &m.Articul,
 		&m.NameUz, &m.NameRu,
 		&m.DescriptionUz, &m.DescriptionRu,
-		&m.IncomePrice, &m.OutcomePrice,
+		&m.OutcomePrice,
 		&m.Quantity,
 		&m.CategoryID, &m.BrandID,
 		&m.Rating, &m.Status, &m.MainImage,
@@ -125,7 +125,7 @@ func (db *ProductRepo) CreateProductVideoFile(ctx context.Context, id, pid, url 
 }
 
 func (db *ProductRepo) DeleteProductByID(ctx context.Context, id string) error {
-	q := `delete from products where id = $1`
+	q := `update products set deleted_at = now() where id = $1`
 	if _, err := db.db.Exec(ctx, q, id); err != nil {
 		return err
 	}
@@ -146,6 +146,9 @@ func (db *ProductRepo) GetProductImageFiles(ctx context.Context, id string) ([]m
 			&tmp.ID,
 			&tmp.ProductID,
 			&tmp.MediaFile,
+			&tmp.CreatedAt,
+			&tmp.UpdatedAt,
+			&tmp.DeletedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -169,6 +172,9 @@ func (db *ProductRepo) GetProductVideoFiles(ctx context.Context, id string) ([]m
 			&tmp.ID,
 			&tmp.ProductID,
 			&tmp.MediaFile,
+			&tmp.CreatedAt,
+			&tmp.UpdatedAt,
+			&tmp.DeletedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -230,7 +236,7 @@ func (db *ProductRepo) GetAll(ctx context.Context, query, catid, bid *string, re
 			&m.ID, &m.Articul,
 			&m.NameUz, &m.NameRu,
 			&m.DescriptionUz, &m.DescriptionRu,
-			&m.IncomePrice, &m.OutcomePrice,
+			&m.OutcomePrice,
 			&m.Quantity,
 			&m.CategoryID, &m.BrandID,
 			&m.Rating, &m.Status, &m.MainImage,
@@ -271,6 +277,9 @@ func (db *ProductRepo) GetProductImageFilesByID(ctx context.Context, id string) 
 		var tmp models.ProductMediaFiles
 		if err := rows.Scan(
 			&tmp.ID, &tmp.ProductID, &tmp.MediaFile,
+			&tmp.CreatedAt,
+			&tmp.UpdatedAt,
+			&tmp.DeletedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -292,6 +301,9 @@ func (db *ProductRepo) GetProductVideoFilesByID(ctx context.Context, id string) 
 		var tmp models.ProductMediaFiles
 		if err := rows.Scan(
 			&tmp.ID, &tmp.ProductID, &tmp.MediaFile,
+			&tmp.CreatedAt,
+			&tmp.UpdatedAt,
+			&tmp.DeletedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -305,14 +317,6 @@ func (db *ProductRepo) ChangeMainImage(ctx context.Context, id, url string, now 
 	q := `update products set main_image = $1, updated_at = $3 where id = $2`
 	_, err := db.db.Exec(ctx, q, url, id, now)
 	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (db *ProductRepo) DeleteProduct(ctx context.Context, id string) error {
-	q := `update products set deleted_at = $1 where id = $2`
-	if _, err := db.db.Exec(ctx, q, time.Now(), id); err != nil {
 		return err
 	}
 	return nil

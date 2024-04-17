@@ -57,7 +57,8 @@ func (v1 *Handlers) CreateCategory(c *gin.Context) {
 
 	ct := models.Category{
 		ID:        uuid.New().String(),
-		Name:      m.Name,
+		NameUz:    m.NameUz,
+		NameRu:    m.NameRu,
 		ParentID:  pn,
 		CreatedAt: time.Now(),
 	}
@@ -75,67 +76,6 @@ func (v1 *Handlers) CreateCategory(c *gin.Context) {
 		return
 	}
 	v1.response(c, http.StatusOK, models_v1.ResponseID{ID: ct.ID})
-}
-
-// AddCategoryTranslation godoc
-// @ID AddCategoryTranslation
-// @Router /api/category/translation [post]
-// @Summary Create category translation
-// @Description Create category translation
-// @Tags category
-// @Security ApiKeyAuth
-// @Accept json
-// @Produce json
-// @Param create_category_translation body models_v1.CategoryTranslation true "Create category translation request"
-// @Success 200 {object} models_v1.Response "success"
-// @Failure 400 {object} models_v1.Response "Bad request/ Bad id"
-// @Failure 404 {object} models_v1.Response "Category not found"
-// @Failure 409 {object} models_v1.Response "Already exists"
-// @Failure 500 {object} models_v1.Response "internal error"
-func (v1 *Handlers) AddCategoryTranslation(c *gin.Context) {
-	var m models_v1.CategoryTranslation
-	if c.BindJSON(&m) != nil {
-		v1.error(c, status.StatusBadRequest)
-		return
-	}
-
-	if !helper.IsValidUUID(m.CategoryID) {
-		v1.error(c, status.StatusBadUUID)
-		return
-	}
-
-	if _, err := v1.storage.Category().GetByID(context.Background(), m.CategoryID); err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			v1.error(c, status.StatusCategoryNotFound)
-			return
-		}
-		v1.error(c, status.StatusInternal)
-		v1.log.Error("could not get by id for category", logs.Error(err))
-		return
-	}
-	ctm := models.CategoryTranslation{
-		CategoryID:   m.CategoryID,
-		Name:         m.Name,
-		LanguageCode: m.LanguageCode,
-	}
-	if err := v1.storage.Category().AddTranslation(context.Background(), ctm); err != nil {
-		if errors.Is(err, storage.ErrAlreadyExists) {
-			v1.error(c, status.StatusAlreadyExists)
-			return
-		} else if errors.Is(err, storage.ErrNotAffected) {
-			v1.error(c, status.StatusInternal)
-			v1.log.Error("got not affected on translation adding",
-				logs.String("cid", m.CategoryID),
-				logs.String("name", m.Name),
-				logs.String("lang", m.LanguageCode),
-			)
-			return
-		}
-	}
-	v1.response(c, http.StatusOK, models_v1.Response{
-		Code:    200,
-		Message: "Ok",
-	})
 }
 
 // ChangeCategoryImage
@@ -273,7 +213,8 @@ func (v1 *Handlers) ChangeCategory(c *gin.Context) {
 	var pn = models.GetStringAddress(m.ParentID)
 	ct := models.Category{
 		ID:       m.ID,
-		Name:     m.Name,
+		NameUz:   m.NameUz,
+		NameRu:   m.NameRu,
 		ParentID: pn,
 	}
 	if err := v1.storage.Category().ChangeCategory(context.Background(), ct); err != nil {
@@ -318,13 +259,6 @@ func (v1 *Handlers) GetCategoryByID(c *gin.Context) {
 		v1.log.Error("could not get category by id", logs.Error(err))
 		return
 	}
-	translations, err := v1.storage.Category().GetTranslations(context.Background(), cat.ID)
-	if err != nil {
-		v1.error(c, status.StatusInternal)
-		v1.log.Error("could not get translations", logs.Error(err))
-		return
-	}
-	cat.Translations = translations
 
 	subs, err := v1.storage.Category().GetSubcategories(context.Background(), cat.ID)
 	if err != nil {
@@ -360,26 +294,14 @@ func (v1 *Handlers) GetAllCategory(c *gin.Context) {
 	}
 
 	for _, e := range res {
-		tr, err := v1.storage.Category().GetTranslations(context.Background(), e.ID)
-		if err != nil {
-			v1.log.Error("could not get translations", logs.Error(err), logs.String("cid", e.ID))
-		}
-		e.Translations = tr
 		if e.Image != nil {
 			e.Image = models.GetStringAddress(v1.filestore.GetURL(*e.Image))
 		}
-
 		subs, err := v1.storage.Category().GetSubcategories(context.Background(), e.ID)
 		if err != nil {
 			v1.log.Error("could not load subcategories", logs.Error(err), logs.String("cid", e.ID))
 		}
 		for _, sub := range subs {
-			trSub, err := v1.storage.Category().GetTranslations(context.Background(), sub.ID)
-			if err != nil {
-				v1.log.Error("could not get translations for sub", logs.Error(err), logs.String("cid", sub.ID))
-			}
-			sub.Translations = trSub
-
 			if sub.Image != nil {
 				sub.Image = models.GetStringAddress(v1.filestore.GetURL(*sub.Image))
 			}
@@ -421,45 +343,6 @@ func (v1 *Handlers) DeleteCategory(c *gin.Context) {
 	if err := v1.storage.Category().DeleteCategory(context.Background(), id); err != nil {
 		v1.log.Error("could not delete category", logs.Error(err), logs.String("cid", id))
 		v1.error(c, status.StatusInternal)
-		return
-	}
-
-	v1.response(c, http.StatusOK, models_v1.Response{
-		Code:    200,
-		Message: "Ok",
-	})
-}
-
-// DeleteCategoryTranslation
-// @id DeleteCategoryTranslation
-// @router /api/category/translation [delete]
-// @tags category
-// @accept json
-// @security ApiKeyAuth
-// @produce json
-// @summary delete category translation
-// @param category_id query string true "category id"
-// @param language query string true "language code"
-// @description delete category translation
-// @success 200 {object} models_v1.Response "deleted successfully"
-// @failure 400 {object} models_v1.Response "bad uuid"
-// @failure 500 {object} models_v1.Response "Internal error"
-func (v1 *Handlers) DeleteCategoryTranslation(c *gin.Context) {
-	var m models_v1.DeleteCategoryRequest
-	if err := c.Bind(&m); err != nil {
-		v1.error(c, status.StatusBadRequest)
-		v1.log.Debug("bad request from client", logs.Error(err))
-		return
-	}
-
-	if !helper.IsValidUUID(m.CategoryID) {
-		v1.error(c, status.StatusBadUUID)
-		return
-	}
-
-	if err := v1.storage.Category().DeleteTranslation(context.Background(), m.CategoryID, m.Language); err != nil {
-		v1.error(c, status.StatusInternal)
-		v1.log.Error("could not delete category translation", logs.Error(err), logs.String("cid", m.CategoryID))
 		return
 	}
 

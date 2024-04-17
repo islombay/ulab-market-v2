@@ -4,6 +4,7 @@ create table if not exists basket(
     quantity int default 0,
 
     created_at timestamp default now() not null,
+    updated_at timestamp default now() not null,
     deleted_at timestamp default null,
 
     foreign key (user_id) references clients(id),

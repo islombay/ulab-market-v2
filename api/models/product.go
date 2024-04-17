@@ -13,7 +13,6 @@ type Product struct {
 	DescriptionUz string `db:"description_uz" json:"description_uz,omitempty" obj:"description_uz"`
 	DescriptionRu string `db:"description_ru" json:"description_ru,omitempty" obj:"description_ru"`
 
-	IncomePrice  float32 `db:"income_price" json:"income_price,omitempty"`
 	OutcomePrice float64 `db:"outcome_price" json:"outcome_price,omitempty" obj:"price"`
 
 	Quantity int `db:"quantity" json:"quantity,omitempty" obj:"quantity"`
@@ -38,6 +37,10 @@ type ProductMediaFiles struct {
 	ID        string `db:"id" json:"id,omitempty"`
 	ProductID string `db:"product_id" json:"product_id,omitempty"`
 	MediaFile string `db:"media_file" json:"media_file,omitempty"`
+
+	CreatedAt time.Time  `db:"created_at" json:"created_at"`
+	UpdatedAt time.Time  `db:"updated_at" json:"updated_at"`
+	DeletedAt *time.Time `db:"deleted_at" json:"deleted_at"`
 }
 
 type GetProductAllLimits struct {

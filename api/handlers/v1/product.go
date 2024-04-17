@@ -112,9 +112,7 @@ func (v1 *Handlers) CreateProduct(c *gin.Context) {
 		NameRu:        m.NameRu,
 		DescriptionUz: m.DescriptionUz,
 		DescriptionRu: m.DescriptionRu,
-		IncomePrice:   m.IncomePrice,
 		OutcomePrice:  m.OutcomePrice,
-		Quantity:      m.Quantity,
 		CategoryID:    models.GetStringAddress(m.CategoryID),
 		BrandID:       models.GetStringAddress(m.BrandID),
 		Status:        m.Status,
@@ -538,7 +536,7 @@ func (v1 *Handlers) DeleteProduct(c *gin.Context) {
 		return
 	}
 
-	if err := v1.storage.Product().DeleteProduct(context.Background(), id); err != nil {
+	if err := v1.storage.Product().DeleteProductByID(context.Background(), id); err != nil {
 		v1.error(c, status.StatusInternal)
 		v1.log.Error("could not delete product", logs.Error(err), logs.String("product_id", id))
 		return

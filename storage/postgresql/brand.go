@@ -42,6 +42,9 @@ func (db *BrandRepo) GetByID(ctx context.Context, id string) (*models.Brand, err
 	if err := db.db.QueryRow(ctx, q, id).Scan(
 		&m.ID,
 		&m.Name,
+		&m.CreatedAt,
+		&m.UpdatedAt,
+		&m.DeletedAt,
 	); err != nil {
 		return nil, err
 	}
@@ -49,11 +52,14 @@ func (db *BrandRepo) GetByID(ctx context.Context, id string) (*models.Brand, err
 }
 
 func (db *BrandRepo) GetByName(ctx context.Context, name string) (*models.Brand, error) {
-	q := `select * from brands where name = $1`
+	q := `select * from brands where name = $1 and deleted_at is null`
 	var m models.Brand
 	if err := db.db.QueryRow(ctx, q, name).Scan(
 		&m.ID,
 		&m.Name,
+		&m.CreatedAt,
+		&m.UpdatedAt,
+		&m.DeletedAt,
 	); err != nil {
 		return nil, err
 	}
@@ -61,7 +67,7 @@ func (db *BrandRepo) GetByName(ctx context.Context, name string) (*models.Brand,
 }
 
 func (db *BrandRepo) Change(ctx context.Context, m models.Brand) error {
-	q := `update brands set name = $1 where id = $2`
+	q := `update brands set name = $1, updated_at = now() where id = $2`
 	if _, err := db.db.Exec(ctx, q, m.Name, m.ID); err != nil {
 		return err
 	}
@@ -69,7 +75,7 @@ func (db *BrandRepo) Change(ctx context.Context, m models.Brand) error {
 }
 
 func (db *BrandRepo) GetAll(ctx context.Context) ([]*models.Brand, error) {
-	q := `select * from brands`
+	q := `select * from brands where deleted_at is null`
 	rows, _ := db.db.Query(ctx, q)
 	if rows.Err() != nil {
 		return nil, rows.Err()
@@ -82,6 +88,9 @@ func (db *BrandRepo) GetAll(ctx context.Context) ([]*models.Brand, error) {
 		if err := rows.Scan(
 			&m.ID,
 			&m.Name,
+			&m.CreatedAt,
+			&m.UpdatedAt,
+			&m.DeletedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -91,7 +100,7 @@ func (db *BrandRepo) GetAll(ctx context.Context) ([]*models.Brand, error) {
 }
 
 func (db *BrandRepo) Delete(ctx context.Context, id string) error {
-	q := `delete from brands where id = $1`
+	q := `update brands set deleted_at = now() where id = $1`
 	if _, err := db.db.Exec(ctx, q, id); err != nil {
 		return err
 	}

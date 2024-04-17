@@ -14,10 +14,7 @@ type CreateProduct struct {
 	DescriptionUz string `json:"description_uz" form:"description_uz" binding:"required"`
 	DescriptionRu string `json:"description_ru" form:"description_ru" binding:"required"`
 
-	IncomePrice  float32 `json:"income_price" form:"income_price"`
 	OutcomePrice float64 `json:"outcome_price" form:"outcome_price" binding:"required"`
-
-	Quantity int `json:"quantity" form:"quantity"`
 
 	CategoryID string `json:"category_id" form:"category_id"`
 	BrandID    string `json:"brand_id" form:"brand_id"`

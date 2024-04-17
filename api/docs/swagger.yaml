@@ -1,9 +1,15 @@
 definitions:
   models.AttachPermission:
     properties:
+      created_at:
+        type: string
+      deleted_at:
+        type: string
       permission_id:
         type: string
       role_id:
+        type: string
+      updated_at:
         type: string
     required:
     - permission_id
@@ -18,14 +24,22 @@ definitions:
     type: object
   models.Brand:
     properties:
+      created_at:
+        type: string
+      deleted_at:
+        type: string
       id:
         type: string
       name:
+        type: string
+      updated_at:
         type: string
     type: object
   models.CategorySwagger:
     properties:
       created_at:
+        type: string
+      deleted_at:
         type: string
       id:
         example: a2d70daf-b4ac-4198-a6a0-999447483c18
@@ -33,7 +47,10 @@ definitions:
       image:
         example: https://firebasestorage.googleapis.com/v0/b/ulab-market.appspot.com/o/test%2Fcategory%2Fa2d70daf-b4ac-4198-a6a0-999447483c18?alt=media&token=test%2Fcategory%2Fa2d70daf-b4ac-4198-a6a0-999447483c18
         type: string
-      name:
+      name_ru:
+        example: электроника
+        type: string
+      name_uz:
         example: electronic
         type: string
       parent_id:
@@ -43,27 +60,22 @@ definitions:
         items:
           $ref: '#/definitions/models.SubCategorySwagger'
         type: array
-      translations:
-        items:
-          $ref: '#/definitions/models.CategoryTranslation'
-        type: array
-    type: object
-  models.CategoryTranslation:
-    properties:
-      category_id:
-        type: string
-      language_code:
-        type: string
-      name:
+      updated_at:
         type: string
     type: object
   models.PermissionModel:
     properties:
+      created_at:
+        type: string
+      deleted_at:
+        type: string
       description:
         type: string
       id:
         type: string
       name:
+        type: string
+      updated_at:
         type: string
     type: object
   models.Product:
@@ -88,8 +100,6 @@ definitions:
         items:
           $ref: '#/definitions/models.ProductMediaFiles'
         type: array
-      income_price:
-        type: number
       main_image:
         type: string
       name_ru:
@@ -113,15 +123,25 @@ definitions:
     type: object
   models.ProductMediaFiles:
     properties:
+      created_at:
+        type: string
+      deleted_at:
+        type: string
       id:
         type: string
       media_file:
         type: string
       product_id:
         type: string
+      updated_at:
+        type: string
     type: object
   models.RoleModel:
     properties:
+      created_at:
+        type: string
+      deleted_at:
+        type: string
       description:
         type: string
       id:
@@ -132,21 +152,29 @@ definitions:
         items:
           $ref: '#/definitions/models.PermissionModel'
         type: array
+      updated_at:
+        type: string
     type: object
   models.SubCategorySwagger:
     properties:
+      created_at:
+        type: string
+      deleted_at:
+        type: string
       id:
         type: string
       image:
         type: string
-      name:
+      name_ru:
+        example: электроника
+        type: string
+      name_uz:
+        example: electronic
         type: string
       parent_id:
         type: string
-      translations:
-        items:
-          $ref: '#/definitions/models.CategoryTranslation'
-        type: array
+      updated_at:
+        type: string
     type: object
   models_v1.AddToBasket:
     properties:
@@ -158,18 +186,15 @@ definitions:
     - product_id
     - quantity
     type: object
-  models_v1.CategoryTranslation:
+  models_v1.AttachRoleToPermission:
     properties:
-      category_id:
+      permission_id:
         type: string
-      language_code:
-        type: string
-      name:
+      role_id:
         type: string
     required:
-    - category_id
-    - language_code
-    - name
+    - permission_id
+    - role_id
     type: object
   models_v1.ChangeAdminRequest:
     properties:
@@ -202,13 +227,16 @@ definitions:
     properties:
       id:
         type: string
-      name:
+      name_ru:
+        type: string
+      name_uz:
         type: string
       parent_id:
         type: string
     required:
     - id
-    - name
+    - name_ru
+    - name_uz
     type: object
   models_v1.ChangePassword:
     properties:
@@ -242,12 +270,15 @@ definitions:
     type: object
   models_v1.CreateCategory:
     properties:
-      name:
+      name_ru:
+        type: string
+      name_uz:
         type: string
       parent_id:
         type: string
     required:
-    - name
+    - name_ru
+    - name_uz
     type: object
   models_v1.CreateNewRole:
     properties:
@@ -1206,83 +1237,6 @@ paths:
       summary: change category image
       tags:
       - category
-  /api/category/translation:
-    delete:
-      consumes:
-      - application/json
-      description: delete category translation
-      operationId: DeleteCategoryTranslation
-      parameters:
-      - description: category id
-        in: query
-        name: category_id
-        required: true
-        type: string
-      - description: language code
-        in: query
-        name: language
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: deleted successfully
-          schema:
-            $ref: '#/definitions/models_v1.Response'
-        "400":
-          description: bad uuid
-          schema:
-            $ref: '#/definitions/models_v1.Response'
-        "500":
-          description: Internal error
-          schema:
-            $ref: '#/definitions/models_v1.Response'
-      security:
-      - ApiKeyAuth: []
-      summary: delete category translation
-      tags:
-      - category
-    post:
-      consumes:
-      - application/json
-      description: Create category translation
-      operationId: AddCategoryTranslation
-      parameters:
-      - description: Create category translation request
-        in: body
-        name: create_category_translation
-        required: true
-        schema:
-          $ref: '#/definitions/models_v1.CategoryTranslation'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: success
-          schema:
-            $ref: '#/definitions/models_v1.Response'
-        "400":
-          description: Bad request/ Bad id
-          schema:
-            $ref: '#/definitions/models_v1.Response'
-        "404":
-          description: Category not found
-          schema:
-            $ref: '#/definitions/models_v1.Response'
-        "409":
-          description: Already exists
-          schema:
-            $ref: '#/definitions/models_v1.Response'
-        "500":
-          description: internal error
-          schema:
-            $ref: '#/definitions/models_v1.Response'
-      security:
-      - ApiKeyAuth: []
-      summary: Create category translation
-      tags:
-      - category
   /api/owner:
     post:
       consumes:
@@ -1477,9 +1431,6 @@ paths:
         required: true
         type: string
       - in: formData
-        name: income_price
-        type: number
-      - in: formData
         name: name_ru
         required: true
         type: string
@@ -1490,9 +1441,6 @@ paths:
         name: outcome_price
         required: true
         type: number
-      - in: formData
-        name: quantity
-        type: integer
       - in: formData
         name: status
         required: true
@@ -1773,7 +1721,7 @@ paths:
         name: disattach_body
         required: true
         schema:
-          $ref: '#/definitions/models.AttachPermission'
+          $ref: '#/definitions/models_v1.AttachRoleToPermission'
       produces:
       - application/json
       responses:
@@ -1805,7 +1753,7 @@ paths:
         name: attach_body
         required: true
         schema:
-          $ref: '#/definitions/models.AttachPermission'
+          $ref: '#/definitions/models_v1.AttachRoleToPermission'
       produces:
       - application/json
       responses:

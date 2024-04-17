@@ -28,3 +28,15 @@ type Staff struct {
 	UpdatedAt time.Time    `json:"updated_at"`
 	DeletedAt sql.NullTime `json:"deleted_at"`
 }
+
+type ClientAddress struct {
+	ID       string  `db:"id"`
+	ClientID string  `db:"client_id"`
+	Long     float64 `db:"long"`
+	Lat      float64 `db:"lat"`
+	Name     string  `db:"name"`
+
+	CreatedAt time.Time  `db:"created_at" json:"created_at"`
+	UpdatedAt time.Time  `db:"updated_at" json:"updated_at"`
+	DeletedAt *time.Time `db:"deleted_at" json:"deleted_at"`
+}

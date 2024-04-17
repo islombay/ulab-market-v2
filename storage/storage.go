@@ -44,8 +44,6 @@ type ProductInterface interface {
 	DeleteProductByID(ctx context.Context, id string) error
 	ChangeMainImage(ctx context.Context, id, url string, now time.Time) error
 
-	DeleteProduct(ctx context.Context, id string) error
-
 	CreateProductImageFile(ctx context.Context, id, pid, url string) error
 	CreateProductVideoFile(ctx context.Context, id, pid, url string) error
 	GetProductVideoFilesByID(ctx context.Context, id string) ([]models.ProductMediaFiles, error)
@@ -92,17 +90,13 @@ type CategoryInterface interface {
 	Create(ctx context.Context, m models.Category) error
 	GetByID(ctx context.Context, id string) (*models.Category, error)
 
-	AddTranslation(ctx context.Context, m models.CategoryTranslation) error
-
 	ChangeImage(ctx context.Context, cid, imageUrl string) error
 	ChangeCategory(ctx context.Context, m models.Category) error
 
-	GetTranslations(ctx context.Context, id string) ([]models.CategoryTranslation, error)
 	GetSubcategories(ctx context.Context, id string) ([]*models.Category, error)
 	GetAll(ctx context.Context) ([]*models.Category, error)
 
 	DeleteCategory(ctx context.Context, id string) error
-	DeleteTranslation(ctx context.Context, cid, lang string) error
 }
 
 type BrandInterface interface {
