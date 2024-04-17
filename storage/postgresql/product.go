@@ -125,7 +125,7 @@ func (db *ProductRepo) CreateProductVideoFile(ctx context.Context, id, pid, url 
 }
 
 func (db *ProductRepo) DeleteProductByID(ctx context.Context, id string) error {
-	q := `update products set deleted_at = now() where id = $1`
+	q := `update products set deleted_at = coalesce(deleted_at, now()) where id = $1`
 	if _, err := db.db.Exec(ctx, q, id); err != nil {
 		return err
 	}

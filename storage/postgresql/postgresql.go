@@ -19,6 +19,7 @@ type Store struct {
 	brand    storage.BrandInterface
 	product  storage.ProductInterface
 	basket   storage.BasketInterface
+	icon     storage.IconInterface
 
 	log logs.LoggerInterface
 }
@@ -100,4 +101,11 @@ func (s *Store) Basket() storage.BasketInterface {
 		s.basket = NewBasketRepo(s.db)
 	}
 	return s.basket
+}
+
+func (s *Store) Icon() storage.IconInterface {
+	if s.icon == nil {
+		s.icon = NewIconRepo(s.db, s.log)
+	}
+	return s.icon
 }

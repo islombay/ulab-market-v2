@@ -70,14 +70,27 @@ create table if not exists client_address (
     foreign key (client_id) references clients (id) on delete cascade
 );
 
+create table if not exists icons_list (
+                                          id uuid primary key ,
+                                          name varchar(255) not null,
+                                          url varchar(255) not null,
+
+                                          created_at timestamp default now() not null,
+                                          deleted_at timestamp default null,
+                                          updated_at timestamp default now() not null
+);
+
 create table if not exists category (
     id uuid primary key,
     name_uz varchar(255) unique not null,
     name_ru varchar(255) unique not null,
-    image varchar(255),
+    image varchar(255) default null,
+    icon_id uuid default null,
     parent_id uuid,
 
     created_at timestamp default now() not null,
     updated_at timestamp default now() not null,
-    deleted_at timestamp default null
+    deleted_at timestamp default null,
+
+    foreign key (icon_id) references icons_list(id)
 );

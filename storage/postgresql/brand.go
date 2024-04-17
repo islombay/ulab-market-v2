@@ -100,7 +100,7 @@ func (db *BrandRepo) GetAll(ctx context.Context) ([]*models.Brand, error) {
 }
 
 func (db *BrandRepo) Delete(ctx context.Context, id string) error {
-	q := `update brands set deleted_at = now() where id = $1`
+	q := `update brands set deleted_at = coalesce(deleted_at, now()) where id = $1`
 	if _, err := db.db.Exec(ctx, q, id); err != nil {
 		return err
 	}

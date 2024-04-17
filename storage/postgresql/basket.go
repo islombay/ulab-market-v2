@@ -73,7 +73,7 @@ func (db *BasketRepo) GetAll(ctx context.Context, user_id string) ([]models.Bask
 
 func (db *BasketRepo) Delete(ctx context.Context, user_id, product_id string) error {
 	//q := `delete from basket where user_id = $1 and product_id = $2`
-	q := `update basket set deleted_at = now() where user_id = $1 and product_id = $2`
+	q := `update basket set deleted_at = coalesce(deleted_at, now()) where user_id = $1 and product_id = $2`
 	_, err := db.db.Exec(ctx, q, user_id, product_id)
 	if err != nil {
 		return err

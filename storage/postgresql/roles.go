@@ -59,7 +59,7 @@ func (s *RoleRepo) GetRoleByID(ctx context.Context, id string) (*models.RoleMode
 
 func (s *RoleRepo) GetRoleByName(ctx context.Context, name string) (*models.RoleModel, error) {
 	q := `select * from roles
-         where name = $1 and deleted_at is null
+         where name = $1
          limit 1;`
 	m := models.RoleModel{}
 
@@ -250,7 +250,7 @@ func (db *RoleRepo) GetPermissions(ctx context.Context) ([]*models.PermissionMod
 }
 
 func (db *RoleRepo) Disattach(ctx context.Context, rId, pId string) error {
-	q := `update permission_to_role set deleted_at = now() where role_id = $1 and permission_id = $2`
+	q := `update permission_to_role set deleted_at = coalesce(deleted_at, now()) where role_id = $1 and permission_id = $2`
 	if _, err := db.db.Exec(ctx, q, rId, pId); err != nil {
 		return err
 	}

@@ -1,8 +1,8 @@
-drop table if exists basket
+drop table if exists basket;
 drop table if exists products_media_files;
 drop table if exists products;
-drop table if exists category_translation;
 drop table if exists category;
+drop table if exists icons_list;
 drop table if exists client_address;
 drop table if exists staff;
 drop table if exists clients;

@@ -88,7 +88,7 @@ func (v1 *Handlers) CreateCategory(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Produce json
 // @Param changeCategoryImage formData models_v1.ChangeCategoryImage true "change category image"
-// @param image formData file true "picture file"
+// @param image formData file false "picture file"
 // @Success 200 {object} models_v1.Response "Success"
 // @Failure 400 {object} models_v1.Response "Bad request / bad uuid"
 // @Failure 404 {object} models_v1.Response "Category not found"
@@ -106,25 +106,6 @@ func (v1 *Handlers) ChangeCategoryImage(c *gin.Context) {
 		return
 	}
 
-	if m.Image.Size > v1.cfg.Media.CategoryPhotoMaxSize {
-		v1.error(c, status.StatusImageMaxSizeExceed)
-		v1.log.Debug("image size exceeds limit",
-			logs.Any("limit", v1.cfg.Media.CategoryPhotoMaxSize),
-			logs.Any("got", m.Image.Size),
-		)
-		return
-	}
-	if valid, err, contentType := helper.IsValidImage(m.Image); !valid && err != nil {
-		if errors.Is(err, helper.ErrInvalidImageType) {
-			v1.error(c, status.StatusImageTypeUnkown)
-			v1.log.Debug("got image type", logs.String("content-type", contentType))
-			return
-		}
-		v1.error(c, status.StatusInternal)
-		v1.log.Error("could not check the image type", logs.Error(err))
-		return
-	}
-
 	if _, err := v1.storage.Category().GetByID(context.Background(), m.CategoryID); err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			v1.error(c, status.StatusCategoryNotFound)
@@ -135,17 +116,61 @@ func (v1 *Handlers) ChangeCategoryImage(c *gin.Context) {
 		return
 	}
 
-	url, err := v1.filestore.Create(m.Image, filestore.FolderCategory, m.CategoryID)
-	if err != nil {
-		v1.log.Error("could not create image file in filestore", logs.Error(err))
-		v1.error(c, status.StatusInternal)
-		return
+	if m.IconID != nil {
+		if !helper.IsValidUUID(*m.IconID) {
+			v1.error(c, status.StatusBadUUID)
+			return
+		}
+		if _, err := v1.storage.Icon().GetIconByID(context.Background(), *m.IconID); err != nil {
+			if errors.Is(err, pgx.ErrNoRows) {
+				v1.error(c, status.StatusIconNotFound)
+				return
+			}
+			v1.error(c, status.StatusInternal)
+			v1.log.Error("could not get icon by id", logs.Error(err))
+			return
+		}
 	}
 
-	if err := v1.storage.Category().ChangeImage(context.Background(), m.CategoryID, url); err != nil {
+	var url string
+	var err error
+
+	if m.Image != nil {
+		if m.Image.Size > v1.cfg.Media.CategoryPhotoMaxSize {
+			v1.error(c, status.StatusImageMaxSizeExceed)
+			v1.log.Debug("image size exceeds limit",
+				logs.Any("limit", v1.cfg.Media.CategoryPhotoMaxSize),
+				logs.Any("got", m.Image.Size),
+			)
+			return
+		}
+		if valid, err, contentType := helper.IsValidImage(m.Image); !valid && err != nil {
+			if errors.Is(err, helper.ErrInvalidImageType) {
+				v1.error(c, status.StatusImageTypeUnkown)
+				v1.log.Debug("got image type", logs.String("content-type", contentType))
+				return
+			}
+			v1.error(c, status.StatusInternal)
+			v1.log.Error("could not check the image type", logs.Error(err))
+			return
+		}
+		url, err = v1.filestore.Create(m.Image, filestore.FolderCategory, m.CategoryID)
+		if err != nil {
+			v1.log.Error("could not create image file in filestore", logs.Error(err))
+			v1.error(c, status.StatusInternal)
+			return
+		}
+	}
+
+	if err := v1.storage.Category().ChangeImage(context.Background(),
+		models.GetStringAddress(m.CategoryID), &url,
+		m.IconID); err != nil {
 		if errors.Is(err, storage.ErrNotAffected) {
 			v1.error(c, status.StatusInternal)
 			v1.log.Error("got not affected for change category image in db")
+			return
+		} else if errors.Is(err, storage.ErrNoUpdate) {
+			v1.error(c, status.StatusNoUpdateProvided)
 			return
 		}
 		v1.error(c, status.StatusInternal)
@@ -266,9 +291,31 @@ func (v1 *Handlers) GetCategoryByID(c *gin.Context) {
 		v1.error(c, status.StatusInternal)
 		return
 	}
-	cat.Sub = subs
+	for i, _ := range subs {
+		if subs[i].Image != nil && *subs[i].Image != "" {
+			subs[i].Image = models.GetStringAddress(v1.filestore.GetURL(*subs[i].Image))
+		}
 
-	if cat.Image != nil {
+		if subs[i].Icon != nil && *subs[i].Icon != "" {
+			ic, err := v1.storage.Icon().GetIconByID(context.Background(), *subs[i].Icon)
+			if err != nil {
+				v1.log.Error("could not get icon by id", logs.Error(err))
+			} else {
+				subs[i].Icon = models.GetStringAddress(v1.filestore.GetURL(ic.URL))
+			}
+		}
+	}
+	cat.Sub = subs
+	if cat.Icon != nil && *cat.Icon != "" {
+		i, err := v1.storage.Icon().GetIconByID(context.Background(), *cat.Icon)
+		if err != nil {
+			v1.log.Error("could not get icon by id", logs.Error(err))
+		} else {
+			cat.Icon = models.GetStringAddress(v1.filestore.GetURL(i.URL))
+		}
+	}
+
+	if cat.Image != nil && *cat.Image != "" {
 		cat.Image = models.GetStringAddress(v1.filestore.GetURL(*cat.Image))
 	}
 
@@ -294,18 +341,36 @@ func (v1 *Handlers) GetAllCategory(c *gin.Context) {
 	}
 
 	for _, e := range res {
-		if e.Image != nil {
+		if e.Image != nil && *e.Image != "" {
 			e.Image = models.GetStringAddress(v1.filestore.GetURL(*e.Image))
 		}
 		subs, err := v1.storage.Category().GetSubcategories(context.Background(), e.ID)
 		if err != nil {
 			v1.log.Error("could not load subcategories", logs.Error(err), logs.String("cid", e.ID))
 		}
-		for _, sub := range subs {
-			if sub.Image != nil {
-				sub.Image = models.GetStringAddress(v1.filestore.GetURL(*sub.Image))
+		for i, _ := range subs {
+			if subs[i].Image != nil && *subs[i].Image != "" {
+				subs[i].Image = models.GetStringAddress(v1.filestore.GetURL(*subs[i].Image))
+			}
+
+			if subs[i].Icon != nil && *subs[i].Icon != "" {
+				ic, err := v1.storage.Icon().GetIconByID(context.Background(), *subs[i].Icon)
+				if err != nil {
+					v1.log.Error("could not get icon by id", logs.Error(err))
+				} else {
+					subs[i].Icon = models.GetStringAddress(v1.filestore.GetURL(ic.URL))
+				}
 			}
 		}
+		if e.Icon != nil && *e.Icon != "" {
+			i, err := v1.storage.Icon().GetIconByID(context.Background(), *e.Icon)
+			if err != nil {
+				v1.log.Error("could not get icon by id", logs.Error(err))
+			} else {
+				e.Icon = models.GetStringAddress(v1.filestore.GetURL(i.URL))
+			}
+		}
+
 		e.Sub = subs
 	}
 	v1.response(c, http.StatusOK, res)

@@ -11,6 +11,7 @@ var (
 	ErrInvalidEmail     = fmt.Errorf("invalid_email")
 	ErrInvalidImageType = fmt.Errorf("invalid_image_type")
 	ErrInvalidVideoType = fmt.Errorf("invalid_video_type")
+	ErrInvalidIconType  = fmt.Errorf("invalid_icon_type")
 )
 
 var (
@@ -24,6 +25,11 @@ var (
 		"video/mp4",
 		"video/x-msvideo",
 		"video/quicktime",
+	}
+	validIconTypes = []string{
+		"image/svg+xml",
+		"text/plain",
+		"text/plain; charset=utf-8",
 	}
 )
 
@@ -78,6 +84,34 @@ func IsValidImage(header *multipart.FileHeader) (bool, error, string) {
 
 	if !found {
 		return false, ErrInvalidImageType, contentType
+	}
+	return true, nil, contentType
+}
+
+func IsValidIcon(header *multipart.FileHeader) (bool, error, string) {
+	file, err := header.Open()
+	if err != nil {
+		return false, err, ""
+	}
+	defer file.Close()
+
+	buffer := make([]byte, 512)
+	_, err = file.Read(buffer)
+	if err != nil {
+		return false, err, ""
+	}
+
+	contentType := http.DetectContentType(buffer)
+	found := false
+	for _, s := range validIconTypes {
+		if s == contentType {
+			found = true
+			break
+		}
+	}
+
+	if !found {
+		return false, ErrInvalidIconType, contentType
 	}
 	return true, nil, contentType
 }

@@ -10,7 +10,8 @@ type CreateCategory struct {
 
 type ChangeCategoryImage struct {
 	CategoryID string                `form:"category_id" binding:"required"`
-	Image      *multipart.FileHeader `form:"image" binding:"required" swaggerignore:"true"`
+	IconID     *string               `form:"icon_id"`
+	Image      *multipart.FileHeader `form:"image" swaggerignore:"true"`
 }
 
 type ChangeCategory struct {

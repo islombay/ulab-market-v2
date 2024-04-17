@@ -25,6 +25,9 @@ var (
 		Permissions: []models.PermissionModel{
 			PermissionCanEditRole,
 
+			PermissionAddIconToList,
+			PermissionDeleteIconToList,
+
 			PermissionCanEditProduct,
 			PermissionCanAddProduct,
 			PermissionCanDeleteProduct,
@@ -88,6 +91,9 @@ var (
 			PermissionCanDeleteRole,
 			PermissionCanViewRole,
 			PermissionCanAttachRole,
+
+			PermissionAddIconToList,
+			PermissionDeleteIconToList,
 		},
 	}
 )
@@ -141,8 +147,16 @@ var (
 	PermissionDeleteCourier = models.PermissionModel{ID: uuid.New().String(), Name: "delete_courier"}
 )
 
+var (
+	PermissionAddIconToList    = models.PermissionModel{ID: uuid.NewString(), Name: "can_add_icon_to_list"}
+	PermissionDeleteIconToList = models.PermissionModel{ID: uuid.NewString(), Name: "can_delete_icon_to_list"}
+)
+
 var PermissionsList = []*models.PermissionModel{
 	&PermissionCanMigrateDown,
+
+	&PermissionAddIconToList,
+	&PermissionDeleteIconToList,
 
 	&PermissionAddToBasket,
 	&PermissionRemoveFromBasket,

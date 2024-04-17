@@ -7,6 +7,7 @@ import (
 	auth_lib "app/pkg/auth"
 	"app/pkg/helper"
 	"app/pkg/logs"
+	"app/pkg/start"
 	"app/storage"
 	"context"
 	"database/sql"
@@ -243,6 +244,28 @@ func (v1 *Handlers) ChangeOwner(c *gin.Context) {
 		}
 		v1.error(c, status.StatusInternal)
 		v1.log.Error("could not update staff member", logs.String("uid", m.ID), logs.Error(err))
+		return
+	}
+	v1.response(c, http.StatusOK, models_v1.Response{
+		Code:    200,
+		Message: "Ok",
+	})
+}
+
+// SuperMigrateDown
+// @id SuperMigrateDown
+// @router /api/super/migrate-down [get]
+// @security ApiKeyAuth
+// @tags super
+// @produce json
+// @success 200 {object} models_v1.Response "success"
+// @failure 500 {object} models_v1.Response "error"
+func (v1 *Handlers) SuperMigrateDown(c *gin.Context) {
+	if err := start.Init(&v1.cfg.DB, v1.log, true, v1.storage.Role(), v1.storage.User()); err != nil {
+		v1.error(c, status.Status{
+			Message: err.Error(),
+			Code:    http.StatusInternalServerError,
+		})
 		return
 	}
 	v1.response(c, http.StatusOK, models_v1.Response{

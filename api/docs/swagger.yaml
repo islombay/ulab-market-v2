@@ -41,6 +41,8 @@ definitions:
         type: string
       deleted_at:
         type: string
+      icon:
+        type: string
       id:
         example: a2d70daf-b4ac-4198-a6a0-999447483c18
         type: string
@@ -61,6 +63,15 @@ definitions:
           $ref: '#/definitions/models.SubCategorySwagger'
         type: array
       updated_at:
+        type: string
+    type: object
+  models.IconModel:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      url:
         type: string
     type: object
   models.PermissionModel:
@@ -160,6 +171,8 @@ definitions:
       created_at:
         type: string
       deleted_at:
+        type: string
+      icon:
         type: string
       id:
         type: string
@@ -1200,10 +1213,12 @@ paths:
         name: category_id
         required: true
         type: string
+      - in: formData
+        name: icon_id
+        type: string
       - description: picture file
         in: formData
         name: image
-        required: true
         type: file
       produces:
       - application/json
@@ -1237,6 +1252,136 @@ paths:
       summary: change category image
       tags:
       - category
+  /api/icon:
+    get:
+      consumes:
+      - application/json
+      description: get all
+      operationId: GetIconsAll
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            items:
+              $ref: '#/definitions/models.IconModel'
+            type: array
+        "500":
+          description: internal error
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+      summary: get all
+      tags:
+      - icon
+    post:
+      consumes:
+      - application/json
+      description: add icon to list
+      operationId: AddIconToList
+      parameters:
+      - in: formData
+        name: name
+        required: true
+        type: string
+      - description: icon file
+        in: formData
+        name: icon
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/models.IconModel'
+        "400":
+          description: bad request
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "409":
+          description: already exists (name)
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "415":
+          description: invalid icon type
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "500":
+          description: internal error
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: add icon to list
+      tags:
+      - icon
+  /api/icon/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: delete icon
+      operationId: DeleteIcon
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "400":
+          description: bad id
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "500":
+          description: internal error
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: delete icon
+      tags:
+      - icon
+    get:
+      consumes:
+      - application/json
+      description: get by id
+      operationId: GetIconByID
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/models.IconModel'
+        "400":
+          description: bad id
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "404":
+          description: not found
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "500":
+          description: internal error
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+      summary: get by id
+      tags:
+      - icon
   /api/owner:
     post:
       consumes:
@@ -1862,6 +2007,24 @@ paths:
       summary: create new role
       tags:
       - role
+  /api/super/migrate-down:
+    get:
+      operationId: SuperMigrateDown
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "500":
+          description: error
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - super
 securityDefinitions:
   ApiKeyAuth:
     in: header

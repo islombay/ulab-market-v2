@@ -139,4 +139,24 @@ var (
 		Description: "video file is unknown",
 		Code:        http.StatusUnsupportedMediaType,
 	}
+
+	StatusIconTypeUnkown = Status{
+		Message:     "Invalid icon type",
+		Description: "icon file is unknown",
+		Code:        http.StatusUnsupportedMediaType,
+	}
+)
+
+var (
+	StatusNotFound = Status{
+		Message:     "Not found",
+		Description: "not found",
+		Code:        http.StatusNotFound,
+	}
+
+	StatusIconNotFound = Status{
+		Message:     "Icon not found",
+		Description: "icon not found",
+		Code:        http.StatusNotFound,
+	}
 )

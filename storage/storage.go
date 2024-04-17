@@ -25,6 +25,16 @@ type StoreInterface interface {
 	Brand() BrandInterface
 	Product() ProductInterface
 	Basket() BasketInterface
+	Icon() IconInterface
+}
+
+type IconInterface interface {
+	GetIconByName(ctx context.Context, name string) (*models.IconModel, error)
+	GetIconByID(ctx context.Context, id string) (*models.IconModel, error)
+	AddIcon(ctx context.Context, m models.IconModel) error
+
+	GetAll(ctx context.Context) ([]models.IconModel, error)
+	Delete(ctx context.Context, id string) error
 }
 
 type BasketInterface interface {
@@ -90,7 +100,7 @@ type CategoryInterface interface {
 	Create(ctx context.Context, m models.Category) error
 	GetByID(ctx context.Context, id string) (*models.Category, error)
 
-	ChangeImage(ctx context.Context, cid, imageUrl string) error
+	ChangeImage(ctx context.Context, cid, imageUrl, iconURL *string) error
 	ChangeCategory(ctx context.Context, m models.Category) error
 
 	GetSubcategories(ctx context.Context, id string) ([]*models.Category, error)

@@ -26,6 +26,14 @@ func NewV1(
 
 	v1 := r.Group("/")
 
+	super := v1.Group("/super")
+	{
+		super.GET("migrate-down",
+			handler.MiddlewareIsSuper(),
+			handler.SuperMigrateDown,
+		)
+	}
+
 	auth := v1.Group("/auth")
 	{
 		auth.POST("/login", handler.Login)
@@ -176,6 +184,22 @@ func NewV1(
 			handler.MiddlewareIsClient(),
 			handler.DeleteFromBasket,
 		)
+	}
+
+	iconsList := v1.Group("/icon")
+	{
+		iconsList.POST("",
+			handler.MiddlewareStaffPermissionCheck(auth_lib.PermissionAddIconToList),
+			handler.AddIconToList,
+		)
+
+		iconsList.DELETE("/:id",
+			handler.MiddlewareStaffPermissionCheck(auth_lib.PermissionDeleteIconToList),
+			handler.DeleteIcon,
+		)
+
+		iconsList.GET("", handler.GetIconsAll)
+		iconsList.GET("/:id", handler.GetIconByID)
 	}
 
 	v1.GET("/ping", func(c *gin.Context) {

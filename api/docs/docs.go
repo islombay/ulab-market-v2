@@ -1126,11 +1126,15 @@ const docTemplate = `{
                         "required": true
                     },
                     {
+                        "type": "string",
+                        "name": "icon_id",
+                        "in": "formData"
+                    },
+                    {
                         "type": "file",
                         "description": "picture file",
                         "name": "image",
-                        "in": "formData",
-                        "required": true
+                        "in": "formData"
                     }
                 ],
                 "responses": {
@@ -1271,6 +1275,204 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal error",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/icon": {
+            "get": {
+                "description": "get all",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "icon"
+                ],
+                "summary": "get all",
+                "operationId": "GetIconsAll",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.IconModel"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "internal error",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "add icon to list",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "icon"
+                ],
+                "summary": "add icon to list",
+                "operationId": "AddIconToList",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "name": "name",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "icon file",
+                        "name": "icon",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/models.IconModel"
+                        }
+                    },
+                    "400": {
+                        "description": "bad request",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    },
+                    "409": {
+                        "description": "already exists (name)",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    },
+                    "415": {
+                        "description": "invalid icon type",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "internal error",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/icon/{id}": {
+            "get": {
+                "description": "get by id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "icon"
+                ],
+                "summary": "get by id",
+                "operationId": "GetIconByID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/models.IconModel"
+                        }
+                    },
+                    "400": {
+                        "description": "bad id",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "not found",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "internal error",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "delete icon",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "icon"
+                ],
+                "summary": "delete icon",
+                "operationId": "DeleteIcon",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "bad id",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "internal error",
                         "schema": {
                             "$ref": "#/definitions/models_v1.Response"
                         }
@@ -2235,6 +2437,36 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/api/super/migrate-down": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "super"
+                ],
+                "operationId": "SuperMigrateDown",
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "error",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -2302,6 +2534,9 @@ const docTemplate = `{
                 "deleted_at": {
                     "type": "string"
                 },
+                "icon": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "string",
                     "example": "a2d70daf-b4ac-4198-a6a0-999447483c18"
@@ -2329,6 +2564,20 @@ const docTemplate = `{
                     }
                 },
                 "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.IconModel": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "url": {
                     "type": "string"
                 }
             }
@@ -2480,6 +2729,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "deleted_at": {
+                    "type": "string"
+                },
+                "icon": {
                     "type": "string"
                 },
                 "id": {
