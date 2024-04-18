@@ -1,6 +1,6 @@
 create table if not exists roles (
     id uuid primary key,
-    name varchar(40) not null unique,
+    name varchar(40) not null,
     description varchar(255),
     created_at timestamp default now() not null,
     updated_at timestamp default now() not null,
@@ -9,7 +9,7 @@ create table if not exists roles (
 
 create table if not exists permissions (
     id uuid primary key,
-    name varchar(40) not null unique,
+    name varchar(40) not null,
     description varchar(255),
 
     created_at timestamp default now() not null,
@@ -82,8 +82,8 @@ create table if not exists icons_list (
 
 create table if not exists category (
     id uuid primary key,
-    name_uz varchar(255) unique not null,
-    name_ru varchar(255) unique not null,
+    name_uz varchar(255) not null,
+    name_ru varchar(255) not null,
     image varchar(255) default null,
     icon_id uuid default null,
     parent_id uuid,
