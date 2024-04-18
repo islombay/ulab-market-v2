@@ -5,6 +5,7 @@ import (
 	"app/config"
 	"app/pkg/logs"
 	"app/pkg/smtp"
+	"app/service"
 	"app/storage"
 	"os"
 
@@ -21,6 +22,7 @@ func NewApi(
 	smtp smtp.SMTPInterface,
 	cache storage.CacheInterface,
 	filestore storage.FileStorageInterface,
+	service service.IServiceManager,
 ) {
 
 	// @securityDefinitions.apikey ApiKeyAuth
@@ -33,7 +35,7 @@ func NewApi(
 
 	r.Use(customCORSMiddleware())
 	api := r.Group("/api")
-	NewV1(api, cfg, store, log, smtp, cache, filestore)
+	NewV1(api, cfg, store, log, smtp, cache, filestore, service)
 
 	cfg.Env = os.Getenv("ENV")
 	if cfg.Env == config.LocalMode {

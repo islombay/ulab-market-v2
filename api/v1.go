@@ -6,10 +6,10 @@ import (
 	auth_lib "app/pkg/auth"
 	"app/pkg/logs"
 	"app/pkg/smtp"
+	"app/service"
 	"app/storage"
-	"net/http"
-
 	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
 func NewV1(
@@ -20,10 +20,11 @@ func NewV1(
 	smtp smtp.SMTPInterface,
 	cache storage.CacheInterface,
 	filestore storage.FileStorageInterface,
+	service service.IServiceManager,
 ) {
 	// initialize v1 handler
-	handler := handlersv1.NewHandler(log, cfg, store, smtp, cache, filestore)
-
+	handler := handlersv1.NewHandler(log, cfg, store, smtp, cache, filestore, service)
+	
 	v1 := r.Group("/")
 
 	super := v1.Group("/super")

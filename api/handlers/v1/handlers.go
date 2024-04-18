@@ -6,6 +6,7 @@ import (
 	"app/config"
 	"app/pkg/logs"
 	"app/pkg/smtp"
+	"app/service"
 	"app/storage"
 	"github.com/gin-gonic/gin"
 )
@@ -17,6 +18,8 @@ type Handlers struct {
 	smtp      smtp.SMTPInterface
 	cache     storage.CacheInterface
 	filestore storage.FileStorageInterface
+
+	service service.IServiceManager
 }
 
 func NewHandler(
@@ -26,6 +29,7 @@ func NewHandler(
 	smtp smtp.SMTPInterface,
 	cache storage.CacheInterface,
 	filestore storage.FileStorageInterface,
+	service service.IServiceManager,
 ) *Handlers {
 	return &Handlers{
 		log:       log,
@@ -34,6 +38,7 @@ func NewHandler(
 		smtp:      smtp,
 		cache:     cache,
 		filestore: filestore,
+		service:   service,
 	}
 }
 

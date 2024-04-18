@@ -6,6 +6,7 @@ import (
 	"app/pkg/logs"
 	"app/pkg/smtp"
 	"app/pkg/start"
+	"app/service"
 	"app/storage/filestore"
 	"app/storage/postgresql"
 	redis_service "app/storage/redis"
@@ -53,6 +54,8 @@ func main() {
 	cacheService := redis_service.NewRedisStore(&cfg.Redis, log)
 	fileService := filestore.NewFilestore(&cfg.FileStorage, log)
 
+	serviceManager := service.New(store, log, fileService, cacheService, smtpService)
+
 	if err := start.Init(&cfg.DB, log, false, store.Role(), store.User()); err != nil {
 		log.Panic("could not run start init", logs.Error(err))
 		return
@@ -61,7 +64,7 @@ func main() {
 	r := gin.New()
 	r.Use(gin.Recovery(), gin.Logger())
 
-	api.NewApi(r, &cfg, store, log, smtpService, cacheService, fileService)
+	api.NewApi(r, &cfg, store, log, smtpService, cacheService, fileService, serviceManager)
 
 	go func() {
 		if err := r.Run(cfg.Server.Host + ":" + cfg.Server.Port); err != nil {
