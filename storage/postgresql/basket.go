@@ -81,3 +81,13 @@ func (db *BasketRepo) Delete(ctx context.Context, user_id, product_id string) er
 
 	return nil
 }
+
+func (db *BasketRepo) ChangeQuantity(ctx context.Context, pid, uid string, quantity int) error {
+	q := `update basket set updated_at = now(), quantity = $1 where user_id = $2 and product_id = $3;`
+
+	_, err := db.db.Exec(ctx, q, quantity, uid, pid)
+	if err != nil {
+		return err
+	}
+	return nil
+}

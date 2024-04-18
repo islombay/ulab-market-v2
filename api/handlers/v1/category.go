@@ -62,6 +62,29 @@ func (v1 *Handlers) CreateCategory(c *gin.Context) {
 		ParentID:  pn,
 		CreatedAt: time.Now(),
 	}
+
+	if _, err := v1.storage.Category().GetByName(context.Background(), m.NameRu); err != nil {
+		if !errors.Is(err, pgx.ErrNoRows) {
+			v1.error(c, status.StatusInternal)
+			v1.log.Error("could not get category by name", logs.Error(err))
+			return
+		}
+	} else {
+		v1.error(c, status.StatusAlreadyExists)
+		return
+	}
+
+	if _, err := v1.storage.Category().GetByName(context.Background(), m.NameUz); err != nil {
+		if !errors.Is(err, pgx.ErrNoRows) {
+			v1.error(c, status.StatusInternal)
+			v1.log.Error("could not get category by name", logs.Error(err))
+			return
+		}
+	} else {
+		v1.error(c, status.StatusAlreadyExists)
+		return
+	}
+
 	if err := v1.storage.Category().Create(context.Background(), ct); err != nil {
 		if errors.Is(err, storage.ErrNotAffected) {
 			v1.error(c, status.StatusInternal)

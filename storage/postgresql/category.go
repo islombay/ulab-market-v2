@@ -189,3 +189,24 @@ func (db *CategoryRepo) DeleteCategory(ctx context.Context, id string) error {
 
 	return nil
 }
+
+func (db *CategoryRepo) GetByName(ctx context.Context, name string) (*models.Category, error) {
+	q := `select 
+    		id, name_uz, name_ru,
+    		image, icon_id, parent_id,
+    		created_at, updated_at, deleted_at
+		from category where (
+		    name_ru ilike $1 or name_uz ilike $1
+		    )
+		and deleted_at is null`
+
+	var res models.Category
+	if err := db.db.QueryRow(ctx, q, "%"+name+"%").Scan(
+		&res.ID, &res.NameUz, &res.NameRu,
+		&res.Image, &res.Icon, &res.ParentID,
+		&res.CreatedAt, &res.UpdatedAt, &res.DeletedAt,
+	); err != nil {
+		return nil, err
+	}
+	return &res, nil
+}

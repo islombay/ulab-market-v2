@@ -190,3 +190,72 @@ func (v1 *Handlers) DeleteFromBasket(c *gin.Context) {
 		Message: "Ok",
 	})
 }
+
+// ChangeBasket
+// @id ChangeBasket
+// @router /api/basket [put]
+// @tags basket
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @param change_basket body models_v1.ChangeBasket true "Change basket body"
+// @success 200 {object} models_v1.Response "Success"
+// @failure 400 {object} models_v1.Response "Bad request / bad quantity / bad id (product)"
+// @failure 500 {object} models_v1.Response "Internal server error"
+func (v1 *Handlers) ChangeBasket(c *gin.Context) {
+	var m models_v1.ChangeBasket
+	if c.BindJSON(&m) != nil {
+		v1.error(c, status.StatusBadRequest)
+		return
+	}
+
+	if m.Quantity == 0 {
+		v1.error(c, status.StatusBadRequest)
+		return
+	}
+
+	if !helper.IsValidUUID(m.ProductID) {
+		v1.error(c, status.StatusBadUUID)
+		return
+	}
+
+	val, ok := c.Get(UserIDContext)
+	if !ok {
+		v1.log.Error("user-id not found")
+		v1.error(c, status.StatusUnauthorized)
+		return
+	}
+
+	str, ok := val.(string)
+	if !ok {
+		v1.log.Error("could not convert")
+		v1.error(c, status.StatusUnauthorized)
+		return
+	}
+
+	if !helper.IsValidUUID(str) {
+		v1.error(c, status.StatusInternal)
+		return
+	}
+
+	// TODO: check whether the quantity exists
+
+	if err := v1.storage.Basket().ChangeQuantity(
+		context.Background(),
+		m.ProductID,
+		str,
+		m.Quantity,
+	); err != nil {
+		v1.error(c, status.StatusInternal)
+		v1.log.Error("could not update quantity of product in basket",
+			logs.Error(err), logs.String("uid", str),
+			logs.String("pid", m.ProductID), logs.Int("q", m.Quantity),
+		)
+		return
+	}
+
+	v1.response(c, http.StatusOK, models_v1.Response{
+		Code:    200,
+		Message: "Ok",
+	})
+}

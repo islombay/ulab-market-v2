@@ -239,6 +239,16 @@ definitions:
     required:
     - id
     type: object
+  models_v1.ChangeBasket:
+    properties:
+      product_id:
+        type: string
+      quantity:
+        type: integer
+    required:
+    - product_id
+    - quantity
+    type: object
   models_v1.ChangeBranch:
     properties:
       id:
@@ -903,6 +913,36 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: add product to basket
+      tags:
+      - basket
+    put:
+      consumes:
+      - application/json
+      operationId: ChangeBasket
+      parameters:
+      - description: Change basket body
+        in: body
+        name: change_basket
+        required: true
+        schema:
+          $ref: '#/definitions/models_v1.ChangeBasket'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "400":
+          description: Bad request / bad quantity / bad id (product)
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+      security:
+      - ApiKeyAuth: []
       tags:
       - basket
   /api/branch:

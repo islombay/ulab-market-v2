@@ -24,7 +24,7 @@ func NewV1(
 ) {
 	// initialize v1 handler
 	handler := handlersv1.NewHandler(log, cfg, store, smtp, cache, filestore, service)
-	
+
 	v1 := r.Group("/")
 
 	super := v1.Group("/super")
@@ -200,6 +200,11 @@ func NewV1(
 		basket.GET("",
 			handler.MiddlewareIsClient(),
 			handler.GetBasket,
+		)
+
+		basket.PUT("",
+			handler.MiddlewareIsClient(),
+			handler.ChangeBasket,
 		)
 
 		basket.DELETE("",

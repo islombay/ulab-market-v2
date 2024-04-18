@@ -53,6 +53,8 @@ type BasketInterface interface {
 	Get(ctx context.Context, user_id, product_id string) (*models.BasketModel, error)
 	GetAll(ctx context.Context, user_id string) ([]models.BasketModel, error)
 	Delete(ctx context.Context, user_id, product_id string) error
+
+	ChangeQuantity(ctx context.Context, pid, uid string, quantity int) error
 }
 
 type ProductInterface interface {
@@ -116,6 +118,7 @@ type CategoryInterface interface {
 
 	GetSubcategories(ctx context.Context, id string) ([]*models.Category, error)
 	GetAll(ctx context.Context) ([]*models.Category, error)
+	GetByName(ctx context.Context, name string) (*models.Category, error)
 
 	DeleteCategory(ctx context.Context, id string) error
 }
