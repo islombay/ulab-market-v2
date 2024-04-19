@@ -31,8 +31,8 @@ import (
 // @tags product
 // @produce json
 // @param createProduct formData models_v1.CreateProduct true "create product"
-// @param main_image formData file false "Main image"
-// @param image_files formData []file false "Image files (multiple)"
+// @param main_image formData file true "Main image"
+// @param image_files formData []file true "Image files (multiple)"
 // @param video_files formData []file false "Video files (multiple)"
 // @Success 200 {object} models.Product "Success"
 // @Failure 400 {object} models_v1.Response "Bad request / bad uuid / status invalid"
@@ -64,6 +64,9 @@ func (v1 *Handlers) CreateProduct(c *gin.Context) {
 
 	// is valid status provided
 	m.Status = strings.ToLower(m.Status)
+	if m.Status == "" {
+		m.Status = helper.ProductStatusActive
+	}
 	if !(m.Status == helper.ProductStatusActive || m.Status == helper.ProductStatusInactive) {
 		v1.error(c, status.StatusProductStatusInvalid)
 		return

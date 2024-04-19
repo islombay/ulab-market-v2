@@ -2472,14 +2472,14 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "name": "status",
-                        "in": "formData",
-                        "required": true
+                        "in": "formData"
                     },
                     {
                         "type": "file",
                         "description": "Main image",
                         "name": "main_image",
-                        "in": "formData"
+                        "in": "formData",
+                        "required": true
                     },
                     {
                         "type": "array",
@@ -2489,7 +2489,8 @@ const docTemplate = `{
                         "collectionFormat": "csv",
                         "description": "Image files (multiple)",
                         "name": "image_files",
-                        "in": "formData"
+                        "in": "formData",
+                        "required": true
                     },
                     {
                         "type": "array",

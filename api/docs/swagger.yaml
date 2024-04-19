@@ -2112,11 +2112,11 @@ paths:
         type: number
       - in: formData
         name: status
-        required: true
         type: string
       - description: Main image
         in: formData
         name: main_image
+        required: true
         type: file
       - collectionFormat: csv
         description: Image files (multiple)
@@ -2124,6 +2124,7 @@ paths:
         items:
           type: file
         name: image_files
+        required: true
         type: array
       - collectionFormat: csv
         description: Video files (multiple)

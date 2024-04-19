@@ -19,11 +19,11 @@ type CreateProduct struct {
 	CategoryID string `json:"category_id" form:"category_id"`
 	BrandID    string `json:"brand_id" form:"brand_id"`
 
-	Status string `json:"status" form:"status" binding:"required"`
+	Status string `json:"status" form:"status"`
 
-	MainImage *multipart.FileHeader `form:"main_image" swaggerignore:"true"`
+	MainImage *multipart.FileHeader `form:"main_image" binding:"required" swaggerignore:"true"`
 
-	ImageFiles []*multipart.FileHeader `form:"image_files" swaggerignore:"true"`
+	ImageFiles []*multipart.FileHeader `form:"image_files" binding:"required" swaggerignore:"true"`
 	VideoFiles []*multipart.FileHeader `form:"video_files" swaggerignore:"true"`
 }
 
