@@ -229,6 +229,24 @@ func NewV1(
 		iconsList.GET("/:id", handler.GetIconByID)
 	}
 
+	order := v1.Group("/order")
+	{
+		order.POST("",
+			handler.MiddlewareIsClient(),
+			handler.CreateOrder,
+		)
+
+		order.POST("/finish/:id",
+			handler.MiddlewareStaffPermissionCheck(auth_lib.PermissionCanFinishOrder),
+			handler.OrderFinish,
+		)
+
+		order.POST("/cancel/:id",
+			handler.MiddlewareStaffPermissionCheck(auth_lib.PermissionCanCancelOrder),
+			handler.OrderFinish,
+		)
+	}
+
 	v1.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"ping": "pong"})
 	})

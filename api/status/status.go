@@ -159,4 +159,29 @@ var (
 		Description: "icon not found",
 		Code:        http.StatusNotFound,
 	}
+	StatusBasketIsEmpty = Status{
+		Message:     "Basket is empty",
+		Description: "Basket is empty",
+		Code:        http.StatusLengthRequired,
+	}
+	StatusPaymentTypeInvalid = Status{
+		Message:     "Payment type invalid",
+		Description: "Payment type invalid",
+		Code:        http.StatusBadRequest,
+	}
+	StatusOrderStatusInvalid = Status{
+		Message:     "Order status invalid",
+		Description: "Order status invalid",
+		Code:        http.StatusBadRequest,
+	}
+	StatusDeleted = Status{
+		Message:     "Deleted",
+		Code:        http.StatusLocked,
+		Description: "deleted",
+	}
+	StatusNotChangable = Status{
+		Message:     "Cannot change",
+		Code:        http.StatusMethodNotAllowed,
+		Description: "cannot changes",
+	}
 )

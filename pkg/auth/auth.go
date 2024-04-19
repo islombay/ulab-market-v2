@@ -54,6 +54,9 @@ var (
 			PermissionAddBranch,
 			PermissionEditBranch,
 			PermissionDeleteBranch,
+
+			PermissionCanFinishOrder,
+			PermissionCanCancelOrder,
 		},
 	}
 	RoleClient = models.RoleModel{
@@ -100,6 +103,11 @@ var (
 			PermissionDeleteIconToList,
 		},
 	}
+)
+
+var (
+	PermissionCanFinishOrder = models.PermissionModel{ID: uuid.NewString(), Name: "finish_order"}
+	PermissionCanCancelOrder = models.PermissionModel{ID: uuid.NewString(), Name: "cancel_order"}
 )
 
 var (
@@ -200,6 +208,9 @@ var PermissionsList = []*models.PermissionModel{
 	&PermissionAddBranch,
 	&PermissionEditBranch,
 	&PermissionDeleteBranch,
+
+	&PermissionCanFinishOrder,
+	&PermissionCanCancelOrder,
 }
 
 var RolesList = []*models.RoleModel{

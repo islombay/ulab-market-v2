@@ -21,13 +21,16 @@ do $$
 
 create table if not exists orders (
     id uuid primary key ,
+    user_id uuid,
     status status_order_enum default 'in_process',
     total_price numeric,
     payment_type payment_order_enum,
 
     created_at timestamp default now() not null,
     updated_at timestamp default now() not null,
-    deleted_at timestamp default null
+    deleted_at timestamp default null,
+
+    foreign key (user_id) references clients(id) on delete set null
 );
 
 create table if not exists order_products (
@@ -60,3 +63,42 @@ create trigger set_order_products_total_price
     before insert or update on order_products
     for each row
     execute function calculate_order_products_total_price();
+
+
+CREATE OR REPLACE FUNCTION update_order_total() RETURNS TRIGGER AS $$
+BEGIN
+    -- Calculate the total price for the current order
+    UPDATE orders SET total_price = (
+        SELECT COALESCE(SUM(total_price), 0)
+        FROM order_products
+        WHERE order_id = NEW.order_id
+    )
+    WHERE id = NEW.order_id;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER update_order_total_after_insert_or_update
+    AFTER INSERT OR UPDATE ON order_products
+    FOR EACH ROW
+EXECUTE FUNCTION update_order_total();
+
+CREATE OR REPLACE FUNCTION update_order_total_delete() RETURNS TRIGGER AS $$
+BEGIN
+    -- Calculate the total price for the current order
+    UPDATE orders SET total_price = (
+        SELECT COALESCE(SUM(total_price), 0)
+        FROM order_products
+        WHERE order_id = OLD.order_id
+    )
+    WHERE id = OLD.order_id;
+
+    RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER update_order_total_after_delete
+    AFTER DELETE ON order_products
+    FOR EACH ROW
+EXECUTE FUNCTION update_order_total_delete();

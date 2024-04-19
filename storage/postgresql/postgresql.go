@@ -12,21 +12,24 @@ import (
 )
 
 type Store struct {
-	db       *pgxpool.Pool
-	role     storage.RoleInterface
-	user     storage.UserInterface
-	category storage.CategoryInterface
-	brand    storage.BrandInterface
-	product  storage.ProductInterface
-	basket   storage.BasketInterface
-	icon     storage.IconInterface
-	branch   storage.BranchInterface
+	db            *pgxpool.Pool
+	role          storage.RoleInterface
+	user          storage.UserInterface
+	category      storage.CategoryInterface
+	brand         storage.BrandInterface
+	product       storage.ProductInterface
+	basket        storage.BasketInterface
+	icon          storage.IconInterface
+	branch        storage.BranchInterface
+	order         storage.OrderI
+	order_product storage.OrderProductI
 
 	log logs.LoggerInterface
 }
 
 const (
 	DuplicateKeyError = "23505"
+	InvalidEnumInput  = "22P02"
 )
 
 func NewPostgresStore(cfg config.DBConfig, log logs.LoggerInterface) (storage.StoreInterface, error) {
@@ -117,4 +120,18 @@ func (s *Store) Branch() storage.BranchInterface {
 	}
 
 	return s.branch
+}
+
+func (s *Store) Order() storage.OrderI {
+	if s.order == nil {
+		s.order = NewOrderRepo(s.db, s.log)
+	}
+	return s.order
+}
+
+func (s *Store) OrderProduct() storage.OrderProductI {
+	if s.order_product == nil {
+		s.order_product = NewOrderProductRepo(s.db, s.log)
+	}
+	return s.order_product
 }

@@ -28,7 +28,7 @@ func (db *BasketRepo) Add(ctx context.Context, user_id, product_id string, quant
 }
 
 func (db *BasketRepo) Get(ctx context.Context, user_id, product_id string) (*models.BasketModel, error) {
-	q := `select * from basket where user_id = $1 and product_id = $2 and deleted_at is null`
+	q := `select * from basket where (user_id = $1 and product_id = $2) and deleted_at is null`
 
 	var tmp models.BasketModel
 	err := db.db.QueryRow(ctx, q, user_id, product_id).Scan(
@@ -36,6 +36,7 @@ func (db *BasketRepo) Get(ctx context.Context, user_id, product_id string) (*mod
 		&tmp.ProductID,
 		&tmp.Quantity,
 		&tmp.CreatedAt,
+		&tmp.UpdatedAt,
 		&tmp.DeletedAt,
 	)
 	if err != nil {

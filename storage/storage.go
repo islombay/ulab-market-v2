@@ -14,7 +14,8 @@ var (
 	// be equal 1 or more
 	ErrNotAffected = fmt.Errorf("not_affected")
 
-	ErrNoUpdate = fmt.Errorf("no_update")
+	ErrNoUpdate         = fmt.Errorf("no_update")
+	ErrInvalidEnumInput = fmt.Errorf("invalid_enum_input")
 )
 
 type StoreInterface interface {
@@ -27,6 +28,20 @@ type StoreInterface interface {
 	Basket() BasketInterface
 	Icon() IconInterface
 	Branch() BranchInterface
+	Order() OrderI
+	OrderProduct() OrderProductI
+}
+
+type OrderProductI interface {
+	Create(ctx context.Context, m []models.OrderProductModel) error
+}
+
+type OrderI interface {
+	Create(ctx context.Context, m models.OrderModel) error
+	Delete(ctx context.Context, id string) error
+	ChangeStatus(ctx context.Context, id, status string) error
+
+	GetByID(ctx context.Context, id string) (*models.OrderModel, error)
 }
 
 type BranchInterface interface {
