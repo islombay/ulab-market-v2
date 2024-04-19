@@ -248,6 +248,9 @@ func NewV1(
 
 		order.GET("/:id", handler.GetOrderByID)
 		order.GET("", handler.GetOrderAll)
+
+		order.GET("/product/:id", handler.GetOrderProduct)
+		order.GET("/product", handler.GetOrderProductAll)
 	}
 
 	v1.GET("/ping", func(c *gin.Context) {

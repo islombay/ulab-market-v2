@@ -179,6 +179,61 @@ func (v1 *Handlers) GetOrderAll(c *gin.Context) {
 	}
 }
 
+// GetOrderProduct
+// @id GetOrderProduct
+// @router /api/order/product/{id} [get]
+// @summary get order product by id
+// @description get order product by id
+// @tags order
+// @accept json
+// @produce json
+// @param id path string true "Order product id"
+// @success 200 {object} models.OrderProductModel "Success"
+// @failure 400 {object} models_v1.Response "bad id"
+// @failure 404 {object} models_v1.Response "Order product not found"
+// @failure 500 {object} models_v1.Response "Internal server error"
+func (v1 *Handlers) GetOrderProduct(c *gin.Context) {
+	productID := c.Param("id")
+
+	if !helper.IsValidUUID(productID) {
+		v1.error(c, status.StatusBadUUID)
+		return
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+
+	res, errStatus := v1.service.Order().GetProductByID(ctx, productID)
+	if errStatus != nil {
+		v1.error(c, *errStatus)
+	} else {
+		v1.response(c, http.StatusOK, res)
+	}
+}
+
+// GetOrderProductAll
+// @id GetOrderProductAll
+// @router /api/order/product [get]
+// @summary get order product all
+// @description get order product all
+// @tags order
+// @accept json
+// @produce json
+// @success 200 {object} []models.OrderProductModel "Success"
+// @failure 404 {object} models_v1.Response "Order not found"
+// @failure 500 {object} models_v1.Response "Internal server error"
+func (v1 *Handlers) GetOrderProductAll(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+
+	res, errStatus := v1.service.Order().GetProductAll(ctx)
+	if errStatus != nil {
+		v1.error(c, *errStatus)
+	} else {
+		v1.response(c, http.StatusOK, res)
+	}
+}
+
 func (v1 *Handlers) getUserID(c *gin.Context) (string, interface{}) {
 	val, ok := c.Get(UserIDContext)
 	if !ok {

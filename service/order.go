@@ -181,3 +181,27 @@ func (srv OrderService) GetAll(ctx context.Context) (interface{}, *status.Status
 
 	return model, nil
 }
+
+func (srv OrderService) GetProductByID(ctx context.Context, productID string) (interface{}, *status.Status) {
+	model, err := srv.store.OrderProduct().GetByID(ctx, productID)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, &status.StatusNotFound
+		}
+		srv.log.Error("could not get order product by id", logs.Error(err),
+			logs.String("id", productID),
+		)
+		return nil, &status.StatusInternal
+	}
+	return model, nil
+}
+
+func (srv OrderService) GetProductAll(ctx context.Context) (interface{}, *status.Status) {
+	model, err := srv.store.OrderProduct().GetAll(ctx)
+	if err != nil {
+		srv.log.Error("could not get order all", logs.Error(err))
+		return nil, &status.StatusInternal
+	}
+
+	return model, nil
+}

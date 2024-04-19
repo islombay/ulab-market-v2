@@ -33,7 +33,9 @@ type StoreInterface interface {
 }
 
 type OrderProductI interface {
+	GetByID(ctx context.Context, id string) (*models.OrderProductModel, error)
 	Create(ctx context.Context, m []models.OrderProductModel) error
+	GetAll(ctx context.Context) ([]models.OrderProductModel, error)
 }
 
 type OrderI interface {

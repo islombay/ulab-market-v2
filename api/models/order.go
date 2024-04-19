@@ -15,14 +15,14 @@ type OrderModel struct {
 }
 
 type OrderProductModel struct {
-	ID           string  `db:"id"`
-	OrderID      string  `db:"order_id"`
-	ProductID    string  `db:"product_id"`
-	Quantity     int     `db:"quantity"`
-	ProductPrice float64 `db:"product_price"`
-	TotalPrice   float64 `db:"total_price"`
+	ID           string  `db:"id" json:"id"`
+	OrderID      string  `db:"order_id" json:"order_id"`
+	ProductID    string  `db:"product_id" json:"product_id"`
+	Quantity     int     `db:"quantity" json:"quantity"`
+	ProductPrice float64 `db:"product_price" json:"product_price"`
+	TotalPrice   float64 `db:"total_price" json:"total_price"`
 
-	CreatedAt time.Time  `db:"created_at"`
-	UpdatedAt time.Time  `db:"updated_at"`
-	DeletedAt *time.Time `db:"deleted_at"`
+	CreatedAt time.Time  `db:"created_at" json:"created_at"`
+	UpdatedAt time.Time  `db:"updated_at" json:"updated_at"`
+	DeletedAt *time.Time `db:"deleted_at" json:"deleted_at"`
 }

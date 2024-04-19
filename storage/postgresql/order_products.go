@@ -41,3 +41,51 @@ func (db *OrderProductsRepo) Create(ctx context.Context, m []models.OrderProduct
 	}
 	return err
 }
+
+func (db *OrderProductsRepo) GetByID(ctx context.Context, id string) (*models.OrderProductModel, error) {
+	q := `select
+    	id, order_id, product_id,
+    	quantity, product_price, total_price,
+    	created_at, updated_at, deleted_at
+    from order_products where id = $1`
+
+	var res models.OrderProductModel
+
+	if err := db.db.QueryRow(ctx, q, id).Scan(
+		&res.ID, &res.OrderID, &res.ProductID,
+		&res.Quantity, &res.ProductPrice, &res.TotalPrice,
+		&res.CreatedAt, &res.UpdatedAt, &res.DeletedAt,
+	); err != nil {
+		return nil, err
+	}
+
+	return &res, nil
+}
+
+func (db *OrderProductsRepo) GetAll(ctx context.Context) ([]models.OrderProductModel, error) {
+	q := `select
+    	id, order_id, product_id,
+    	quantity, product_price, total_price,
+    	created_at, updated_at, deleted_at
+    from order_products;`
+
+	var res []models.OrderProductModel
+	rows, _ := db.db.Query(ctx, q)
+	if rows.Err() != nil {
+		return nil, rows.Err()
+	}
+
+	for rows.Next() {
+		var tmp models.OrderProductModel
+		if err := rows.Scan(
+			&tmp.ID, &tmp.OrderID, &tmp.ProductID,
+			&tmp.Quantity, &tmp.ProductPrice, &tmp.TotalPrice,
+			&tmp.CreatedAt, &tmp.UpdatedAt, &tmp.DeletedAt,
+		); err != nil {
+			return nil, err
+		}
+		res = append(res, tmp)
+	}
+
+	return res, nil
+}
