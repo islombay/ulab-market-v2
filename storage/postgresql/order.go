@@ -76,3 +76,31 @@ func (db *OrderRepo) GetByID(ctx context.Context, id string) (*models.OrderModel
 	}
 	return &res, nil
 }
+
+func (db *OrderRepo) GetAll(ctx context.Context) ([]models.OrderModel, error) {
+	q := `select
+			id, user_id, status,
+			total_price,payment_type,
+			created_at, updated_at, deleted_at
+		from orders`
+
+	rows, _ := db.db.Query(ctx, q)
+	if rows.Err() != nil {
+		return nil, rows.Err()
+	}
+
+	res := []models.OrderModel{}
+
+	for rows.Next() {
+		var tmp models.OrderModel
+		if err := rows.Scan(
+			&tmp.ID, &tmp.UserID, &tmp.Status,
+			&tmp.TotalPrice, &tmp.PaymentType,
+			&tmp.CreatedAt, &tmp.UpdatedAt, &tmp.DeletedAt,
+		); err != nil {
+			return nil, err
+		}
+		res = append(res, tmp)
+	}
+	return res, nil
+}

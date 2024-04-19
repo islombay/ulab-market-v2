@@ -41,6 +41,7 @@ type OrderI interface {
 	Delete(ctx context.Context, id string) error
 	ChangeStatus(ctx context.Context, id, status string) error
 
+	GetAll(ctx context.Context) ([]models.OrderModel, error)
 	GetByID(ctx context.Context, id string) (*models.OrderModel, error)
 }
 

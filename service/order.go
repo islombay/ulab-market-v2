@@ -158,3 +158,26 @@ func (srv OrderService) ChangeOrderStatus(ctx context.Context, id, orderStatus s
 		Message: "Ok",
 	}, nil
 }
+
+func (srv OrderService) GetByID(ctx context.Context, id string) (interface{}, *status.Status) {
+	model, err := srv.store.Order().GetByID(ctx, id)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, &status.StatusNotFound
+		}
+		srv.log.Error("could not get order by id", logs.Error(err),
+			logs.String("oid", id))
+		return nil, &status.StatusInternal
+	}
+	return model, nil
+}
+
+func (srv OrderService) GetAll(ctx context.Context) (interface{}, *status.Status) {
+	model, err := srv.store.Order().GetAll(ctx)
+	if err != nil {
+		srv.log.Error("could not get order all", logs.Error(err))
+		return nil, &status.StatusInternal
+	}
+
+	return model, nil
+}

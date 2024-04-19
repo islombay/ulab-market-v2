@@ -245,6 +245,9 @@ func NewV1(
 			handler.MiddlewareStaffPermissionCheck(auth_lib.PermissionCanCancelOrder),
 			handler.OrderFinish,
 		)
+
+		order.GET("/:id", handler.GetOrderByID)
+		order.GET("", handler.GetOrderAll)
 	}
 
 	v1.GET("/ping", func(c *gin.Context) {
