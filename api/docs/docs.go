@@ -583,10 +583,7 @@ const docTemplate = `{
                     "200": {
                         "description": "success",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.BasketModel"
-                            }
+                            "$ref": "#/definitions/models_v1.GetBasket"
                         }
                     },
                     "500": {
@@ -3165,17 +3162,6 @@ const docTemplate = `{
                 }
             }
         },
-        "models.BasketModel": {
-            "type": "object",
-            "properties": {
-                "product_id": {
-                    "type": "string"
-                },
-                "quantity": {
-                    "type": "integer"
-                }
-            }
-        },
         "models.BranchModel": {
             "type": "object",
             "properties": {
@@ -3728,6 +3714,43 @@ const docTemplate = `{
             "properties": {
                 "payment_type": {
                     "type": "string"
+                }
+            }
+        },
+        "models_v1.GetBasket": {
+            "type": "object",
+            "properties": {
+                "products": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models_v1.GetBasketProduct"
+                    }
+                },
+                "total_price": {
+                    "type": "number"
+                }
+            }
+        },
+        "models_v1.GetBasketProduct": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "main_image": {
+                    "type": "string"
+                },
+                "name_ru": {
+                    "type": "string"
+                },
+                "name_uz": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "number"
+                },
+                "quantity": {
+                    "type": "integer"
                 }
             }
         },
