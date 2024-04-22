@@ -26,13 +26,12 @@ func NewStorageRepo(db *pgxpool.Pool, log logs.LoggerInterface) *storageRepo {
 func (s *storageRepo) Create(ctx context.Context, createStorage models_v1.CreateStorage) (string, error) {
 	var id string
 
-	query := `insert into storage (id, product_id, income_id, branch_id, total_price, quantity) 
-	                          values ($1, $2, $3, $4, $5, $6) returning id`
+	query := `insert into storage (id, product_id, branch_id, total_price, quantity) 
+	                          values ($1, $2, $3, $4, $5) returning id`
 
 	if err := s.db.QueryRow(ctx, query,
 		uuid.New(),
 		createStorage.ProductID,
-		createStorage.IncomeID,
 		createStorage.BranchID,
 		createStorage.TotalPrice,
 		createStorage.Quantity,
@@ -50,14 +49,13 @@ func (s *storageRepo) Create(ctx context.Context, createStorage models_v1.Create
 }
 
 func (s *storageRepo) GetByID(ctx context.Context, id string) (models_v1.Storage, error) {
-	query := `select id, product_id, income_id, branch_id, total_price, quantity, 
+	query := `select id, product_id, branch_id, total_price, quantity, 
 	     created_at, updated_at, deleted_at from storage where id = $1 and deleted_at is null`
 
 	var store models_v1.Storage
 	if err := s.db.QueryRow(ctx, query, id).Scan(
 		&store.ID,
 		&store.ProductID,
-		&store.IncomeID,
 		&store.BranchID,
 		&store.TotalPrice,
 		&store.Quantity,
@@ -81,7 +79,7 @@ func (s *storageRepo) GetList(ctx context.Context, store models_v1.StorageReques
 	pagination = ` LIMIT $1 OFFSET $2`
 
 	if store.Search != "" {
-		filter += fmt.Sprintf(` or product_id = '%s' or income_id = '%s' or branch_id = '%s'`, store.Search, store.Search, store.Search)
+		filter += fmt.Sprintf(` or product_id = '%s' or branch_id = '%s'`, store.Search, store.Search)
 	}
 
 	countQuery = `select count(1) from storages where deleted_at is null` + filter
@@ -90,7 +88,7 @@ func (s *storageRepo) GetList(ctx context.Context, store models_v1.StorageReques
 		return models_v1.StorageResponse{}, err
 	}
 
-	query = `select id, product_id, income_id, branch_id, total_price, quantity, created_at, updated_at, deleted_at
+	query = `select id, product_id, branch_id, total_price, quantity, created_at, updated_at, deleted_at
 	           from storages where deleted_at is null` + filter + pagination
 
 	rows, err := s.db.Query(ctx, query, store.Limit, offset)
@@ -104,7 +102,6 @@ func (s *storageRepo) GetList(ctx context.Context, store models_v1.StorageReques
 		if err = rows.Scan(
 			&str.ID,
 			&str.ProductID,
-			&str.IncomeID,
 			&str.BranchID,
 			&str.TotalPrice,
 			&str.Quantity,
@@ -138,12 +135,6 @@ func (s *storageRepo) Update(ctx context.Context, store models_v1.UpdateStorage)
 		params["product_id"] = store.ProductID
 
 		filter += " product_id = @product_id,"
-	}
-
-	if store.IncomeID != "" {
-		params["income_id"] = store.IncomeID
-
-		filter += " income_id = @income_id,"
 	}
 
 	if store.BranchID != "" {

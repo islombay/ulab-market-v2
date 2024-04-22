@@ -7,7 +7,6 @@ import (
 type Storage struct {
 	ID         string     `json:"id"`
 	ProductID  string     `json:"product_id"`
-	IncomeID   string     `json:"income_id"`
 	BranchID   string     `json:"branch_id"`
 	TotalPrice float32    `json:"total_price"`
 	Quantity   int        `json:"quantity"`
@@ -18,7 +17,6 @@ type Storage struct {
 
 type CreateStorage struct {
 	ProductID  string  `json:"product_id"`
-	IncomeID   string  `json:"income_id"`
 	BranchID   string  `json:"branch_id"`
 	TotalPrice float32 `json:"total_price"`
 	Quantity   int     `json:"quantity"`
@@ -27,7 +25,6 @@ type CreateStorage struct {
 type UpdateStorage struct {
 	ID         string  `json:"id"`
 	ProductID  string  `json:"product_id"`
-	IncomeID   string  `json:"income_id"`
 	BranchID   string  `json:"branch_id"`
 	TotalPrice float32 `json:"total_price"`
 	Quantity   int     `json:"quantity"`
