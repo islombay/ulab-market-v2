@@ -154,9 +154,9 @@ type BrandInterface interface {
 }
 
 type StoragesInterface interface {
-	Create(context.Context, models_v1.CreateStorage) (string, error)
+	Create(context.Context, models_v1.CreateStorage) (models_v1.Storage, error)
 	GetByID(context.Context, string) (models_v1.Storage, error)
 	GetList(context.Context, models_v1.StorageRequest) (models_v1.StorageResponse, error)
-	Update(context.Context, models_v1.UpdateStorage) (string, error)
+	Update(context.Context, models_v1.UpdateStorage) (models_v1.Storage, error)
 	Delete(context.Context, string) error
 }
