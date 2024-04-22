@@ -23,11 +23,12 @@ func NewStorageRepo(db *pgxpool.Pool, log logs.LoggerInterface) *storageRepo {
 	return &storageRepo{db: db, log: log}
 }
 
-func (s *storageRepo) Create(ctx context.Context, createStorage models_v1.CreateStorage) (string, error) {
-	var id string
+func (s *storageRepo) Create(ctx context.Context, createStorage models_v1.CreateStorage) (models_v1.Storage, error) {
+	var store models_v1.Storage
 
 	query := `insert into storage (id, product_id, branch_id, total_price, quantity) 
-	                          values ($1, $2, $3, $4, $5) returning id`
+	                          values ($1, $2, $3, $4, $5) 
+	                          returning id, product_id, branch_id, total_price, quantity`
 
 	if err := s.db.QueryRow(ctx, query,
 		uuid.New(),
@@ -35,17 +36,23 @@ func (s *storageRepo) Create(ctx context.Context, createStorage models_v1.Create
 		createStorage.BranchID,
 		createStorage.TotalPrice,
 		createStorage.Quantity,
-	).Scan(&id); err != nil {
+	).Scan(
+		&store.ID,
+		&store.ProductID,
+		&store.BranchID,
+		&store.TotalPrice,
+		&store.Quantity,
+	); err != nil {
 		var pgcon *pgconn.PgError
 		if errors.As(err, &pgcon) {
 			if pgcon.Code == DuplicateKeyError {
-				return "", storage.ErrAlreadyExists
+				return models_v1.Storage{}, storage.ErrAlreadyExists
 			}
 		}
-		return "", err
+		return models_v1.Storage{}, err
 	}
 
-	return id, nil
+	return store, nil
 }
 
 func (s *storageRepo) GetByID(ctx context.Context, id string) (models_v1.Storage, error) {
@@ -121,12 +128,12 @@ func (s *storageRepo) GetList(ctx context.Context, store models_v1.StorageReques
 	}, nil
 }
 
-func (s *storageRepo) Update(ctx context.Context, store models_v1.UpdateStorage) (string, error) {
+func (s *storageRepo) Update(ctx context.Context, store models_v1.UpdateStorage) (models_v1.Storage, error) {
 	var (
-		id     string
-		params = make(map[string]interface{})
-		query  = `update storage set `
-		filter = ""
+		updatedStore models_v1.Storage
+		params       = make(map[string]interface{})
+		query        = `update storage set `
+		filter       = ""
 	)
 
 	params["id"] = store.ID
@@ -155,17 +162,21 @@ func (s *storageRepo) Update(ctx context.Context, store models_v1.UpdateStorage)
 		filter += " quantity = @quantity,"
 	}
 
-	query += filter + ` updated_at = now() where deleted_at is null and id = @id returning id`
+	query += filter + ` updated_at = now() where deleted_at is null and id = @id returning id, product_id, branch_id, total_price, quantity`
 
 	fullQuery, args := helper.ReplaceQueryParams(query, params)
 
 	if err := s.db.QueryRow(ctx, fullQuery, args...).Scan(
-		&id,
+		&updatedStore.ID,
+		&updatedStore.ProductID,
+		&updatedStore.BranchID,
+		&updatedStore.TotalPrice,
+		&updatedStore.Quantity,
 	); err != nil {
-		return "", err
+		return models_v1.Storage{}, err
 	}
 
-	return id, nil
+	return updatedStore, nil
 }
 
 func (s *storageRepo) Delete(ctx context.Context, id string) error {
