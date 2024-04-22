@@ -12,8 +12,8 @@ type storeService struct {
 	log   logs.LoggerInterface
 }
 
-func NewStoreService(store storage.StoreInterface, log logs.LoggerInterface) storeService {
-	return storeService{
+func NewStoreService(store storage.StoreInterface, log logs.LoggerInterface) *storeService {
+	return &storeService{
 		log:   log,
 		store: store,
 	}
