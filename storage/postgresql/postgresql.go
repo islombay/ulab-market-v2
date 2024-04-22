@@ -23,6 +23,7 @@ type Store struct {
 	branch        storage.BranchInterface
 	order         storage.OrderI
 	order_product storage.OrderProductI
+	storages      storage.StoragesInterface
 
 	log logs.LoggerInterface
 }
@@ -134,4 +135,11 @@ func (s *Store) OrderProduct() storage.OrderProductI {
 		s.order_product = NewOrderProductRepo(s.db, s.log)
 	}
 	return s.order_product
+}
+
+func (s *Store) Storage() storage.StoragesInterface {
+	if s.storages == nil {
+		s.storages = NewStorageRepo(s.db, s.log)
+	}
+	return s.storages
 }

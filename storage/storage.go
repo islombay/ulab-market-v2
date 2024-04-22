@@ -2,6 +2,7 @@ package storage
 
 import (
 	"app/api/models"
+	models_v1 "app/api/models/v1"
 	"context"
 	"fmt"
 	"time"
@@ -30,6 +31,7 @@ type StoreInterface interface {
 	Branch() BranchInterface
 	Order() OrderI
 	OrderProduct() OrderProductI
+	Storage() StoragesInterface
 }
 
 type OrderProductI interface {
@@ -149,4 +151,12 @@ type BrandInterface interface {
 
 	Change(ctx context.Context, m models.Brand) error
 	Delete(ctx context.Context, id string) error
+}
+
+type StoragesInterface interface {
+	Create(context.Context, models_v1.CreateStorage) (string, error)
+	GetByID(context.Context, string) (models_v1.Storage, error)
+	GetList(context.Context, models_v1.StorageRequest) (models_v1.StorageResponse, error)
+	Update(context.Context, models_v1.UpdateStorage) (string, error)
+	Delete(context.Context, string) error
 }
