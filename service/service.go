@@ -8,12 +8,12 @@ import (
 
 type IServiceManager interface {
 	Order() OrderService
-	Store() storeService
+	Store() *storeService
 }
 
 type Service struct {
 	order        OrderService
-	storeService storeService
+	storeService *storeService
 }
 
 func New(str storage.StoreInterface, log logs.LoggerInterface, filestorage storage.FileStorageInterface, cache storage.CacheInterface, stmp smtp.SMTPInterface) IServiceManager {
@@ -29,7 +29,7 @@ func (s *Service) Order() OrderService {
 	return s.order
 }
 
-func (s *Service) Store() storeService {
+func (s *Service) Store() *storeService {
 	return s.storeService
 }
 
