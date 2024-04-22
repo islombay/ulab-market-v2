@@ -19,7 +19,7 @@ create table if not exists incomes (
     updated_at timestamp default now() not null,
     deleted_at timestamp default null,
 
-    foreign key (courier_id) references staffs(id) on delete set null
+    foreign key (courier_id) references staff(id) on delete set null
     foreign key (storage_id) references storage(id) on delete set null
 );
 
