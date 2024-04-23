@@ -32,6 +32,7 @@ type StoreInterface interface {
 	Order() OrderI
 	OrderProduct() OrderProductI
 	Storage() StoragesInterface
+	Favourite() FavouriteI
 }
 
 type OrderProductI interface {
@@ -159,4 +160,9 @@ type StoragesInterface interface {
 	GetList(context.Context, models_v1.StorageRequest) (models_v1.StorageResponse, error)
 	Update(context.Context, models_v1.UpdateStorage) (string, error)
 	Delete(context.Context, string) error
+}
+
+type FavouriteI interface {
+	Create(context.Context, string, string) error
+	Get(context.Context, string, string) (*models.FavouriteModel, error)
 }

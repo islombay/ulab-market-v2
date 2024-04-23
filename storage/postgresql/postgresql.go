@@ -25,6 +25,8 @@ type Store struct {
 	order_product storage.OrderProductI
 	storages      storage.StoragesInterface
 
+	favouite storage.FavouriteI
+
 	log logs.LoggerInterface
 }
 
@@ -142,4 +144,12 @@ func (s *Store) Storage() storage.StoragesInterface {
 		s.storages = NewStorageRepo(s.db, s.log)
 	}
 	return s.storages
+}
+
+func (s *Store) Favourite() storage.FavouriteI {
+	if s.favouite == nil {
+		s.favouite = NewFavouriteRepo(s.db)
+	}
+
+	return s.favouite
 }
