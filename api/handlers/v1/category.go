@@ -206,7 +206,7 @@ func (v1 *Handlers) ChangeCategoryImage(c *gin.Context) {
 		}
 	}
 
-	var url string
+	var url string = ""
 	var err error
 
 	if m.Image != nil {
@@ -237,7 +237,7 @@ func (v1 *Handlers) ChangeCategoryImage(c *gin.Context) {
 	}
 
 	if err := v1.storage.Category().ChangeImage(context.Background(),
-		models.GetStringAddress(m.CategoryID), &url,
+		models.GetStringAddress(m.CategoryID), models.GetStringAddress(url),
 		m.IconID); err != nil {
 		if errors.Is(err, storage.ErrNotAffected) {
 			v1.error(c, status.StatusInternal)
