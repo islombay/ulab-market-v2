@@ -1346,13 +1346,38 @@
                 "operationId": "createCategory",
                 "parameters": [
                     {
-                        "description": "Create category request",
-                        "name": "create_category",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models_v1.CreateCategory"
-                        }
+                        "type": "string",
+                        "name": "icon_id",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "name": "name_ru",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "name": "name_uz",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "name": "parent_id",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "file",
+                        "description": "Icon file",
+                        "name": "icon",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "file",
+                        "description": "Image file",
+                        "name": "image",
+                        "in": "formData"
                     }
                 ],
                 "responses": {
@@ -3741,24 +3766,6 @@
             ],
             "properties": {
                 "name": {
-                    "type": "string"
-                }
-            }
-        },
-        "models_v1.CreateCategory": {
-            "type": "object",
-            "required": [
-                "name_ru",
-                "name_uz"
-            ],
-            "properties": {
-                "name_ru": {
-                    "type": "string"
-                },
-                "name_uz": {
-                    "type": "string"
-                },
-                "parent_id": {
                     "type": "string"
                 }
             }

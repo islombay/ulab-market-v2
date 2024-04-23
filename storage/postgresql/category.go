@@ -7,10 +7,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/jackc/pgconn"
-	"github.com/jackc/pgx/v4/pgxpool"
 	"strings"
 	"time"
+
+	"github.com/jackc/pgconn"
+	"github.com/jackc/pgx/v4/pgxpool"
 )
 
 type CategoryRepo struct {
@@ -29,6 +30,7 @@ func (db *CategoryRepo) Create(ctx context.Context, m models.Category) error {
 		var pgcon *pgconn.PgError
 		if errors.As(err, &pgcon) {
 			if pgcon.Code == DuplicateKeyError {
+				db.log.Error("category already exists", logs.Error(err))
 				return storage.ErrAlreadyExists
 			}
 		}
@@ -196,12 +198,12 @@ func (db *CategoryRepo) GetByName(ctx context.Context, name string) (*models.Cat
     		image, icon_id, parent_id,
     		created_at, updated_at, deleted_at
 		from category where (
-		    name_ru ilike $1 or name_uz ilike $1
+		    name_ru = $1 or name_uz = $1
 		    )
 		and deleted_at is null`
 
 	var res models.Category
-	if err := db.db.QueryRow(ctx, q, "%"+name+"%").Scan(
+	if err := db.db.QueryRow(ctx, q, name).Scan(
 		&res.ID, &res.NameUz, &res.NameRu,
 		&res.Image, &res.Icon, &res.ParentID,
 		&res.CreatedAt, &res.UpdatedAt, &res.DeletedAt,

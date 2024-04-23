@@ -10,11 +10,13 @@ import (
 	"app/storage/filestore"
 	"context"
 	"errors"
+	"fmt"
+	"net/http"
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v4"
-	"net/http"
-	"time"
 )
 
 // CreateCategory godoc
@@ -26,14 +28,15 @@ import (
 // @Security ApiKeyAuth
 // @Accept json
 // @Produce json
-// @Param create_category body models_v1.CreateCategory true "Create category request"
+// @Param create_category formData models_v1.CreateCategory true "Create category request"
+// @param image formData file false "Image file"
 // @Success 200 {object} models_v1.ResponseID "success"
 // @Failure 400 {object} models_v1.Response "Bad request"
 // @Failure 409 {object} models_v1.Response "Already exists"
 // @Failure 500 {object} models_v1.Response "internal error"
 func (v1 *Handlers) CreateCategory(c *gin.Context) {
 	var m models_v1.CreateCategory
-	if c.BindJSON(&m) != nil {
+	if c.Bind(&m) != nil {
 		v1.error(c, status.StatusBadRequest)
 		return
 	}
@@ -55,6 +58,30 @@ func (v1 *Handlers) CreateCategory(c *gin.Context) {
 	}
 	var pn = models.GetStringAddress(m.ParentID)
 
+	if f, err := v1.storage.Category().GetByName(context.Background(), m.NameRu); err != nil {
+		if !errors.Is(err, pgx.ErrNoRows) {
+			v1.error(c, status.StatusInternal)
+			v1.log.Error("could not get category by name", logs.Error(err))
+			return
+		}
+	} else {
+		fmt.Println(f, err)
+		v1.error(c, status.StatusAlreadyExists)
+		return
+	}
+
+	if f, err := v1.storage.Category().GetByName(context.Background(), m.NameUz); err != nil {
+		if !errors.Is(err, pgx.ErrNoRows) {
+			v1.error(c, status.StatusInternal)
+			v1.log.Error("could not get category by name", logs.Error(err))
+			return
+		}
+	} else {
+		fmt.Println(f, err, "2")
+		v1.error(c, status.StatusAlreadyExists)
+		return
+	}
+
 	ct := models.Category{
 		ID:        uuid.New().String(),
 		NameUz:    m.NameUz,
@@ -63,26 +90,53 @@ func (v1 *Handlers) CreateCategory(c *gin.Context) {
 		CreatedAt: time.Now(),
 	}
 
-	if _, err := v1.storage.Category().GetByName(context.Background(), m.NameRu); err != nil {
-		if !errors.Is(err, pgx.ErrNoRows) {
-			v1.error(c, status.StatusInternal)
-			v1.log.Error("could not get category by name", logs.Error(err))
+	if m.IconID != nil {
+		if !helper.IsValidUUID(*m.IconID) {
+			v1.error(c, status.StatusBadUUID)
 			return
 		}
-	} else {
-		v1.error(c, status.StatusAlreadyExists)
-		return
+		if _, err := v1.storage.Icon().GetIconByID(context.Background(), *m.IconID); err != nil {
+			if errors.Is(err, pgx.ErrNoRows) {
+				v1.error(c, status.StatusIconNotFound)
+				return
+			}
+			v1.error(c, status.StatusInternal)
+			v1.log.Error("could not get icon by id", logs.Error(err))
+			return
+		}
+
+		ct.Icon = m.IconID
 	}
 
-	if _, err := v1.storage.Category().GetByName(context.Background(), m.NameUz); err != nil {
-		if !errors.Is(err, pgx.ErrNoRows) {
-			v1.error(c, status.StatusInternal)
-			v1.log.Error("could not get category by name", logs.Error(err))
+	var url string
+	var err error
+
+	if m.Image != nil {
+		if m.Image.Size > v1.cfg.Media.CategoryPhotoMaxSize {
+			v1.error(c, status.StatusImageMaxSizeExceed)
+			v1.log.Debug("image size exceeds limit",
+				logs.Any("limit", v1.cfg.Media.CategoryPhotoMaxSize),
+				logs.Any("got", m.Image.Size),
+			)
 			return
 		}
-	} else {
-		v1.error(c, status.StatusAlreadyExists)
-		return
+		if valid, err, contentType := helper.IsValidImage(m.Image); !valid && err != nil {
+			if errors.Is(err, helper.ErrInvalidImageType) {
+				v1.error(c, status.StatusImageTypeUnkown)
+				v1.log.Debug("got image type", logs.String("content-type", contentType))
+				return
+			}
+			v1.error(c, status.StatusInternal)
+			v1.log.Error("could not check the image type", logs.Error(err))
+			return
+		}
+		url, err = v1.filestore.Create(m.Image, filestore.FolderCategory, ct.ID)
+		if err != nil {
+			v1.log.Error("could not create image file in filestore", logs.Error(err))
+			v1.error(c, status.StatusInternal)
+			return
+		}
+		ct.Image = &url
 	}
 
 	if err := v1.storage.Category().Create(context.Background(), ct); err != nil {
