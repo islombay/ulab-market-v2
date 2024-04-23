@@ -30,6 +30,7 @@ var (
 		"image/svg+xml",
 		"text/plain",
 		"text/plain; charset=utf-8",
+		"image/png",
 	}
 )
 

@@ -1380,12 +1380,6 @@ const docTemplate = `{
                     },
                     {
                         "type": "file",
-                        "description": "Icon file",
-                        "name": "icon",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "file",
                         "description": "Image file",
                         "name": "image",
                         "in": "formData"

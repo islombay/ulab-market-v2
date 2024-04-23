@@ -197,10 +197,7 @@ func (db *CategoryRepo) GetByName(ctx context.Context, name string) (*models.Cat
     		id, name_uz, name_ru,
     		image, icon_id, parent_id,
     		created_at, updated_at, deleted_at
-		from category where (
-		    name_ru = $1 or name_uz = $1
-		    )
-		and deleted_at is null`
+		from category where (name_ru = $1 or name_uz = $1) and deleted_at is null`
 
 	var res models.Category
 	if err := db.db.QueryRow(ctx, q, name).Scan(

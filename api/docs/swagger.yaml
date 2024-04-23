@@ -1377,10 +1377,6 @@ paths:
       - in: formData
         name: parent_id
         type: string
-      - description: Icon file
-        in: formData
-        name: icon
-        type: file
       - description: Image file
         in: formData
         name: image

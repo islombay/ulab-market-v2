@@ -10,7 +10,6 @@ import (
 	"app/storage/filestore"
 	"context"
 	"errors"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -58,26 +57,24 @@ func (v1 *Handlers) CreateCategory(c *gin.Context) {
 	}
 	var pn = models.GetStringAddress(m.ParentID)
 
-	if f, err := v1.storage.Category().GetByName(context.Background(), m.NameRu); err != nil {
+	if _, err := v1.storage.Category().GetByName(context.Background(), m.NameRu); err != nil {
 		if !errors.Is(err, pgx.ErrNoRows) {
 			v1.error(c, status.StatusInternal)
 			v1.log.Error("could not get category by name", logs.Error(err))
 			return
 		}
 	} else {
-		fmt.Println(f, err)
 		v1.error(c, status.StatusAlreadyExists)
 		return
 	}
 
-	if f, err := v1.storage.Category().GetByName(context.Background(), m.NameUz); err != nil {
+	if _, err := v1.storage.Category().GetByName(context.Background(), m.NameUz); err != nil {
 		if !errors.Is(err, pgx.ErrNoRows) {
 			v1.error(c, status.StatusInternal)
 			v1.log.Error("could not get category by name", logs.Error(err))
 			return
 		}
 	} else {
-		fmt.Println(f, err, "2")
 		v1.error(c, status.StatusAlreadyExists)
 		return
 	}
