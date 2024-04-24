@@ -57,6 +57,12 @@ var (
 
 			PermissionCanFinishOrder,
 			PermissionCanCancelOrder,
+
+			PermissionCreateStore,
+			PermissionGetStoreByID,
+			PermissionGetStoreList,
+			PermissionUpdateStore,
+			PermissionDeleteStore,
 		},
 	}
 	RoleClient = models.RoleModel{
@@ -84,6 +90,12 @@ var (
 			PermissionAddCourier,
 			PermissionEditCourier,
 			PermissionDeleteCourier,
+
+			PermissionCreateStore,
+			PermissionGetStoreByID,
+			PermissionGetStoreList,
+			PermissionUpdateStore,
+			PermissionDeleteStore,
 		},
 	}
 	RoleSuper = models.RoleModel{
@@ -170,6 +182,15 @@ var (
 	PermissionDeleteIconToList = models.PermissionModel{ID: uuid.NewString(), Name: "can_delete_icon_to_list"}
 )
 
+// storage permission
+var (
+	PermissionCreateStore  = models.PermissionModel{ID: uuid.NewString(), Name: "can_add_storage"}
+	PermissionGetStoreByID = models.PermissionModel{ID: uuid.NewString(), Name: "can_read_storage"}
+	PermissionGetStoreList = models.PermissionModel{ID: uuid.NewString(), Name: "can_read_storage_list"}
+	PermissionUpdateStore  = models.PermissionModel{ID: uuid.NewString(), Name: "can_edit_storage"}
+	PermissionDeleteStore  = models.PermissionModel{ID: uuid.NewString(), Name: "can_delete_storage"}
+)
+
 var PermissionsList = []*models.PermissionModel{
 	&PermissionCanMigrateDown,
 
@@ -211,6 +232,12 @@ var PermissionsList = []*models.PermissionModel{
 
 	&PermissionCanFinishOrder,
 	&PermissionCanCancelOrder,
+
+	&PermissionCreateStore,
+	&PermissionGetStoreByID,
+	&PermissionGetStoreList,
+	&PermissionUpdateStore,
+	&PermissionDeleteStore,
 }
 
 var RolesList = []*models.RoleModel{

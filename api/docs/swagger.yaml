@@ -200,6 +200,14 @@ definitions:
       updated_at:
         type: string
     type: object
+  models.Response:
+    properties:
+      data: {}
+      description:
+        type: string
+      statusCode:
+        type: integer
+    type: object
   models.RoleModel:
     properties:
       created_at:
@@ -387,6 +395,17 @@ definitions:
     required:
     - payment_type
     type: object
+  models_v1.CreateStorage:
+    properties:
+      branch_id:
+        type: string
+      product_id:
+        type: string
+      quantity:
+        type: integer
+      total_price:
+        type: number
+    type: object
   models_v1.GetBasket:
     properties:
       products:
@@ -496,6 +515,34 @@ definitions:
       id:
         type: string
     type: object
+  models_v1.Storage:
+    properties:
+      branch_id:
+        type: string
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      id:
+        type: string
+      product_id:
+        type: string
+      quantity:
+        type: integer
+      total_price:
+        type: number
+      updated_at:
+        type: string
+    type: object
+  models_v1.StorageResponse:
+    properties:
+      count:
+        type: integer
+      storage:
+        items:
+          $ref: '#/definitions/models_v1.Storage'
+        type: array
+    type: object
   models_v1.Token:
     properties:
       token:
@@ -506,6 +553,19 @@ definitions:
       id:
         example: 438b3f0a-126b-4085-a8e9-525dfe0941e5
         type: string
+    type: object
+  models_v1.UpdateStorage:
+    properties:
+      branch_id:
+        type: string
+      id:
+        type: string
+      product_id:
+        type: string
+      quantity:
+        type: integer
+      total_price:
+        type: number
     type: object
   models_v1.VerifyCodeRequest:
     properties:
@@ -2602,6 +2662,190 @@ paths:
       summary: create new role
       tags:
       - role
+  /api/storage:
+    get:
+      consumes:
+      - application/json
+      description: get storage list
+      parameters:
+      - description: page
+        in: query
+        name: page
+        type: string
+      - description: limit
+        in: query
+        name: limit
+        type: string
+      - description: search
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models_v1.StorageResponse'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "404":
+          description: Page not found
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "500":
+          description: Interval server error
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Get storage  list
+      tags:
+      - storage
+    post:
+      consumes:
+      - application/json
+      description: Create a new storage
+      parameters:
+      - description: storage
+        in: body
+        name: storage
+        schema:
+          $ref: '#/definitions/models_v1.CreateStorage'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models_v1.Storage'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "404":
+          description: Page not found
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "500":
+          description: Interval server error
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Create a new storage
+      tags:
+      - storage
+  /api/storage/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: delete storage
+      parameters:
+      - description: storage_id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "404":
+          description: Page not found
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "500":
+          description: Interval server error
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete storage
+      tags:
+      - storage
+    get:
+      consumes:
+      - application/json
+      description: get storage  by id
+      parameters:
+      - description: storage_id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models_v1.Storage'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "404":
+          description: Page not found
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "500":
+          description: Interval server error
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Get storage  by id
+      tags:
+      - storage
+    put:
+      consumes:
+      - application/json
+      description: update storage
+      parameters:
+      - description: storage
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: storage
+        in: body
+        name: sale_point
+        schema:
+          $ref: '#/definitions/models_v1.UpdateStorage'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models_v1.Storage'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "404":
+          description: Page not found
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "500":
+          description: Interval server error
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Update storage
+      tags:
+      - storage
   /api/super/migrate-down:
     get:
       operationId: SuperMigrateDown

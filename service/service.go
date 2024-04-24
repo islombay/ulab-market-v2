@@ -8,18 +8,21 @@ import (
 
 type IServiceManager interface {
 	Order() OrderService
+	Store() *storeService
 	Favourite() *FavouriteService
 }
 
 type Service struct {
-	order     OrderService
-	favourite *FavouriteService
+	order        OrderService
+	favourite    *FavouriteService
+	storeService *storeService
 }
 
 func New(str storage.StoreInterface, log logs.LoggerInterface, filestorage storage.FileStorageInterface, cache storage.CacheInterface, stmp smtp.SMTPInterface) IServiceManager {
 	srv := Service{}
 
 	srv.order = NewOrderService(str, log, filestorage)
+	srv.storeService = NewStoreService(str, log)
 	srv.favourite = NewFavouriteService(str, log)
 
 	return &srv
@@ -27,6 +30,10 @@ func New(str storage.StoreInterface, log logs.LoggerInterface, filestorage stora
 
 func (s *Service) Order() OrderService {
 	return s.order
+}
+
+func (s *Service) Store() *storeService {
+	return s.storeService
 }
 
 func (s *Service) Favourite() *FavouriteService {

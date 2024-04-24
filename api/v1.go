@@ -254,6 +254,29 @@ func NewV1(
 		order.GET("/product", handler.GetOrderProductAll)
 	}
 
+	storeTable := v1.Group("/storage")
+	{
+		storeTable.POST("",
+			handler.MiddlewareStaffPermissionCheck(auth_lib.PermissionCreateStore),
+			handler.CreateStorage)
+
+		storeTable.GET("/:id",
+			handler.MiddlewareStaffPermissionCheck(auth_lib.PermissionGetStoreByID),
+			handler.GetStorageByID)
+
+		storeTable.GET("",
+			handler.MiddlewareStaffPermissionCheck(auth_lib.PermissionGetStoreList),
+			handler.GetStorageList)
+
+		storeTable.PUT("/:id",
+			handler.MiddlewareStaffPermissionCheck(auth_lib.PermissionUpdateStore),
+			handler.UpdateStorage)
+
+		storeTable.DELETE("/:id",
+			handler.MiddlewareStaffPermissionCheck(auth_lib.PermissionDeleteStore),
+			handler.DeleteStorage)
+	}
+
 	favourite := v1.Group("/favourite")
 	{
 		favourite.POST("",

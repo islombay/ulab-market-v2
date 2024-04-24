@@ -1,6 +1,7 @@
 package handlersv1
 
 import (
+	"app/api/models"
 	models_v1 "app/api/models/v1"
 	"app/api/status"
 	"app/config"
@@ -68,4 +69,27 @@ func (v1 *Handlers) response(c *gin.Context, code int, data interface{}) {
 	)
 
 	c.JSON(code, data)
+}
+
+func handleResponse(c *gin.Context, log logs.LoggerInterface, msg string, statusCode int, data interface{}) {
+	resp := models.Response{}
+
+	switch code := statusCode; {
+	case code < 400:
+		resp.Description = "OK"
+		log.Info("~~~~> OK", logs.String("msg", msg), logs.Any("status", code))
+	case code == 401:
+		resp.Description = "Unauthorized"
+	case code < 500:
+		resp.Description = "Bad Request"
+		log.Error("!!!!! BAD REQUEST", logs.String("msg", msg), logs.Any("status", code))
+	default:
+		resp.Description = "Internal Server Error"
+		log.Error("!!!!! INTERNAL SERVER ERROR", logs.String("msg", msg), logs.Any("status", code), logs.Any("error", data))
+	}
+
+	resp.StatusCode = statusCode
+	resp.Data = data
+
+	c.JSON(resp.StatusCode, resp)
 }
