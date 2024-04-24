@@ -92,5 +92,5 @@ create table if not exists category (
     updated_at timestamp default now() not null,
     deleted_at timestamp default null,
 
-    foreign key (icon_id) references icons_list(id)
+    foreign key (icon_id) references icons_list(id) on delete set null
 );

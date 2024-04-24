@@ -71,6 +71,13 @@ definitions:
       updated_at:
         type: string
     type: object
+  models.FavouriteModel:
+    properties:
+      product_id:
+        type: string
+      user_id:
+        type: string
+    type: object
   models.IconModel:
     properties:
       id:
@@ -253,6 +260,13 @@ definitions:
     - product_id
     - quantity
     type: object
+  models_v1.AddToFavourite:
+    properties:
+      product_id:
+        type: string
+    required:
+    - product_id
+    type: object
   models_v1.AttachRoleToPermission:
     properties:
       permission_id:
@@ -361,18 +375,6 @@ definitions:
         type: string
     required:
     - name
-    type: object
-  models_v1.CreateCategory:
-    properties:
-      name_ru:
-        type: string
-      name_uz:
-        type: string
-      parent_id:
-        type: string
-    required:
-    - name_ru
-    - name_uz
     type: object
   models_v1.CreateNewRole:
     properties:
@@ -1421,12 +1423,24 @@ paths:
       description: Create category
       operationId: createCategory
       parameters:
-      - description: Create category request
-        in: body
-        name: create_category
+      - in: formData
+        name: icon_id
+        type: string
+      - in: formData
+        name: name_ru
         required: true
-        schema:
-          $ref: '#/definitions/models_v1.CreateCategory'
+        type: string
+      - in: formData
+        name: name_uz
+        required: true
+        type: string
+      - in: formData
+        name: parent_id
+        type: string
+      - description: Image file
+        in: formData
+        name: image
+        type: file
       produces:
       - application/json
       responses:
@@ -1607,6 +1621,47 @@ paths:
       summary: change category image
       tags:
       - category
+  /api/favourite:
+    post:
+      consumes:
+      - application/json
+      description: Add product to favourite
+      operationId: AddToFavourite
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models_v1.AddToFavourite'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/models.FavouriteModel'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "404":
+          description: Product not found
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: Add product to favourite
+      tags:
+      - favourite
   /api/icon:
     get:
       consumes:

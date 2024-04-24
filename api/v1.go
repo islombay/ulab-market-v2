@@ -8,8 +8,9 @@ import (
 	"app/pkg/smtp"
 	"app/service"
 	"app/storage"
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 func NewV1(
@@ -274,6 +275,24 @@ func NewV1(
 		storeTable.DELETE("/:id",
 			handler.MiddlewareStaffPermissionCheck(auth_lib.PermissionDeleteStore),
 			handler.DeleteStorage)
+	}
+
+	favourite := v1.Group("/favourite")
+	{
+		favourite.POST("",
+			handler.MiddlewareIsClient(),
+			handler.AddToFavourite,
+		)
+
+		favourite.DELETE("/:productID",
+			handler.MiddlewareIsClient(),
+			handler.DeleteFromFavourite,
+		)
+
+		favourite.GET("",
+			handler.MiddlewareIsClient(),
+			handler.GetAllFavourite,
+		)
 	}
 
 	v1.GET("/ping", func(c *gin.Context) {

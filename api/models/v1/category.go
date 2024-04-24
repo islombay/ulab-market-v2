@@ -3,9 +3,11 @@ package models_v1
 import "mime/multipart"
 
 type CreateCategory struct {
-	NameUz   string `json:"name_uz" binding:"required"`
-	NameRu   string `json:"name_ru" binding:"required"`
-	ParentID string `json:"parent_id"`
+	NameUz   string                `form:"name_uz" binding:"required"`
+	NameRu   string                `form:"name_ru" binding:"required"`
+	IconID   *string               `form:"icon_id"`
+	Image    *multipart.FileHeader `form:"image" swaggerignore:"true"`
+	ParentID string                `form:"parent_id"`
 }
 
 type ChangeCategoryImage struct {

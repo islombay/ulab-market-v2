@@ -4,6 +4,7 @@ import (
 	"app/api/models"
 	"app/pkg/logs"
 	"context"
+
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
@@ -82,7 +83,23 @@ func (db *IconRepo) GetAll(ctx context.Context) ([]models.IconModel, error) {
 
 func (db *IconRepo) Delete(ctx context.Context, id string) error {
 	q := `update icons_list set deleted_at = coalesce(deleted_at, now()) where id =$1`
-	if _, err := db.db.Exec(ctx, q, id); err != nil {
+
+	tx, err := db.db.Begin(ctx)
+	if err != nil {
+		return err
+	}
+	if _, err := tx.Exec(ctx, q, id); err != nil {
+		return err
+	}
+
+	q = `update category set icon_id = null where icon_id = $1`
+	if _, err := tx.Exec(ctx, q, id); err != nil {
+		tx.Rollback(ctx)
+		return err
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		tx.Rollback(ctx)
 		return err
 	}
 
