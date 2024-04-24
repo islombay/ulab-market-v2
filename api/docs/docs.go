@@ -4275,6 +4275,9 @@ const docTemplate = `{
         "models_v1.RequestCode": {
             "type": "object",
             "properties": {
+                "code": {
+                    "type": "string"
+                },
                 "email": {
                     "type": "string"
                 },

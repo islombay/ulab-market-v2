@@ -481,6 +481,8 @@ definitions:
     type: object
   models_v1.RequestCode:
     properties:
+      code:
+        type: string
       email:
         type: string
       need_code:
