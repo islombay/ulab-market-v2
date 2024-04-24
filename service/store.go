@@ -20,6 +20,14 @@ func NewStoreService(store storage.StoreInterface, log logs.LoggerInterface) *st
 }
 
 func (s *storeService) CreateStore(ctx context.Context, createStorage models_v1.CreateStorage) (models_v1.Storage, error) {
+	productData, err := s.store.Product().GetByID(ctx, createStorage.ProductID)
+	if err != nil {
+		s.log.Error("error is while getting product data", logs.Error(err))
+		return models_v1.Storage{}, err
+	}
+
+	createStorage.TotalPrice += float32(productData.OutcomePrice) * float32(createStorage.Quantity)
+
 	return s.store.Storage().Create(ctx, createStorage)
 }
 

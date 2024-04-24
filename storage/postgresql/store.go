@@ -28,7 +28,7 @@ func (s *storageRepo) Create(ctx context.Context, createStorage models_v1.Create
 
 	query := `insert into storage (id, product_id, branch_id, total_price, quantity) 
 	                          values ($1, $2, $3, $4, $5) 
-	                          returning id, product_id, branch_id, total_price, quantity`
+	                          returning id, product_id, branch_id, total_price, quantity, created_at, updated_at, deleted_at`
 
 	if err := s.db.QueryRow(ctx, query,
 		uuid.New(),
@@ -42,6 +42,9 @@ func (s *storageRepo) Create(ctx context.Context, createStorage models_v1.Create
 		&store.BranchID,
 		&store.TotalPrice,
 		&store.Quantity,
+		&store.CreatedAt,
+		&store.UpdatedAt,
+		&store.DeletedAt,
 	); err != nil {
 		var pgcon *pgconn.PgError
 		if errors.As(err, &pgcon) {
@@ -86,17 +89,17 @@ func (s *storageRepo) GetList(ctx context.Context, store models_v1.StorageReques
 	pagination = ` LIMIT $1 OFFSET $2`
 
 	if store.Search != "" {
-		filter += fmt.Sprintf(` or product_id = '%s' or branch_id = '%s'`, store.Search, store.Search)
+		filter += fmt.Sprintf(` and (product_id = '%s' or branch_id = '%s')`, store.Search, store.Search)
 	}
 
-	countQuery = `select count(1) from storages where deleted_at is null` + filter
+	countQuery = `select count(1) from storage where deleted_at is null` + filter
 	if err := s.db.QueryRow(ctx, countQuery).Scan(&count); err != nil {
 		s.log.Error("error is while scanning count", logs.Error(err))
 		return models_v1.StorageResponse{}, err
 	}
 
 	query = `select id, product_id, branch_id, total_price, quantity, created_at, updated_at, deleted_at
-	           from storages where deleted_at is null` + filter + pagination
+	           from storage where deleted_at is null` + filter + pagination
 
 	rows, err := s.db.Query(ctx, query, store.Limit, offset)
 	if err != nil {
