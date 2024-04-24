@@ -209,3 +209,31 @@ func (db *CategoryRepo) GetByName(ctx context.Context, name string) (*models.Cat
 	}
 	return &res, nil
 }
+
+func (db *CategoryRepo) GetBrands(ctx context.Context, id string) ([]models.Brand, error) {
+	q := `select p.brand_id, b.name from products as p
+			join brands as b on b.id = p.brand_id
+		where p.category_id = $1
+		group by p.brand_id, b.name;`
+
+	rows, _ := db.db.Query(ctx, q, id)
+	if rows.Err() != nil {
+		return nil, rows.Err()
+	}
+
+	res := []models.Brand{}
+	for rows.Next() {
+		var tmp models.Brand
+
+		if err := rows.Scan(
+			&tmp.ID, &tmp.Name,
+		); err != nil {
+			db.log.Error("could not get category brands", logs.Error(err),
+				logs.String("category_id", id))
+		} else {
+			res = append(res, tmp)
+		}
+	}
+
+	return res, nil
+}

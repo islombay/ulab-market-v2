@@ -1571,6 +1571,34 @@ paths:
       summary: get category by id
       tags:
       - category
+  /api/category/{id}/brand:
+    get:
+      consumes:
+      - application/json
+      operationId: GetCategoryBrands
+      parameters:
+      - description: Category id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: '#/definitions/models.Brand'
+        "400":
+          description: Bad id
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models_v1.Response'
+      tags:
+      - category
   /api/category/change_image:
     post:
       consumes:

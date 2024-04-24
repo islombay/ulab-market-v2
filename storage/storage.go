@@ -141,6 +141,8 @@ type CategoryInterface interface {
 	GetAll(ctx context.Context) ([]*models.Category, error)
 	GetByName(ctx context.Context, name string) (*models.Category, error)
 
+	GetBrands(ctx context.Context, id string) ([]models.Brand, error)
+
 	DeleteCategory(ctx context.Context, id string) error
 }
 

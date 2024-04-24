@@ -106,6 +106,8 @@ func NewV1(
 		)
 
 		category.GET("/:id", handler.GetCategoryByID)
+		category.GET("/:id/brand", handler.GetCategoryBrands)
+
 		category.GET("", handler.GetAllCategory)
 	}
 

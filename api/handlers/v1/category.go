@@ -490,3 +490,34 @@ func (v1 *Handlers) DeleteCategory(c *gin.Context) {
 		Message: "Ok",
 	})
 }
+
+// GetCategoryBrands
+// @id 		GetCategoryBrands
+// @router 	/api/category/{id}/brand [get]
+// @tags 	category
+// @accept 	json
+// @produce json
+// @param 	id 	path string true 		"Category id"
+// @success 200 {object} models.Brand 		"Success"
+// @failure 400 {object} models_v1.Response "Bad id"
+// @failure 500 {object} models_v1.Response "Internal server error"
+func (v1 *Handlers) GetCategoryBrands(c *gin.Context) {
+	id := c.Param("id")
+	if !helper.IsValidUUID(id) {
+		v1.error(c, status.StatusBadUUID)
+		return
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+
+	res, err := v1.storage.Category().GetBrands(ctx, id)
+	if err != nil {
+		v1.error(c, status.StatusInternal)
+		v1.log.Error("could not get category brands", logs.Error(err),
+			logs.String("cid", id))
+		return
+	}
+
+	v1.response(c, http.StatusOK, res)
+}
