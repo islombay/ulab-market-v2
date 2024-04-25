@@ -11,14 +11,15 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
-	"github.com/jackc/pgx/v4"
 	"mime/multipart"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
+	"github.com/jackc/pgx/v4"
 )
 
 // CreateProduct
@@ -349,9 +350,7 @@ func (v1 *Handlers) GetAllProducts(c *gin.Context) {
 			v1.log.Error("could not reobject", logs.Error(err))
 			return
 		}
-		if p.MainImage != nil {
-			tmp.MainImage = *p.MainImage
-		}
+
 		res[i] = tmp
 	}
 

@@ -25,14 +25,22 @@ func Reobject(src, dst interface{}, tagKey string) error {
 		}
 	}
 
-	// Attempt to set destination fields based on matching tag values
 	for i := 0; i < dstVal.NumField(); i++ {
 		dstField := dstVal.Type().Field(i)
 		tag, ok := dstField.Tag.Lookup(tagKey)
 		if ok {
 			if srcField, found := srcFieldsByTag[tag]; found {
-				if dstVal.Field(i).CanSet() && srcField.Type() == dstVal.Field(i).Type() {
-					dstVal.Field(i).Set(srcField)
+				dstFieldVal := dstVal.Field(i)
+				if dstFieldVal.CanSet() {
+					if srcField.Kind() == reflect.Ptr && dstFieldVal.Kind() != reflect.Ptr {
+						if !srcField.IsNil() && srcField.Elem().Type() == dstFieldVal.Type() {
+							// Dereference the pointer if src is not nil and types match
+							dstFieldVal.Set(srcField.Elem())
+						}
+					} else if srcField.Type() == dstFieldVal.Type() {
+						// Set directly if the types are exactly the same
+						dstFieldVal.Set(srcField)
+					}
 				}
 			}
 		}

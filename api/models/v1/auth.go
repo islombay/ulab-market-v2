@@ -11,6 +11,7 @@ type RequestCode struct {
 	Email    string `json:"email,omitempty" `
 	Phone    string `json:"phone_number,omitempty"`
 	NeedCode bool   `json:"need_code"`
+	Code     string `json:"code,omitempty"`
 }
 
 type VerifyCodeRequest struct {

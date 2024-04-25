@@ -22,6 +22,7 @@ do $$
 create table if not exists orders (
     id uuid primary key ,
     user_id uuid,
+    branch_id uuid,
     status status_order_enum default 'in_process',
     total_price numeric,
     payment_type payment_order_enum,
@@ -30,7 +31,8 @@ create table if not exists orders (
     updated_at timestamp default now() not null,
     deleted_at timestamp default null,
 
-    foreign key (user_id) references clients(id) on delete set null
+    foreign key (user_id) references clients(id) on delete set null,
+    foreign key (branch_id) references branches(id) on delete set null
 );
 
 create table if not exists order_products (

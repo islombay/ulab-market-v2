@@ -13,11 +13,12 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"net/http"
+	"time"
+
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v4"
 	"golang.org/x/crypto/bcrypt"
-	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -232,7 +233,7 @@ func (v1 *Handlers) RegisterClient(c *gin.Context) {
 
 	oneTimeCodeDuration := 3 * time.Hour
 
-	if err := auth_lib.SendVerificationCode(verificationSource, verificationType,
+	if err, _ := auth_lib.SendVerificationCode(verificationSource, verificationType,
 		auth_lib.CodeLength,
 		v1.cache, v1.smtp,
 		oneTimeCodeDuration,
@@ -277,6 +278,8 @@ func (v1 *Handlers) VerifyCode(c *gin.Context) {
 	var identityFunc func(context.Context, string) (*models.Client, error)
 	if m.Type == auth_lib.VerificationEmail {
 		identityFunc = v1.storage.User().GetClientByEmail
+	} else if m.Type == auth_lib.VerificationPhone {
+		identityFunc = v1.storage.User().GetClientByPhone
 	} else {
 		v1.error(c, status.StatusNotImplemented)
 		return
@@ -379,8 +382,7 @@ func (v1 *Handlers) Login(c *gin.Context) {
 			v1.error(c, status.StatusBadPhone)
 			return
 		}
-		v1.error(c, status.StatusNotImplemented)
-		return
+		identityFunc = v1.storage.User().GetClientByPhone
 	} else {
 		v1.error(c, status.StatusVerificationTypeNotFound)
 		return
@@ -414,8 +416,8 @@ func (v1 *Handlers) Login(c *gin.Context) {
 	verificationSource := m.Source
 
 	oneTimeCodeDuration := time.Hour
-
-	if err := auth_lib.SendVerificationCode(verificationSource, verificationType,
+	oneTimeCode := ""
+	if err, code := auth_lib.SendVerificationCode(verificationSource, verificationType,
 		auth_lib.CodeLength,
 		v1.cache, v1.smtp,
 		oneTimeCodeDuration,
@@ -430,6 +432,8 @@ func (v1 *Handlers) Login(c *gin.Context) {
 			logs.String("source", verificationSource),
 		)
 		return
+	} else {
+		oneTimeCode = code
 	}
 
 	res := models_v1.RequestCode{
@@ -437,6 +441,7 @@ func (v1 *Handlers) Login(c *gin.Context) {
 	}
 	if verificationType == auth_lib.VerificationPhone {
 		res.Phone = verificationSource
+		res.Code = oneTimeCode
 	} else if verificationType == auth_lib.VerificationEmail {
 		res.Email = verificationSource
 	}
@@ -496,7 +501,7 @@ func (v1 *Handlers) RequestCode(c *gin.Context) {
 
 	oneTimeCodeDuration := 3 * time.Hour
 
-	if err := auth_lib.SendVerificationCode(verificationSource, verificationType,
+	if err, _ := auth_lib.SendVerificationCode(verificationSource, verificationType,
 		auth_lib.CodeLength,
 		v1.cache, v1.smtp,
 		oneTimeCodeDuration,

@@ -18,7 +18,7 @@ func SendVerificationCode(source, sourceType string, codeLength int,
 	cache storage.CacheInterface,
 	smtp smtp.SMTPInterface,
 	codeExpirationTime time.Duration,
-) error {
+) (error, string) {
 	oneTimeCode := GenerateRandomPassword(codeLength)
 	oneTimeCodeExpireTime := time.Now().Add(codeExpirationTime)
 	err := cache.Code().SetCode(
@@ -28,18 +28,19 @@ func SendVerificationCode(source, sourceType string, codeLength int,
 		oneTimeCodeExpireTime,
 	)
 	if err != nil {
-		return err
+		return err, ""
 	}
 
 	if sourceType == VerificationEmail {
 		if err := smtp.Email().SendVerificationCode(source, oneTimeCode); err != nil {
 			if errors.Is(err, helper.ErrInvalidEmail) {
-				return helper.ErrInvalidEmail
+				return helper.ErrInvalidEmail, ""
 			}
-			return err
+			return err, ""
 		}
 	} else {
-		return ErrUnimplemented
+		// ignore
+		// return ErrUnimplemented
 	}
-	return nil
+	return nil, oneTimeCode
 }
