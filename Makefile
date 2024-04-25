@@ -1,5 +1,4 @@
 swag:
-	[ -d "api/docs" ] || mkdir api/docs
 	swag init -g api/api.go -o api/docs
 
 run-server:
