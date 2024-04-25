@@ -6,29 +6,23 @@ import (
 
 // income
 type Income struct {
-	ID         string     `json:"id"`
-	BranchID   string     `json:"branch_id"`
-	TotalPrice float32    `json:"total_price"`
-	Comment    string     `json:"comment"`
-	CourierID  string     `json:"courier_id"`
-	CreatedAt  time.Time  `json:"created_at" db:"created_at"`
-	UpdatedAt  time.Time  `json:"updated_at" db:"updated_at"`
-	DeletedAt  *time.Time `json:"deleted_at" db:"deleted_at"`
+	ID         string          `json:"id"`
+	BranchID   string          `json:"branch_id"`
+	TotalPrice float32         `json:"total_price"`
+	Comment    string          `json:"comment"`
+	CourierID  string          `json:"courier_id"`
+	Products   []IncomeProduct `json:"products"`
+	CreatedAt  time.Time       `json:"created_at" db:"created_at"`
+	UpdatedAt  time.Time       `json:"updated_at" db:"updated_at"`
+	DeletedAt  *time.Time      `json:"deleted_at" db:"deleted_at"`
 }
 
 type CreateIncome struct {
-	BranchID   string  `json:"branch_id"`
-	TotalPrice float32 `json:"total_price"`
-	Comment    string  `json:"comment"`
-	CourierID  string  `json:"courier_id"`
-}
-
-type UpdateIncome struct {
-	ID         string  `json:"id"`
-	BranchID   string  `json:"branch_id"`
-	TotalPrice float32 `json:"total_price"`
-	Comment    string  `json:"comment"`
-	CourierID  string  `json:"courier_id"`
+	BranchID   string                `json:"branch_id"`
+	TotalPrice float32               `json:"-"`
+	Comment    string                `json:"comment"`
+	CourierID  string                `json:"courier_id"`
+	Products   []CreateIncomeProduct `json:"products"`
 }
 
 type IncomeRequest struct {
@@ -63,15 +57,6 @@ type CreateIncomeProduct struct {
 	TotalPrice   float32 `json:"total_price"`
 }
 
-type UpdateIncomeProduct struct {
-	ID           string  `json:"id"`
-	IncomeID     string  `json:"income_id"`
-	ProductID    string  `json:"product_id"`
-	Quantity     int     `json:"quantity"`
-	ProductPrice float32 `json:"product_price"`
-	TotalPrice   float32 `json:"total_price"`
-}
-
 type IncomeProductRequest struct {
 	Page   int    `json:"page"`
 	Limit  int    `json:"limit"`
@@ -81,4 +66,9 @@ type IncomeProductRequest struct {
 type IncomeProductResponse struct {
 	IncomeProducts []IncomeProduct `json:"income_products"`
 	Count          int             `json:"count"`
+}
+
+type CreateIncomeResponse struct {
+	Income         Income          `json:"income"`
+	IncomeProducts []IncomeProduct `json:"income_products"`
 }

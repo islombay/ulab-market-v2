@@ -2,7 +2,6 @@ package postgresql
 
 import (
 	models_v1 "app/api/models/v1"
-	"app/pkg/helper"
 	"app/pkg/logs"
 	"context"
 	"fmt"
@@ -22,11 +21,13 @@ func NewIncomeRepo(db *pgxpool.Pool, log logs.LoggerInterface) *incomeRepo {
 	}
 }
 
+// income
+
 func (i *incomeRepo) Create(ctx context.Context, income models_v1.CreateIncome) (models_v1.Income, error) {
 	var createdIncome models_v1.Income
 	query := `insert into incomes(id, branch_id, total_price, comment, courier_id)
                          values($1, $2, $3, $4, $5)
-                returning id, branch_id, total_price, comment, courier_id`
+                returning id, branch_id, total_price, comment, courier_id, created_at, updated_at, deleted_at`
 	if err := i.db.QueryRow(ctx, query,
 		uuid.New(),
 		income.BranchID,
@@ -39,6 +40,9 @@ func (i *incomeRepo) Create(ctx context.Context, income models_v1.CreateIncome) 
 		&createdIncome.TotalPrice,
 		&createdIncome.Comment,
 		&createdIncome.CourierID,
+		&createdIncome.CreatedAt,
+		&createdIncome.UpdatedAt,
+		&createdIncome.DeletedAt,
 	); err != nil {
 		i.log.Error("error is while creating income", logs.Error(err))
 		return models_v1.Income{}, err
@@ -50,7 +54,7 @@ func (i *incomeRepo) Create(ctx context.Context, income models_v1.CreateIncome) 
 func (i *incomeRepo) GetByID(ctx context.Context, id string) (models_v1.Income, error) {
 	var income models_v1.Income
 
-	query := `select id, branch_id, total_price, comment, courier_id from incomes where deleted_at is null`
+	query := `select id, branch_id, total_price, comment, courier_id, created_at, updated_at, deleted_at from incomes where deleted_at is null`
 
 	if err := i.db.QueryRow(ctx, query, id).Scan(
 		&income.ID,
@@ -58,6 +62,9 @@ func (i *incomeRepo) GetByID(ctx context.Context, id string) (models_v1.Income, 
 		&income.TotalPrice,
 		&income.Comment,
 		&income.CourierID,
+		&income.CreatedAt,
+		&income.UpdatedAt,
+		&income.DeletedAt,
 	); err != nil {
 		i.log.Error("error is while getting income by id", logs.Error(err))
 		return models_v1.Income{}, err
@@ -86,7 +93,7 @@ func (i *incomeRepo) GetList(ctx context.Context, request models_v1.IncomeReques
 		return models_v1.IncomeResponse{}, err
 	}
 
-	query = `select id, branch_id, total_price, comment, courier_id from incomes where deleted_at is null` + filter + pagination
+	query = `select id, branch_id, total_price, comment, courier_id, created_at, updated_at, deleted_at from incomes where deleted_at is null` + filter + pagination
 	rows, err := i.db.Query(ctx, query, request.Limit, offset)
 	if err != nil {
 		i.log.Error("error is while selecting all from incomes", logs.Error(err))
@@ -101,6 +108,9 @@ func (i *incomeRepo) GetList(ctx context.Context, request models_v1.IncomeReques
 			&income.TotalPrice,
 			&income.Comment,
 			&income.CourierID,
+			&income.CreatedAt,
+			&income.UpdatedAt,
+			&income.DeletedAt,
 		); err != nil {
 			i.log.Error("error is while scanning all from incomes", logs.Error(err))
 			return models_v1.IncomeResponse{}, err
@@ -114,60 +124,6 @@ func (i *incomeRepo) GetList(ctx context.Context, request models_v1.IncomeReques
 	return response, nil
 }
 
-func (i *incomeRepo) Update(ctx context.Context, income models_v1.UpdateIncome) (models_v1.Income, error) {
-	var (
-		updatedIncome models_v1.Income
-		params        = make(map[string]interface{})
-		query         = `update incomes set `
-		filter        = ""
-	)
-
-	params["id"] = income.ID
-
-	if income.BranchID != "" {
-		params["branch_id"] = income.BranchID
-
-		filter += " branch_id = @branch_id,"
-	}
-
-	if income.TotalPrice != 0.0 {
-		params["total_price"] = income.TotalPrice
-
-		filter += " total_price = @total_price,"
-	}
-
-	if income.Comment != "" {
-		params["comment"] = income.Comment
-
-		filter += " comment = @comment,"
-	}
-
-	if income.CourierID != "" {
-		params["courier_id"] = income.CourierID
-
-		filter += " courier_id = @courier_id,"
-	}
-
-	query += filter + ` updated_at = now() where deleted_at is null and id = @id returning id, branch_id, total_price, comment, courier_id, created_at, updated_at, deleted_at`
-
-	fullQuery, args := helper.ReplaceQueryParams(query, params)
-
-	if err := i.db.QueryRow(ctx, fullQuery, args...).Scan(
-		&updatedIncome.ID,
-		&updatedIncome.BranchID,
-		&updatedIncome.TotalPrice,
-		&updatedIncome.Comment,
-		&updatedIncome.CourierID,
-		&updatedIncome.CreatedAt,
-		&updatedIncome.UpdatedAt,
-		&updatedIncome.DeletedAt,
-	); err != nil {
-		return models_v1.Income{}, err
-	}
-
-	return updatedIncome, nil
-}
-
 func (i *incomeRepo) Delete(ctx context.Context, id string) error {
 	q := `update incomes set deleted_at = coalesce(deleted_at, now()) where id = $1`
 	if _, err := i.db.Exec(ctx, q, id); err != nil {
@@ -175,4 +131,110 @@ func (i *incomeRepo) Delete(ctx context.Context, id string) error {
 	}
 
 	return nil
+}
+
+// income_product
+
+func (i *incomeRepo) CreateIncomeProduct(ctx context.Context, product models_v1.CreateIncomeProduct) (models_v1.IncomeProduct, error) {
+	var incomeProduct models_v1.IncomeProduct
+
+	query := `insert into income_products (id, income_id, product_id, quantity, product_price, total_price)
+                     values($1, $2, $3, $4, $5, $6)
+    returning id, income_id, product_id, quantity, product_price, total_price, created_at, updated_at, deleted_at`
+
+	if err := i.db.QueryRow(ctx, query,
+		uuid.New(),
+		product.IncomeID,
+		product.ProductID,
+		product.Quantity,
+		product.ProductPrice,
+		product.TotalPrice,
+	).Scan(
+		&incomeProduct.ID,
+		&incomeProduct.ProductID,
+		&incomeProduct.Quantity,
+		&incomeProduct.ProductPrice,
+		&incomeProduct.TotalPrice,
+		&incomeProduct.CreatedAt,
+		&incomeProduct.UpdatedAt,
+		&incomeProduct.DeletedAt,
+	); err != nil {
+		i.log.Error("error is while scanning income product", logs.Error(err))
+		return models_v1.IncomeProduct{}, err
+	}
+
+	return incomeProduct, nil
+}
+
+func (i *incomeRepo) GetByIncomeProductID(ctx context.Context, id string) (models_v1.IncomeProduct, error) {
+	var incomeProduct models_v1.IncomeProduct
+
+	query := `select id, income_id, product_id, quantity, product_price, total_price, created_at, updated_at, deleted_at from income_products where deleted_at is null`
+
+	if err := i.db.QueryRow(ctx, query, id).Scan(
+		&incomeProduct.ID,
+		&incomeProduct.ProductID,
+		&incomeProduct.Quantity,
+		&incomeProduct.ProductPrice,
+		&incomeProduct.TotalPrice,
+		&incomeProduct.CreatedAt,
+		&incomeProduct.UpdatedAt,
+		&incomeProduct.DeletedAt,
+	); err != nil {
+		i.log.Error("error is while getting income by id", logs.Error(err))
+		return models_v1.IncomeProduct{}, err
+	}
+
+	return incomeProduct, nil
+}
+
+func (i *incomeRepo) GetIncomeProductsList(ctx context.Context, request models_v1.IncomeProductRequest) (models_v1.IncomeProductResponse, error) {
+	var (
+		query, countQuery, pagination, filter string
+		count                                 = 0
+		offset                                = (request.Page - 1) * request.Limit
+		response                              models_v1.IncomeProductResponse
+	)
+
+	pagination = ` LIMIT $1 OFFSET $2`
+
+	if request.Search != "" {
+		filter += fmt.Sprintf(` and (income_id = '%s' or product_id = '%s')`, request.Search, request.Search)
+	}
+
+	countQuery = `select count(1) from income_products where deleted_at is null ` + filter
+	if err := i.db.QueryRow(ctx, countQuery).Scan(&count); err != nil {
+		i.log.Error("error is while scanning count", logs.Error(err))
+		return models_v1.IncomeProductResponse{}, err
+	}
+
+	query = `select id, income_id, product_id, quantity, product_price, total_price, created_at, updated_at, deleted_at from incomes where deleted_at is null` + filter + pagination
+	rows, err := i.db.Query(ctx, query, request.Limit, offset)
+	if err != nil {
+		i.log.Error("error is while selecting all from incomes", logs.Error(err))
+		return models_v1.IncomeProductResponse{}, err
+	}
+
+	for rows.Next() {
+		incomeProduct := models_v1.IncomeProduct{}
+		if err = rows.Scan(
+			&incomeProduct.ID,
+			&incomeProduct.ProductID,
+			&incomeProduct.Quantity,
+			&incomeProduct.ProductPrice,
+			&incomeProduct.TotalPrice,
+			&incomeProduct.CreatedAt,
+			&incomeProduct.UpdatedAt,
+			&incomeProduct.DeletedAt,
+		); err != nil {
+			i.log.Error("error is while scanning all from incomes", logs.Error(err))
+			return models_v1.IncomeProductResponse{}, err
+		}
+
+		response.IncomeProducts = append(response.IncomeProducts, incomeProduct)
+	}
+
+	response.Count = count
+
+	return response, nil
 }
