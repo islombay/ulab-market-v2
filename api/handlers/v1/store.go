@@ -19,7 +19,7 @@ import (
 // @Accept       json
 // @Produce      json
 // @Param        storage  body models_v1.CreateStorage false "storage"
-// @Success      201  {object}  models_v1.Storage
+// @Success      201  {object}  models_v1.Income
 // @Failure      400  {object}  models_v1.Response "Bad request"
 // @Failure      404  {object}  models_v1.Response "Page not found"
 // @Failure      500  {object}  models_v1.Response "Interval server error"
@@ -49,7 +49,7 @@ func (v1 *Handlers) CreateStorage(c *gin.Context) {
 // @Accept       json
 // @Produce      json
 // @Param        id path string true "storage_id"
-// @Success      201  {object}  models_v1.Storage
+// @Success      201  {object}  models_v1.Income
 // @Failure      400  {object}  models_v1.Response "Bad request"
 // @Failure      404  {object}  models_v1.Response "Page not found"
 // @Failure      500  {object}  models_v1.Response "Interval server error"
@@ -124,7 +124,7 @@ func (v1 *Handlers) GetStorageList(c *gin.Context) {
 // @Produce      json
 // @Param        id path string true "storage"
 // @Param        sale_point  body models_v1.UpdateStorage false "storage"
-// @Success      201  {object}  models_v1.Storage
+// @Success      201  {object}  models_v1.Income
 // @Failure      400  {object}  models_v1.Response "Bad request"
 // @Failure      404  {object}  models_v1.Response "Page not found"
 // @Failure      500  {object}  models_v1.Response "Interval server error"

@@ -8,7 +8,7 @@ type Storage struct {
 	ID         string     `json:"id"`
 	ProductID  string     `json:"product_id"`
 	BranchID   string     `json:"branch_id"`
-	TotalPrice float32    `json:"total_price"`
+	TotalPrice float32    `json:"-"`
 	Quantity   int        `json:"quantity"`
 	CreatedAt  time.Time  `json:"created_at" db:"created_at"`
 	UpdatedAt  time.Time  `json:"updated_at" db:"updated_at"`
@@ -18,7 +18,7 @@ type Storage struct {
 type CreateStorage struct {
 	ProductID  string  `json:"product_id"`
 	BranchID   string  `json:"branch_id"`
-	TotalPrice float32 `json:"total_price"`
+	TotalPrice float32 `json:"-"`
 	Quantity   int     `json:"quantity"`
 }
 
@@ -26,7 +26,7 @@ type UpdateStorage struct {
 	ID         string  `json:"id"`
 	ProductID  string  `json:"product_id"`
 	BranchID   string  `json:"branch_id"`
-	TotalPrice float32 `json:"total_price"`
+	TotalPrice float32 `json:"-"`
 	Quantity   int     `json:"quantity"`
 }
 
