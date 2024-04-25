@@ -102,7 +102,7 @@ func (v1 *Handlers) CreateCategory(c *gin.Context) {
 			return
 		}
 
-		ct.Icon = m.IconID
+		ct.IconID = m.IconID
 	}
 
 	var url string
@@ -370,22 +370,22 @@ func (v1 *Handlers) GetCategoryByID(c *gin.Context) {
 			subs[i].Image = models.GetStringAddress(v1.filestore.GetURL(*subs[i].Image))
 		}
 
-		if subs[i].Icon != nil && *subs[i].Icon != "" {
-			ic, err := v1.storage.Icon().GetIconByID(context.Background(), *subs[i].Icon)
+		if subs[i].IconID != nil && *subs[i].IconID != "" {
+			ic, err := v1.storage.Icon().GetIconByID(context.Background(), *subs[i].IconID)
 			if err != nil {
 				v1.log.Error("could not get icon by id", logs.Error(err))
 			} else {
-				subs[i].Icon = models.GetStringAddress(v1.filestore.GetURL(ic.URL))
+				subs[i].IconID = models.GetStringAddress(v1.filestore.GetURL(ic.URL))
 			}
 		}
 	}
 	cat.Sub = subs
-	if cat.Icon != nil && *cat.Icon != "" {
-		i, err := v1.storage.Icon().GetIconByID(context.Background(), *cat.Icon)
+	if cat.IconID != nil && *cat.IconID != "" {
+		i, err := v1.storage.Icon().GetIconByID(context.Background(), *cat.IconID)
 		if err != nil {
 			v1.log.Error("could not get icon by id", logs.Error(err))
 		} else {
-			cat.Icon = models.GetStringAddress(v1.filestore.GetURL(i.URL))
+			cat.IconID = models.GetStringAddress(v1.filestore.GetURL(i.URL))
 		}
 	}
 
@@ -427,21 +427,21 @@ func (v1 *Handlers) GetAllCategory(c *gin.Context) {
 				subs[i].Image = models.GetStringAddress(v1.filestore.GetURL(*subs[i].Image))
 			}
 
-			if subs[i].Icon != nil && *subs[i].Icon != "" {
-				ic, err := v1.storage.Icon().GetIconByID(context.Background(), *subs[i].Icon)
+			if subs[i].IconID != nil && *subs[i].IconID != "" {
+				ic, err := v1.storage.Icon().GetIconByID(context.Background(), *subs[i].IconID)
 				if err != nil {
 					v1.log.Error("could not get icon by id", logs.Error(err))
 				} else {
-					subs[i].Icon = models.GetStringAddress(v1.filestore.GetURL(ic.URL))
+					subs[i].IconID = models.GetStringAddress(v1.filestore.GetURL(ic.URL))
 				}
 			}
 		}
-		if e.Icon != nil && *e.Icon != "" {
-			i, err := v1.storage.Icon().GetIconByID(context.Background(), *e.Icon)
+		if e.IconID != nil && *e.IconID != "" {
+			i, err := v1.storage.Icon().GetIconByID(context.Background(), *e.IconID)
 			if err != nil {
 				v1.log.Error("could not get icon by id", logs.Error(err))
 			} else {
-				e.Icon = models.GetStringAddress(v1.filestore.GetURL(i.URL))
+				e.IconID = models.GetStringAddress(v1.filestore.GetURL(i.URL))
 			}
 		}
 

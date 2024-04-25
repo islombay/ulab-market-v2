@@ -5,6 +5,7 @@ import (
 	"app/storage"
 	"context"
 	"errors"
+
 	"github.com/jackc/pgconn"
 	"github.com/jackc/pgx/v4/pgxpool"
 )
@@ -18,8 +19,8 @@ func NewBranchRepo(db *pgxpool.Pool) *branchRepo {
 }
 
 func (db *branchRepo) Create(ctx context.Context, m models.BranchModel) error {
-	q := `insert into branches (id, name) values ($1, $2)`
-	r, err := db.db.Exec(ctx, q, m.ID, m.Name)
+	q := `insert into branches (id, name, open_time, close_time) values ($1, $2, $3, $4)`
+	r, err := db.db.Exec(ctx, q, m.ID, m.Name, m.OpenTime, m.CloseTime)
 	if err != nil {
 		var pgcon *pgconn.PgError
 		if errors.As(err, &pgcon) {
@@ -37,7 +38,9 @@ func (db *branchRepo) Create(ctx context.Context, m models.BranchModel) error {
 }
 
 func (db *branchRepo) GetByID(ctx context.Context, id string) (*models.BranchModel, error) {
-	q := `select * from branches where id = $1`
+	q := `select
+			id, name, created_at, updated_at, deleted_at, open_time, close_time
+		from branches where id = $1`
 	var m models.BranchModel
 	if err := db.db.QueryRow(ctx, q, id).Scan(
 		&m.ID,
@@ -45,6 +48,8 @@ func (db *branchRepo) GetByID(ctx context.Context, id string) (*models.BranchMod
 		&m.CreatedAt,
 		&m.UpdatedAt,
 		&m.DeletedAt,
+		&m.OpenTime,
+		&m.CloseTime,
 	); err != nil {
 		return nil, err
 	}
@@ -52,7 +57,9 @@ func (db *branchRepo) GetByID(ctx context.Context, id string) (*models.BranchMod
 }
 
 func (db *branchRepo) GetByName(ctx context.Context, name string) (*models.BranchModel, error) {
-	q := `select * from branches where name = $1 and deleted_at is null`
+	q := `select 
+			id, name, created_at, updated_at, deleted_at, open_time, close_time
+	 	from branches where name = $1 and deleted_at is null`
 	var m models.BranchModel
 	if err := db.db.QueryRow(ctx, q, name).Scan(
 		&m.ID,
@@ -60,6 +67,8 @@ func (db *branchRepo) GetByName(ctx context.Context, name string) (*models.Branc
 		&m.CreatedAt,
 		&m.UpdatedAt,
 		&m.DeletedAt,
+		&m.OpenTime,
+		&m.CloseTime,
 	); err != nil {
 		return nil, err
 	}
@@ -67,15 +76,22 @@ func (db *branchRepo) GetByName(ctx context.Context, name string) (*models.Branc
 }
 
 func (db *branchRepo) Change(ctx context.Context, m models.BranchModel) error {
-	q := `update branches set name = $1, updated_at = now() where id = $2`
-	if _, err := db.db.Exec(ctx, q, m.Name, m.ID); err != nil {
+	q := `update branches set
+			name = $1,
+			updated_at = now(),
+			open_time = $2,
+			close_time = $3
+		where id = $4`
+	if _, err := db.db.Exec(ctx, q, m.Name, m.OpenTime, m.CloseTime, m.ID); err != nil {
 		return err
 	}
 	return nil
 }
 
 func (db *branchRepo) GetAll(ctx context.Context) ([]*models.BranchModel, error) {
-	q := `select * from branches where deleted_at is null`
+	q := `select
+			id, name, created_at, updated_at, deleted_at, open_time, close_time
+		from branches where deleted_at is null`
 	rows, _ := db.db.Query(ctx, q)
 	if rows.Err() != nil {
 		return nil, rows.Err()
@@ -91,6 +107,8 @@ func (db *branchRepo) GetAll(ctx context.Context) ([]*models.BranchModel, error)
 			&m.CreatedAt,
 			&m.UpdatedAt,
 			&m.DeletedAt,
+			&m.OpenTime,
+			&m.CloseTime,
 		); err != nil {
 			return nil, err
 		}
