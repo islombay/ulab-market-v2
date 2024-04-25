@@ -5,6 +5,7 @@ run-server:
 	go run cmd/main.go
 
 swag-install:
+	pwd
 	[ -d "api/docs" ] || mkdir api/docs
 	go get -u github.com/swaggo/swag/cmd/swag
 	go install github.com/swaggo/swag/cmd/swag@v1.16.3

@@ -4,4 +4,7 @@ TODO_LIST.txt
 TODO_LIST
 .idea/
 mocks/
-api/docs
+
+api/docs/docs.go
+api/docs/swagger.json
+api/docs/swagger.yaml
