@@ -6,8 +6,8 @@ run-server:
 
 swag-install:
 	pwd
-	ls
-	[ -d "api/docs" ] && echo "api/docs exist" || mkdir api/docs && "api/docs does not exist"
+	ls api
+	[ -d "api/docs" ] && echo "Directory exists" || (echo "Directory does not exist, creating"; mkdir "api/docs")
 	go get -u github.com/swaggo/swag/cmd/swag
 	go install github.com/swaggo/swag/cmd/swag@v1.16.3
 
