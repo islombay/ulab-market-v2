@@ -24,8 +24,10 @@ func NewCategoryRepo(db *pgxpool.Pool, log logs.LoggerInterface) *CategoryRepo {
 }
 
 func (db *CategoryRepo) Create(ctx context.Context, m models.Category) error {
-	q := `insert into category (id, name_uz, name_ru, parent_id, created_at) values ($1, $2, $3, $4, $5)`
-	ra, err := db.db.Exec(ctx, q, m.ID, m.NameUz, m.NameRu, m.ParentID, m.CreatedAt)
+	q := `insert into category (
+		id, name_uz, name_ru, parent_id, created_at, icon_id
+		) values ($1, $2, $3, $4, $5, $6)`
+	ra, err := db.db.Exec(ctx, q, m.ID, m.NameUz, m.NameRu, m.ParentID, m.CreatedAt, m.IconID)
 	if err != nil {
 		var pgcon *pgconn.PgError
 		if errors.As(err, &pgcon) {
@@ -54,7 +56,7 @@ func (db *CategoryRepo) GetByID(ctx context.Context, id string) (*models.Categor
 		&m.NameUz,
 		&m.NameRu,
 		&m.Image,
-		&m.Icon,
+		&m.IconID,
 		&m.ParentID,
 		&m.CreatedAt,
 		&m.UpdatedAt,
@@ -84,7 +86,7 @@ func (db *CategoryRepo) GetAll(ctx context.Context) ([]*models.Category, error) 
 			&tmp.NameUz,
 			&tmp.NameRu,
 			&tmp.Image,
-			&tmp.Icon,
+			&tmp.IconID,
 			&tmp.ParentID,
 			&tmp.CreatedAt,
 			&tmp.UpdatedAt,
@@ -167,7 +169,7 @@ func (db *CategoryRepo) GetSubcategories(ctx context.Context, id string) ([]*mod
 			&tmp.NameUz,
 			&tmp.NameRu,
 			&tmp.Image,
-			&tmp.Icon,
+			&tmp.IconID,
 			&tmp.ParentID,
 			&tmp.CreatedAt,
 			&tmp.UpdatedAt,
@@ -202,7 +204,7 @@ func (db *CategoryRepo) GetByName(ctx context.Context, name string) (*models.Cat
 	var res models.Category
 	if err := db.db.QueryRow(ctx, q, name).Scan(
 		&res.ID, &res.NameUz, &res.NameRu,
-		&res.Image, &res.Icon, &res.ParentID,
+		&res.Image, &res.IconID, &res.ParentID,
 		&res.CreatedAt, &res.UpdatedAt, &res.DeletedAt,
 	); err != nil {
 		return nil, err

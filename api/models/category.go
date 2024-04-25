@@ -7,7 +7,7 @@ type Category struct {
 	NameUz   string      `json:"name_uz" db:"name_uz"`
 	NameRu   string      `json:"name_ru" db:"name_ru"`
 	Image    *string     `json:"image,omitempty" db:"image"`
-	Icon     *string     `json:"icon,omitempty" db:"icon"`
+	IconID   *string     `json:"icon_id,omitempty" db:"icon_id"`
 	ParentID *string     `json:"parent_id,omitempty" db:"parent_id"`
 	Sub      []*Category `json:"subcategories,omitempty"`
 
@@ -21,7 +21,7 @@ type CategorySwagger struct {
 	NameUz   string                `json:"name_uz" example:"electronic"`
 	NameRu   string                `json:"name_ru" example:"электроника"`
 	Image    *string               `json:"image,omitempty" example:"https://firebasestorage.googleapis.com/v0/b/ulab-market.appspot.com/o/test%2Fcategory%2Fa2d70daf-b4ac-4198-a6a0-999447483c18?alt=media&token=test%2Fcategory%2Fa2d70daf-b4ac-4198-a6a0-999447483c18"`
-	Icon     *string               `json:"icon,omitempty"`
+	Icon     *string               `json:"icon_id,omitempty"`
 	ParentID *string               `json:"parent_id,omitempty" example:""`
 	Sub      []*SubCategorySwagger `json:"subcategories,omitempty"`
 
@@ -35,7 +35,7 @@ type SubCategorySwagger struct {
 	NameUz   string  `json:"name_uz" example:"electronic"`
 	NameRu   string  `json:"name_ru" example:"электроника"`
 	Image    *string `json:"image,omitempty"`
-	Icon     *string `json:"icon,omitempty"`
+	Icon     *string `json:"icon_id,omitempty"`
 	ParentID *string `json:"parent_id,omitempty"`
 
 	CreatedAt time.Time  `json:"created_at"`

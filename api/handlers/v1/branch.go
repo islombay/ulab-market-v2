@@ -9,10 +9,11 @@ import (
 	"app/storage"
 	"context"
 	"errors"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v4"
-	"net/http"
 )
 
 // AddBranch godoc
@@ -31,13 +32,19 @@ import (
 // @Failure 500 {object} models_v1.Response "internal error"
 func (v1 *Handlers) AddBranch(c *gin.Context) {
 	var m models_v1.CreateBranch
-	if c.BindJSON(&m) != nil {
+	if err := c.BindJSON(&m); err != nil {
+		v1.log.Debug("got bad request for create branch", logs.Error(err))
 		v1.error(c, status.StatusBadRequest)
 		return
 	}
+
+	// TODO: implement open_time and close_time checking
 	b := models.BranchModel{
 		ID:   uuid.NewString(),
 		Name: m.Name,
+
+		OpenTime:  m.OpenTime,
+		CloseTime: m.CloseTime,
 	}
 	if err := v1.storage.Branch().Create(context.Background(), b); err != nil {
 		if errors.Is(err, storage.ErrNotAffected) {
@@ -128,8 +135,10 @@ func (v1 *Handlers) ChangeBranch(c *gin.Context) {
 		return
 	}
 	b = &models.BranchModel{
-		ID:   m.ID,
-		Name: m.Name,
+		ID:        m.ID,
+		Name:      m.Name,
+		OpenTime:  m.OpenTime,
+		CloseTime: m.CloseTime,
 	}
 	if err := v1.storage.Branch().Change(context.Background(), *b); err != nil {
 		v1.error(c, status.StatusInternal)

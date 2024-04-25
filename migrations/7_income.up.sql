@@ -36,6 +36,7 @@ end;
 $$
 language plpgsql;
 
+drop trigger if exists set_income_products_total_price on income_products;
 create trigger set_income_products_total_price
     before insert or update on income_products
                          for each row
@@ -55,6 +56,7 @@ RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
+drop trigger if exists update_income_total_after_insert_or_update on income_products;
 CREATE TRIGGER update_income_total_after_insert_or_update
     AFTER INSERT OR UPDATE ON income_products
                         FOR EACH ROW

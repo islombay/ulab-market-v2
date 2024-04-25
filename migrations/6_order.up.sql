@@ -61,6 +61,7 @@ returns trigger as
 $$
 language plpgsql;
 
+drop trigger if exists set_order_products_total_price on order_products;
 create trigger set_order_products_total_price
     before insert or update on order_products
     for each row
@@ -81,6 +82,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+drop trigger if exists update_order_total_after_insert_or_update on order_products;
 CREATE TRIGGER update_order_total_after_insert_or_update
     AFTER INSERT OR UPDATE ON order_products
     FOR EACH ROW
@@ -100,6 +102,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+drop trigger if exists update_order_total_after_delete on order_products;
 CREATE TRIGGER update_order_total_after_delete
     AFTER DELETE ON order_products
     FOR EACH ROW
