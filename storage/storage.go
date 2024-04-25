@@ -34,7 +34,6 @@ type StoreInterface interface {
 	Storage() StoragesInterface
 	Favourite() FavouriteI
 	Income() IncomeInterface
-	IncomeProduct() IncomeProductInterface
 }
 
 type OrderProductI interface {
@@ -175,10 +174,8 @@ type IncomeInterface interface {
 	Create(context.Context, models_v1.CreateIncome) (models_v1.Income, error)
 	GetByID(context.Context, string) (models_v1.Income, error)
 	GetList(context.Context, models_v1.IncomeRequest) (models_v1.IncomeResponse, error)
-}
 
-type IncomeProductInterface interface {
 	CreateIncomeProduct(context.Context, models_v1.CreateIncomeProduct) (models_v1.IncomeProduct, error)
 	GetByIncomeProductID(context.Context, string) (models_v1.IncomeProduct, error)
-	GetIncomeProductList(context.Context, models_v1.IncomeProductRequest) (models_v1.IncomeProductResponse, error)
+	GetIncomeProductsList(context.Context, models_v1.IncomeProductRequest) (models_v1.IncomeProductResponse, error)
 }

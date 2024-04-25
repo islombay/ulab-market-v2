@@ -5,6 +5,7 @@ import (
 	"app/pkg/logs"
 	"context"
 	"fmt"
+
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v4/pgxpool"
 )

@@ -31,7 +31,7 @@ func (i *incomeService) Create(ctx context.Context, income models_v1.CreateIncom
 	}
 
 	for _, incomeProduct := range income.Products {
-		createdIncomeProduct, err := i.store.IncomeProduct().CreateIncomeProduct(ctx, models_v1.CreateIncomeProduct{
+		createdIncomeProduct, err := i.store.Income().CreateIncomeProduct(ctx, models_v1.CreateIncomeProduct{
 			IncomeID:     createdIncome.ID,
 			ProductID:    incomeProduct.ProductID,
 			Quantity:     incomeProduct.Quantity,
@@ -62,9 +62,9 @@ func (i *incomeService) GetList(ctx context.Context, request models_v1.IncomeReq
 // income_product
 
 func (i *incomeService) GetByIncomeProductID(ctx context.Context, id string) (models_v1.IncomeProduct, error) {
-	return i.store.IncomeProduct().GetByIncomeProductID(ctx, id)
+	return i.store.Income().GetByIncomeProductID(ctx, id)
 }
 
 func (i *incomeService) GetIncomeProductsList(ctx context.Context, request models_v1.IncomeProductRequest) (models_v1.IncomeProductResponse, error) {
-	return i.store.IncomeProduct().GetIncomeProductList(ctx, request)
+	return i.store.Income().GetIncomeProductsList(ctx, request)
 }

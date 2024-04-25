@@ -24,6 +24,7 @@ type Store struct {
 	order         storage.OrderI
 	order_product storage.OrderProductI
 	storages      storage.StoragesInterface
+	income        storage.IncomeInterface
 
 	favouite storage.FavouriteI
 
@@ -152,4 +153,12 @@ func (s *Store) Favourite() storage.FavouriteI {
 	}
 
 	return s.favouite
+}
+
+func (s *Store) Income() storage.IncomeInterface {
+	if s.income == nil {
+		s.income = NewIncomeRepo(s.db, s.log)
+	}
+	return s.income
+
 }
