@@ -26,15 +26,18 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Trigger on income_products
+drop trigger if exists update_storage_after_income_products_change on income_products;
 CREATE TRIGGER update_storage_after_income_products_change
     AFTER INSERT OR UPDATE OR DELETE ON income_products
     FOR EACH ROW EXECUTE FUNCTION update_storage_quantity();
 
 -- Trigger on order_products when orders are finished
+drop trigger if exists update_storage_after_order_products_change on order_products;
 CREATE TRIGGER update_storage_after_order_products_change
     AFTER INSERT OR UPDATE OR DELETE ON order_products
     FOR EACH ROW EXECUTE FUNCTION update_storage_quantity();
 
+drop trigger if exists update_storage_after_order_change on orders;
 create trigger update_storage_after_order_change
     after insert or update or delete on orders
     for each row execute function update_storage_quantity();
