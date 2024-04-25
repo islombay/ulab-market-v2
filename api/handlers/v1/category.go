@@ -439,7 +439,8 @@ func (v1 *Handlers) GetAllCategory(c *gin.Context) {
 		if e.IconID != nil && *e.IconID != "" {
 			i, err := v1.storage.Icon().GetIconByID(context.Background(), *e.IconID)
 			if err != nil {
-				v1.log.Error("could not get icon by id", logs.Error(err))
+				v1.log.Error("could not get icon by id", logs.Error(err),
+					logs.String("icon_id", *e.IconID))
 			} else {
 				e.IconID = models.GetStringAddress(v1.filestore.GetURL(i.URL))
 			}
