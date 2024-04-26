@@ -2923,7 +2923,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Success",
                         "schema": {
-                            "$ref": "#/definitions/models.Product"
+                            "$ref": "#/definitions/models_v1.Product"
                         }
                     },
                     "400": {
@@ -4317,6 +4317,73 @@ const docTemplate = `{
                 "type": {
                     "type": "string",
                     "example": "phone_number"
+                }
+            }
+        },
+        "models_v1.Product": {
+            "type": "object",
+            "properties": {
+                "brand_id": {
+                    "type": "string"
+                },
+                "category_id": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "description_ru": {
+                    "type": "string"
+                },
+                "description_uz": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "image_files": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models_v1.ProductMediaFiles"
+                    }
+                },
+                "main_image": {
+                    "type": "string"
+                },
+                "name_ru": {
+                    "type": "string"
+                },
+                "name_uz": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "number"
+                },
+                "quantity": {
+                    "type": "integer"
+                },
+                "rating": {
+                    "type": "number"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "video_files": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models_v1.ProductMediaFiles"
+                    }
+                }
+            }
+        },
+        "models_v1.ProductMediaFiles": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "media_file": {
+                    "type": "string"
                 }
             }
         },

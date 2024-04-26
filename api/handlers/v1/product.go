@@ -365,7 +365,7 @@ func (v1 *Handlers) GetAllProducts(c *gin.Context) {
 // @tags product
 // @param id path string true "product id"
 // @produce json
-// @Success 200 {object} models.Product "Success"
+// @Success 200 {object} models_v1.Product "Success"
 // @Failure 400 {object} models_v1.Response "Bad request / bad uuid"
 // @Failure 404 {object} models_v1.Response "Product not found"
 // @Failure 500 {object} models_v1.Response "Internal error"
@@ -390,32 +390,42 @@ func (v1 *Handlers) GetProductByID(c *gin.Context) {
 		v1.error(c, status.StatusProductNotFount)
 		return
 	}
+
+	var tmp models_v1.Product
+
 	imgFiles, err := v1.storage.Product().GetProductImageFilesByID(context.Background(), id)
 	if err != nil {
 		v1.error(c, status.StatusInternal)
 		v1.log.Error("could not get image files for a product", logs.Error(err), logs.String("product_id", id))
 	}
+
+	tmp.ImageFiles = make([]models_v1.ProductMediaFiles, len(imgFiles))
 	for i, _ := range imgFiles {
 		imgFiles[i].MediaFile = v1.filestore.GetURL(imgFiles[i].MediaFile)
+		tmp.ImageFiles[i] = models_v1.ProductMediaFiles{
+			ID:        imgFiles[i].ID,
+			MediaFile: imgFiles[i].MediaFile,
+		}
 	}
-	product.ImageFiles = imgFiles
 
 	vdFiles, err := v1.storage.Product().GetProductVideoFilesByID(context.Background(), id)
 	if err != nil {
 		v1.error(c, status.StatusInternal)
 		v1.log.Error("could not get video files for a product", logs.Error(err), logs.String("product_id", id))
 	}
+
+	tmp.VideoFiles = make([]models_v1.ProductMediaFiles, len(vdFiles))
 	for i, _ := range vdFiles {
 		vdFiles[i].MediaFile = v1.filestore.GetURL(vdFiles[i].MediaFile)
+		tmp.VideoFiles[i] = models_v1.ProductMediaFiles{
+			ID:        vdFiles[i].ID,
+			MediaFile: vdFiles[i].MediaFile,
+		}
 	}
-
-	product.VideoFiles = vdFiles
 
 	if product.MainImage != nil {
 		product.MainImage = models.GetStringAddress(v1.filestore.GetURL(*product.MainImage))
 	}
-
-	var tmp models_v1.Product
 
 	if err := helper.Reobject(*product, &tmp, "obj"); err != nil {
 		v1.error(c, status.StatusInternal)
