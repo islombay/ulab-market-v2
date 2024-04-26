@@ -30,21 +30,22 @@ func (i *incomeService) Create(ctx context.Context, income models_v1.CreateIncom
 		return models_v1.CreateIncomeResponse{}, err
 	}
 
-	for _, incomeProduct := range income.Products {
-		createdIncomeProduct, err := i.store.Income().CreateIncomeProduct(ctx, models_v1.CreateIncomeProduct{
-			IncomeID:     createdIncome.ID,
-			ProductID:    incomeProduct.ProductID,
-			Quantity:     incomeProduct.Quantity,
-			ProductPrice: incomeProduct.ProductPrice,
-			TotalPrice:   incomeProduct.TotalPrice,
-		})
-		if err != nil {
-			i.log.Error("error is while creating income product", logs.Error(err))
-			return models_v1.CreateIncomeResponse{}, err
-		}
+	// o'chirildi sababi postgres'ni o'zida transaction orqali income_products qo'shilyabti
+	// for _, incomeProduct := range income.Products {
+	// 	createdIncomeProduct, err := i.store.Income().CreateIncomeProduct(ctx, models_v1.CreateIncomeProduct{
+	// 		IncomeID:     createdIncome.ID,
+	// 		ProductID:    incomeProduct.ProductID,
+	// 		Quantity:     incomeProduct.Quantity,
+	// 		ProductPrice: incomeProduct.ProductPrice,
+	// 		TotalPrice:   incomeProduct.TotalPrice,
+	// 	})
+	// 	if err != nil {
+	// 		i.log.Error("error is while creating income product", logs.Error(err))
+	// 		return models_v1.CreateIncomeResponse{}, err
+	// 	}
 
-		incomeResponse.IncomeProducts = append(incomeResponse.IncomeProducts, createdIncomeProduct)
-	}
+	// 	incomeResponse.IncomeProducts = append(incomeResponse.IncomeProducts, createdIncomeProduct)
+	// }
 
 	incomeResponse.Income = createdIncome
 

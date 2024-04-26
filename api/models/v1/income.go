@@ -10,7 +10,6 @@ type Income struct {
 	BranchID   string          `json:"branch_id"`
 	TotalPrice float32         `json:"total_price"`
 	Comment    string          `json:"comment"`
-	CourierID  string          `json:"courier_id"`
 	Products   []IncomeProduct `json:"products"`
 	CreatedAt  time.Time       `json:"created_at" db:"created_at"`
 	UpdatedAt  time.Time       `json:"updated_at" db:"updated_at"`
@@ -21,7 +20,6 @@ type CreateIncome struct {
 	BranchID   string                `json:"branch_id"`
 	TotalPrice float32               `json:"-"`
 	Comment    string                `json:"comment"`
-	CourierID  string                `json:"courier_id"`
 	Products   []CreateIncomeProduct `json:"products"`
 }
 

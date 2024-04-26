@@ -26,26 +26,58 @@ func NewIncomeRepo(db *pgxpool.Pool, log logs.LoggerInterface) *incomeRepo {
 
 func (i *incomeRepo) Create(ctx context.Context, income models_v1.CreateIncome) (models_v1.Income, error) {
 	var createdIncome models_v1.Income
-	query := `insert into incomes(id, branch_id, total_price, comment, courier_id)
-                         values($1, $2, $3, $4, $5)
-                returning id, branch_id, total_price, comment, courier_id, created_at, updated_at, deleted_at`
-	if err := i.db.QueryRow(ctx, query,
-		uuid.New(),
+	query := `insert into incomes(id, branch_id, total_price, comment)
+                         values($1, $2, $3, $4)
+                returning id, branch_id, total_price, comment, created_at, updated_at, deleted_at`
+
+	tx, err := i.db.Begin(ctx)
+	if err != nil {
+		return models_v1.Income{}, err
+	}
+	if err := tx.QueryRow(ctx, query,
+		uuid.NewString(),
 		income.BranchID,
 		income.TotalPrice,
 		income.Comment,
-		income.CourierID,
 	).Scan(
 		&createdIncome.ID,
 		&createdIncome.BranchID,
 		&createdIncome.TotalPrice,
 		&createdIncome.Comment,
-		&createdIncome.CourierID,
 		&createdIncome.CreatedAt,
 		&createdIncome.UpdatedAt,
 		&createdIncome.DeletedAt,
 	); err != nil {
 		i.log.Error("error is while creating income", logs.Error(err))
+		return models_v1.Income{}, err
+	}
+
+	createdIncome.Products = make([]models_v1.IncomeProduct, len(income.Products))
+
+	// create income products
+	for index, e := range income.Products {
+		q := `insert into income_products (id, income_id, product_id, quantity, product_price, total_price)
+                     values($1, $2, $3, $4, $5, $6)
+    		returning id, income_id, product_id, quantity, product_price, total_price, created_at, updated_at, deleted_at`
+
+		e.TotalPrice = e.ProductPrice * float32(e.Quantity)
+
+		var tmp models_v1.IncomeProduct
+
+		if err := tx.QueryRow(ctx, q, uuid.NewString(), createdIncome.ID, e.ProductID, e.Quantity, e.ProductPrice, e.TotalPrice).Scan(
+			&tmp.ID, &tmp.IncomeID, &tmp.ProductID, &tmp.Quantity, &tmp.ProductPrice, &tmp.TotalPrice,
+			&tmp.CreatedAt, &tmp.UpdatedAt, &tmp.DeletedAt,
+		); err != nil {
+			i.log.Error("error is while scanning income product", logs.Error(err))
+			defer tx.Rollback(ctx)
+			return models_v1.Income{}, err
+		}
+		createdIncome.Products[index] = tmp
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		i.log.Error("could not commit transaction", logs.Error(err))
+		defer tx.Rollback(ctx)
 		return models_v1.Income{}, err
 	}
 
@@ -55,14 +87,13 @@ func (i *incomeRepo) Create(ctx context.Context, income models_v1.CreateIncome) 
 func (i *incomeRepo) GetByID(ctx context.Context, id string) (models_v1.Income, error) {
 	var income models_v1.Income
 
-	query := `select id, branch_id, total_price, comment, courier_id, created_at, updated_at, deleted_at from incomes where deleted_at is null`
+	query := `select id, branch_id, total_price, comment, created_at, updated_at, deleted_at from incomes where deleted_at is null`
 
 	if err := i.db.QueryRow(ctx, query, id).Scan(
 		&income.ID,
 		&income.BranchID,
 		&income.TotalPrice,
 		&income.Comment,
-		&income.CourierID,
 		&income.CreatedAt,
 		&income.UpdatedAt,
 		&income.DeletedAt,
@@ -85,7 +116,7 @@ func (i *incomeRepo) GetList(ctx context.Context, request models_v1.IncomeReques
 	pagination = ` LIMIT $1 OFFSET $2`
 
 	if request.Search != "" {
-		filter += fmt.Sprintf(` and (branch_id = '%s' or courier_id = '%s')`, request.Search, request.Search)
+		filter += fmt.Sprintf(` and (branch_id = '%s')`, request.Search, request.Search)
 	}
 
 	countQuery = `select count(1) from incomes where deleted_at is null ` + filter
@@ -94,7 +125,7 @@ func (i *incomeRepo) GetList(ctx context.Context, request models_v1.IncomeReques
 		return models_v1.IncomeResponse{}, err
 	}
 
-	query = `select id, branch_id, total_price, comment, courier_id, created_at, updated_at, deleted_at from incomes where deleted_at is null` + filter + pagination
+	query = `select id, branch_id, total_price, comment, created_at, updated_at, deleted_at from incomes where deleted_at is null` + filter + pagination
 	rows, err := i.db.Query(ctx, query, request.Limit, offset)
 	if err != nil {
 		i.log.Error("error is while selecting all from incomes", logs.Error(err))
@@ -108,7 +139,6 @@ func (i *incomeRepo) GetList(ctx context.Context, request models_v1.IncomeReques
 			&income.BranchID,
 			&income.TotalPrice,
 			&income.Comment,
-			&income.CourierID,
 			&income.CreatedAt,
 			&income.UpdatedAt,
 			&income.DeletedAt,
