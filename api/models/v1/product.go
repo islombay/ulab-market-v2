@@ -1,7 +1,6 @@
 package models_v1
 
 import (
-	"app/api/models"
 	"mime/multipart"
 	"time"
 )
@@ -42,27 +41,32 @@ type ChangeProductMainImage struct {
 
 type Product struct {
 	ID     string `json:"id" obj:"id"`
-	NameUz string `json:"name_uz" obj:"name_uz"`
-	NameRu string `json:"name_ru" obj:"name_ru"`
+	NameUz string `json:"name_uz,omitempty" obj:"name_uz"`
+	NameRu string `json:"name_ru,omitempty" obj:"name_ru"`
 
-	DescriptionUz string `json:"description_uz" obj:"description_uz"`
-	DescriptionRu string `json:"description_ru" obj:"description_ru"`
+	DescriptionUz string `json:"description_uz,omitempty" obj:"description_uz"`
+	DescriptionRu string `json:"description_ru,omitempty" obj:"description_ru"`
 
-	Price float64 `json:"price" obj:"price"`
+	Price float64 `json:"price,omitempty" obj:"price"`
 
-	Quantity int `json:"quantity" obj:"quantity"`
+	Quantity int `json:"quantity,omitempty" obj:"quantity"`
 
-	CategoryID string `json:"category_id" obj:"category_id"`
-	BrandID    string `json:"brand_id" obj:"brand_id"`
+	CategoryID string `json:"category_id,omitempty" obj:"category_id"`
+	BrandID    string `json:"brand_id,omitempty" obj:"brand_id"`
 
-	MainImage string  `json:"main_image" obj:"main_image"`
-	Rating    float32 `json:"rating" obj:"rating"`
+	MainImage string  `json:"main_image,omitempty" obj:"main_image"`
+	Rating    float32 `json:"rating,omitempty" obj:"rating"`
 
-	ImageFiles []models.ProductMediaFiles `json:"image_files" obj:"image_files"`
-	VideoFiles []models.ProductMediaFiles `json:"video_files" obj:"video_files"`
+	ImageFiles []ProductMediaFiles `json:"image_files,omitempty" obj:"image_files"`
+	VideoFiles []ProductMediaFiles `json:"video_files,omitempty" obj:"video_files"`
 
 	CreatedAt time.Time `db:"created_at" json:"created_at" obj:"created_at"`
 	UpdatedAt time.Time `db:"updated_at" json:"updated_at" obj:"updated_at"`
+}
+
+type ProductMediaFiles struct {
+	ID        string `json:"id" obj:"id"`
+	MediaFile string `json:"media_file" obj:"media_file"`
 }
 
 type AddProductMediaFiles struct {
@@ -79,13 +83,10 @@ type ChangeProductRequest struct {
 	DescriptionUz string `json:"description_uz" binding:"required"`
 	DescriptionRu string `json:"description_ru" binding:"required"`
 
-	IncomePrice  float32 `json:"income_price"`
-	OutcomePrice float64 `json:"outcome_price"binding:"required"`
-
-	Quantity int `json:"quantity"`
+	// OutcomePrice float64 `json:"outcome_price"binding:"required"`
 
 	CategoryID string `json:"category_id"`
 	BrandID    string `json:"brand_id"`
 
-	Status string `json:"status" binding:"required"`
+	// Status string `json:"status" binding:"required"`
 }

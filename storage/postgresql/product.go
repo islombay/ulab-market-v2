@@ -6,9 +6,10 @@ import (
 	"app/storage"
 	"context"
 	"fmt"
-	"github.com/jackc/pgx/v4/pgxpool"
 	"strings"
 	"time"
+
+	"github.com/jackc/pgx/v4/pgxpool"
 )
 
 type ProductRepo struct {
@@ -73,7 +74,16 @@ func (db *ProductRepo) GetByArticul(ctx context.Context, articul string) (*model
 }
 
 func (db *ProductRepo) GetByID(ctx context.Context, id string) (*models.Product, error) {
-	q := `select * from products where id = $1 and deleted_at is null`
+	q := `select
+			id, articul, name_uz, name_ru,
+			description_uz, description_ru,
+			outcome_price, (
+				select coalesce(sum(s.quantity), 0) from storage as s
+				where s.product_id = $1
+			) as quantity, category_id, brand_id,
+			rating, status, main_image,
+			created_at, updated_at, deleted_at
+	from products where id = $1 and deleted_at is null`
 	var m models.Product
 	if err := db.db.QueryRow(ctx, q, id).Scan(
 		&m.ID, &m.Articul,

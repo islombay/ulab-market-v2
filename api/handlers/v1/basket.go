@@ -8,10 +8,11 @@ import (
 	"app/pkg/logs"
 	"context"
 	"errors"
-	"github.com/gin-gonic/gin"
-	"github.com/jackc/pgx/v4"
 	"net/http"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/jackc/pgx/v4"
 )
 
 // AddToBasket
@@ -72,11 +73,26 @@ func (v1 *Handlers) AddToBasket(c *gin.Context) {
 		}
 	}
 
+	product, err := v1.storage.Product().GetByID(context.Background(), m.ProductID)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			v1.error(c, status.StatusProductNotFount)
+			return
+		}
+		v1.error(c, status.StatusInternal)
+		return
+	}
+
+	if int(m.Quantity) > product.Quantity {
+		v1.error(c, status.StatusProductQuantityTooMany)
+		return
+	}
+
 	if err := v1.storage.Basket().Add(
 		context.Background(),
 		str,
 		m.ProductID,
-		m.Quantity,
+		int(m.Quantity),
 		time.Now(),
 	); err != nil {
 		v1.error(c, status.StatusInternal)
@@ -131,7 +147,9 @@ func (v1 *Handlers) GetBasket(c *gin.Context) {
 		res = []models.BasketModel{}
 	}
 
-	resBody := models_v1.GetBasket{}
+	resBody := models_v1.GetBasket{
+		Products: []models_v1.GetBasketProduct{},
+	}
 
 	for _, e := range res {
 		product, err := v1.storage.Product().GetByID(context.Background(), e.ProductID)
@@ -267,17 +285,46 @@ func (v1 *Handlers) ChangeBasket(c *gin.Context) {
 	}
 
 	// TODO: check whether the quantity exists
+	userBasket, err := v1.storage.Basket().Get(context.Background(),
+		str,
+		m.ProductID,
+	)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			v1.error(c, status.StatusNotFound)
+			return
+		}
+		v1.error(c, status.StatusInternal)
+		v1.log.Error("could not found basket for changing", logs.Error(err),
+			logs.String("user_id", str), logs.String("product_id", m.ProductID),
+		)
+		return
+	}
+
+	product, err := v1.storage.Product().GetByID(context.Background(), m.ProductID)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			v1.error(c, status.StatusProductNotFount)
+			return
+		}
+		v1.error(c, status.StatusInternal)
+		return
+	}
+	if userBasket.Quantity+int(m.Quantity) > product.Quantity {
+		v1.error(c, status.StatusProductQuantityTooMany)
+		return
+	}
 
 	if err := v1.storage.Basket().ChangeQuantity(
 		context.Background(),
 		m.ProductID,
 		str,
-		m.Quantity,
+		int(m.Quantity),
 	); err != nil {
 		v1.error(c, status.StatusInternal)
 		v1.log.Error("could not update quantity of product in basket",
 			logs.Error(err), logs.String("uid", str),
-			logs.String("pid", m.ProductID), logs.Int("q", m.Quantity),
+			logs.String("pid", m.ProductID), logs.Int("q", int(m.Quantity)),
 		)
 		return
 	}

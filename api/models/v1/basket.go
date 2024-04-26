@@ -2,7 +2,7 @@ package models_v1
 
 type AddToBasket struct {
 	ProductID string `json:"product_id" binding:"required"`
-	Quantity  int    `json:"quantity" binding:"required"`
+	Quantity  uint   `json:"quantity" binding:"required"`
 }
 
 type RemoveFromBasket struct {
@@ -11,7 +11,7 @@ type RemoveFromBasket struct {
 
 type ChangeBasket struct {
 	ProductID string `json:"product_id" binding:"required"`
-	Quantity  int    `json:"quantity" binding:"required"`
+	Quantity  uint   `json:"quantity" binding:"required"`
 }
 
 type GetBasket struct {
