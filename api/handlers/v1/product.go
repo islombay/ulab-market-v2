@@ -23,10 +23,10 @@ import (
 )
 
 // CreateProduct
-// @id createProduct
-// @router /api/product [post]
-// @summary create product
-// @description create product
+// @ID createProduct
+// @Router /api/product [post]
+// @Summary create product
+// @Description create product
 // @security ApiKeyAuth
 // @accept multipart/form-data
 // @tags product

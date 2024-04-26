@@ -5,9 +5,10 @@ import (
 	"app/pkg/logs"
 	"context"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
 
 // CreateStorage    godoc
@@ -15,7 +16,7 @@ import (
 // @Summary      Create a new storage
 // @Description  Create a new storage
 // @Tags         storage
-// @security ApiKeyAuth
+// @security 	ApiKeyAuth
 // @Accept       json
 // @Produce      json
 // @Param        storage  body models_v1.CreateStorage false "storage"
