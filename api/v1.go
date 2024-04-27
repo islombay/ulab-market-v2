@@ -9,6 +9,7 @@ import (
 	"app/service"
 	"app/storage"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 )
@@ -41,6 +42,10 @@ func NewV1(
 		auth.POST("/login", handler.Login)
 		auth.POST("/login_admin", handler.LoginAdmin)
 		auth.POST("/verify_code", handler.VerifyCode)
+
+		auth.GET("/tgbot", func(c *gin.Context) {
+			c.JSON(http.StatusOK, gin.H{"url": os.Getenv("auth_tg_bot")})
+		})
 
 		//auth.POST("/register", handler.RegisterClient)
 		//auth.POST("/change_password", handler.ChangePassword)

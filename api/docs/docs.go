@@ -4230,9 +4230,6 @@ const docTemplate = `{
                 "comment": {
                     "type": "string"
                 },
-                "courier_id": {
-                    "type": "string"
-                },
                 "created_at": {
                     "type": "string"
                 },
