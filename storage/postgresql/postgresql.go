@@ -62,6 +62,7 @@ func NewPostgresStore(cfg config.DBConfig, log logs.LoggerInterface) (storage.St
 		category: NewCategoryRepo(db, log),
 		brand:    NewBrandRepo(db),
 		product:  NewProductRepo(db, log),
+		income:   NewIncomeRepo(db, log),
 	}, nil
 }
 

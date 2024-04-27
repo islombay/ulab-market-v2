@@ -8,4 +8,10 @@ var (
 		Description: "brand not found",
 		Code:        http.StatusNotFound,
 	}
+
+	StatusBranchNotFound = Status{
+		Message:     "Branch not found",
+		Description: "branch not found",
+		Code:        http.StatusNotFound,
+	}
 )

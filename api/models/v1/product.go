@@ -15,6 +15,11 @@ type CreateProduct struct {
 
 	OutcomePrice float64 `json:"outcome_price" form:"outcome_price" binding:"required"`
 
+	IncomePrice float32 `json:"income_price" form:"income_price" binding:"required"`
+
+	Quantity uint   `json:"quantity" form:"quantity" binding:"required"`
+	BranchID string `json:"branch_id" form:"branch_id" binding:"required"`
+
 	CategoryID string `json:"category_id" form:"category_id"`
 	BrandID    string `json:"brand_id" form:"brand_id"`
 

@@ -28,7 +28,7 @@ func (i *incomeRepo) Create(ctx context.Context, income models_v1.CreateIncome) 
 	var createdIncome models_v1.Income
 	query := `insert into incomes(id, branch_id, total_price, comment)
                          values($1, $2, $3, $4)
-                returning id, branch_id, total_price, comment, created_at, updated_at, deleted_at`
+                returning id, branch_id, comment, total_price, created_at, updated_at, deleted_at`
 
 	tx, err := i.db.Begin(ctx)
 	if err != nil {
@@ -42,12 +42,13 @@ func (i *incomeRepo) Create(ctx context.Context, income models_v1.CreateIncome) 
 	).Scan(
 		&createdIncome.ID,
 		&createdIncome.BranchID,
-		&createdIncome.TotalPrice,
 		&createdIncome.Comment,
+		&createdIncome.TotalPrice,
 		&createdIncome.CreatedAt,
 		&createdIncome.UpdatedAt,
 		&createdIncome.DeletedAt,
 	); err != nil {
+		fmt.Println(i.log)
 		i.log.Error("error is while creating income", logs.Error(err))
 		return models_v1.Income{}, err
 	}

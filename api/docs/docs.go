@@ -2555,6 +2555,12 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
+                        "name": "branch_id",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
                         "name": "brand_id",
                         "in": "formData"
                     },
@@ -2576,6 +2582,12 @@ const docTemplate = `{
                         "required": true
                     },
                     {
+                        "type": "number",
+                        "name": "income_price",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
                         "type": "string",
                         "name": "name_ru",
                         "in": "formData",
@@ -2584,11 +2596,18 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "name": "name_uz",
-                        "in": "formData"
+                        "in": "formData",
+                        "required": true
                     },
                     {
                         "type": "number",
                         "name": "outcome_price",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "name": "quantity",
                         "in": "formData",
                         "required": true
                     },

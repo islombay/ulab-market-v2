@@ -50,6 +50,27 @@ func (v1 *Handlers) CreateProduct(c *gin.Context) {
 		return
 	}
 
+	if m.IncomePrice <= 0 {
+		v1.error(c, status.StatusProductPriceInvalid)
+		return
+	}
+
+	if !helper.IsValidUUID(m.BranchID) {
+		v1.error(c, status.StatusBadUUID)
+		return
+	}
+
+	if _, err := v1.storage.Branch().GetByID(context.Background(), m.BranchID); err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			v1.error(c, status.StatusBranchNotFound)
+			return
+		}
+		v1.error(c, status.StatusInternal)
+		v1.log.Error("could not get branch by id", logs.Error(err),
+			logs.String("bid", m.BranchID))
+		return
+	}
+
 	// check whether the same articul exists
 	_, err := v1.storage.Product().GetByArticul(context.Background(), m.Articul)
 	if err != nil {
@@ -291,6 +312,20 @@ func (v1 *Handlers) CreateProduct(c *gin.Context) {
 	pr.ImageFiles = imageFiles
 	pr.VideoFiles = videoFiles
 
+	incomeCreate := models_v1.CreateIncome{
+		BranchID:   m.BranchID,
+		Comment:    "created during product create",
+		TotalPrice: m.IncomePrice * float32(m.Quantity),
+		Products: []models_v1.CreateIncomeProduct{
+			models_v1.CreateIncomeProduct{
+				ProductID:    pr.ID,
+				Quantity:     int(m.Quantity),
+				ProductPrice: m.IncomePrice,
+			},
+		},
+	}
+
+	v1.service.Income().Create(context.Background(), incomeCreate)
 	v1.response(c, http.StatusOK, pr)
 }
 
