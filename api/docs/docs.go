@@ -2899,6 +2899,58 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/product/change_price": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "change products price",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "product"
+                ],
+                "summary": "Change products price (selling price)",
+                "operationId": "ChangeProductPrice",
+                "parameters": [
+                    {
+                        "description": "Change product price",
+                        "name": "price_body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.ChangeProductPrice"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad id/ bad price",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/api/product/{id}": {
             "get": {
                 "description": "get product by id",
@@ -4108,6 +4160,21 @@ const docTemplate = `{
                         "phone_number"
                     ],
                     "example": "email"
+                }
+            }
+        },
+        "models_v1.ChangeProductPrice": {
+            "type": "object",
+            "required": [
+                "id",
+                "price"
+            ],
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "number"
                 }
             }
         },

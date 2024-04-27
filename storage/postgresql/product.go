@@ -331,3 +331,9 @@ func (db *ProductRepo) ChangeMainImage(ctx context.Context, id, url string, now 
 	}
 	return nil
 }
+
+func (db *ProductRepo) ChangeProductPrice(ctx context.Context, id string, price float32) error {
+	q := `update products set outcome_price = $1, updated_at = now() where id = $2`
+	_, err := db.db.Exec(ctx, q, price, id)
+	return err
+}

@@ -7,7 +7,7 @@ import (
 
 type CreateProduct struct {
 	Articul string `json:"articul" form:"articul" binding:"required"`
-	NameUz  string `json:"name_uz" form:"name_uz"`
+	NameUz  string `json:"name_uz" form:"name_uz" binding:"required"`
 	NameRu  string `json:"name_ru" form:"name_ru" binding:"required"`
 
 	DescriptionUz string `json:"description_uz" form:"description_uz" binding:"required"`
@@ -89,4 +89,9 @@ type ChangeProductRequest struct {
 	BrandID    string `json:"brand_id"`
 
 	// Status string `json:"status" binding:"required"`
+}
+
+type ChangeProductPrice struct {
+	ID    string  `json:"id" binding:"required"`
+	Price float32 `json:"price" binding:"required"`
 }

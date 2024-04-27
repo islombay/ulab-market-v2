@@ -174,6 +174,11 @@ func NewV1(
 			handler.ChangeProductMainImage,
 		)
 
+		product.PUT("/change_price",
+			handler.MiddlewareStaffPermissionCheck(auth_lib.PermissionCanEditProduct),
+			handler.ChangeProductPrice,
+		)
+
 		product.DELETE("/:id",
 			handler.MiddlewareStaffPermissionCheck(auth_lib.PermissionCanDeleteProduct),
 			handler.DeleteProduct,

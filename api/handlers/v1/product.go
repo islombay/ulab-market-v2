@@ -63,6 +63,11 @@ func (v1 *Handlers) CreateProduct(c *gin.Context) {
 		return
 	}
 
+	if m.OutcomePrice <= 0 {
+		v1.error(c, status.StatusProductPriceInvalid)
+		return
+	}
+
 	// is valid status provided
 	m.Status = strings.ToLower(m.Status)
 	if m.Status == "" {
@@ -767,4 +772,47 @@ func (v1 *Handlers) EditProduct(c *gin.Context) {
 		v1.log.Debug("bad request: editproduct", logs.Error(err))
 		return
 	}
+}
+
+// ChangeProductPrice
+// @id ChangeProductPrice
+// @router /api/product/change_price [put]
+// @tags product
+// @security ApiKeyAuth
+// @Summary Change products price (selling price)
+// @description change products price
+// @accept json
+// @produce json
+// @param price_body body models_v1.ChangeProductPrice true "Change product price"
+// @success 200 {object} models_v1.Response "Success"
+// @failure 400 {object} models_v1.Response "Bad id/ bad price"
+// @failure 500 {object} models_v1.Response "Internal server error"
+func (v1 *Handlers) ChangeProductPrice(c *gin.Context) {
+	var m models_v1.ChangeProductPrice
+	if err := c.BindJSON(&m); err != nil {
+		v1.error(c, status.StatusBadRequest)
+		return
+	}
+	if !helper.IsValidUUID(m.ID) {
+		v1.error(c, status.StatusBadUUID)
+		return
+	}
+
+	if m.Price <= 0 {
+		v1.error(c, status.StatusProductPriceInvalid)
+		return
+	}
+
+	err := v1.storage.Product().ChangeProductPrice(context.Background(), m.ID, m.Price)
+	if err != nil {
+		v1.error(c, status.StatusInternal)
+		v1.log.Error("could not update price of product", logs.Error(err),
+			logs.String("pid", m.ID), logs.Any("price", m.Price))
+		return
+	}
+
+	v1.response(c, http.StatusOK, models_v1.Response{
+		Message: "Ok",
+		Code:    200,
+	})
 }
