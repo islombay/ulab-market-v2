@@ -391,6 +391,25 @@ func (v1 *Handlers) GetAllProducts(c *gin.Context) {
 			return
 		}
 
+		if p.CategoryID != nil {
+			tmpCat, err := v1.storage.Category().GetByID(context.Background(), *p.CategoryID)
+			if err != nil {
+				if errors.Is(err, pgx.ErrNoRows) {
+					v1.log.Error("could not find category by id from product", logs.String("pid", p.ID),
+						logs.String("cid", *p.CategoryID))
+				} else {
+					v1.log.Error("could not get category information from product", logs.String("pid", p.ID),
+						logs.String("cid", *p.CategoryID), logs.Error(err))
+				}
+			} else {
+				tmp.CategoryInformation = *tmpCat
+				if tmp.CategoryInformation.Image != nil {
+					tmp.CategoryInformation.Image = models.GetStringAddress(v1.filestore.GetURL(*tmp.CategoryInformation.Image))
+				}
+			}
+		}
+		tmp.Articul = p.Articul
+
 		res[i] = tmp
 	}
 

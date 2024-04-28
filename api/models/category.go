@@ -3,9 +3,9 @@ package models
 import "time"
 
 type Category struct {
-	ID       string      `json:"id" db:"id"`
-	NameUz   string      `json:"name_uz" db:"name_uz"`
-	NameRu   string      `json:"name_ru" db:"name_ru"`
+	ID       string      `json:"id,omitempty" db:"id"`
+	NameUz   string      `json:"name_uz,omitempty" db:"name_uz"`
+	NameRu   string      `json:"name_ru,omitempty" db:"name_ru"`
 	Image    *string     `json:"image,omitempty" db:"image"`
 	IconID   *string     `json:"icon_id,omitempty" db:"icon_id"`
 	ParentID *string     `json:"parent_id,omitempty" db:"parent_id"`

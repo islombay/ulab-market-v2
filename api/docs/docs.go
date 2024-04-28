@@ -3694,6 +3694,44 @@ const docTemplate = `{
                 }
             }
         },
+        "models.Category": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
+                "icon_id": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "image": {
+                    "type": "string"
+                },
+                "name_ru": {
+                    "type": "string"
+                },
+                "name_uz": {
+                    "type": "string"
+                },
+                "parent_id": {
+                    "type": "string"
+                },
+                "subcategories": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Category"
+                    }
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
         "models.CategorySwagger": {
             "type": "object",
             "properties": {
@@ -4406,11 +4444,20 @@ const docTemplate = `{
         "models_v1.Product": {
             "type": "object",
             "properties": {
+                "articul": {
+                    "type": "string"
+                },
                 "brand_id": {
                     "type": "string"
                 },
+                "brand_information": {
+                    "$ref": "#/definitions/models.Brand"
+                },
                 "category_id": {
                     "type": "string"
+                },
+                "category_information": {
+                    "$ref": "#/definitions/models.Category"
                 },
                 "created_at": {
                     "type": "string"

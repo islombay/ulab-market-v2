@@ -3,9 +3,10 @@ package auth_lib
 import (
 	"errors"
 	"fmt"
-	"github.com/golang-jwt/jwt/v5"
 	"os"
 	"time"
+
+	"github.com/golang-jwt/jwt/v5"
 )
 
 var (
@@ -54,6 +55,8 @@ func ParseToken(tokens string) (*Token, error) {
 		} else if errors.Is(err, jwt.ErrSignatureInvalid) {
 			return nil, ErrTokenInvalid
 		} else if errors.Is(err, jwt.ErrTokenSignatureInvalid) {
+			return nil, ErrTokenInvalid
+		} else if errors.Is(err, jwt.ErrTokenMalformed) {
 			return nil, ErrTokenInvalid
 		}
 		return nil, err

@@ -7,14 +7,17 @@ import (
 	"app/pkg/logs"
 	"context"
 	"errors"
+	"strings"
+
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v4"
-	"strings"
 )
 
 const (
 	AuthorizationHeader = "Authorization"
 	UserIDContext       = "uid"
+	UserRoleContext     = "role"
+	UserStaffContext    = "is_staff"
 	TokenStaff          = "staff"
 	TokenClient         = "client"
 	TokenSuper          = "super"
@@ -33,6 +36,7 @@ func (v1 *Handlers) MiddlewareIsStaff() gin.HandlerFunc {
 			return
 		}
 		c.Set(UserIDContext, token.UID)
+		c.Set(UserRoleContext, token.Type)
 		c.Next()
 	}
 }
@@ -110,6 +114,8 @@ func (v1 *Handlers) MiddlewareStaffPermissionCheck(permission models.PermissionM
 			return
 		}
 		userID := token.UID
+
+		c.Set(UserStaffContext, true)
 
 		user, err := v1.storage.User().GetStaffByID(context.Background(), userID)
 		if err != nil {

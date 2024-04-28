@@ -1,6 +1,7 @@
 package models_v1
 
 import (
+	"app/api/models"
 	"mime/multipart"
 	"time"
 )
@@ -45,9 +46,10 @@ type ChangeProductMainImage struct {
 }
 
 type Product struct {
-	ID     string `json:"id" obj:"id"`
-	NameUz string `json:"name_uz,omitempty" obj:"name_uz"`
-	NameRu string `json:"name_ru,omitempty" obj:"name_ru"`
+	ID      string `json:"id" obj:"id"`
+	Articul string `json:"articul,omitempty"`
+	NameUz  string `json:"name_uz,omitempty" obj:"name_uz"`
+	NameRu  string `json:"name_ru,omitempty" obj:"name_ru"`
 
 	DescriptionUz string `json:"description_uz,omitempty" obj:"description_uz"`
 	DescriptionRu string `json:"description_ru,omitempty" obj:"description_ru"`
@@ -58,6 +60,9 @@ type Product struct {
 
 	CategoryID string `json:"category_id,omitempty" obj:"category_id"`
 	BrandID    string `json:"brand_id,omitempty" obj:"brand_id"`
+
+	CategoryInformation models.Category `json:"category_information,omitempty" `
+	// BrandInformation    models.Brand    `json:"brand_information,omitempty"`
 
 	MainImage string  `json:"main_image,omitempty" obj:"main_image"`
 	Rating    float32 `json:"rating,omitempty" obj:"rating"`
