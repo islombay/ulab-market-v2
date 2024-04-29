@@ -61,7 +61,7 @@ type Product struct {
 	CategoryID string `json:"category_id,omitempty" obj:"category_id"`
 	BrandID    string `json:"brand_id,omitempty" obj:"brand_id"`
 
-	CategoryInformation models.Category `json:"category_information,omitempty" `
+	CategoryInformation models.Category `json:"category,omitempty" `
 	// BrandInformation    models.Brand    `json:"brand_information,omitempty"`
 
 	MainImage string  `json:"main_image,omitempty" obj:"main_image"`
