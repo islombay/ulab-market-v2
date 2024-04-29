@@ -199,11 +199,11 @@ func (db *ProductRepo) GetAll(ctx context.Context, query, catid, bid *string, re
 			description_uz, description_ru,
 			outcome_price, (
 				select coalesce(sum(s.quantity), 0) from storage as s
-				where s.product_id = $1
+				where s.product_id = p.id
 			) as quantity, category_id, brand_id,
 			rating, status, main_image,
 			created_at, updated_at, deleted_at
-		from products`
+		from products as p`
 	var args []interface{}
 	var whereClause []string
 
