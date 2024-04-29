@@ -12,3 +12,6 @@ create table if not exists storage (
     foreign key (product_id) references products(id) on delete  set null,
     foreign key (branch_id) references branches(id) on delete set null
 );
+
+ALTER TABLE storage
+    ADD CONSTRAINT storage_unique_product_branch UNIQUE (product_id, branch_id);

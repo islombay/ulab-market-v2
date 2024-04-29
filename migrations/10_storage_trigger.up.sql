@@ -1,27 +1,30 @@
 CREATE OR REPLACE FUNCTION update_storage_quantity()
     RETURNS TRIGGER AS $$
 BEGIN
-    -- Calculate the new quantity for the storage
-WITH summed_income as (
-    SELECT income_products.product_id, incomes.branch_id, SUM(income_products.quantity) as total_income_quantity
-    FROM income_products
-             JOIN incomes ON incomes.id = income_products.income_id
-    GROUP BY income_products.product_id, incomes.branch_id
-), summed_order as (
-    SELECT order_products.product_id, orders.branch_id, SUM(order_products.quantity) as total_order_quantity
-    FROM order_products
-             JOIN orders ON orders.id = order_products.order_id
-    WHERE orders.status in ('finished', 'in_process')
-    GROUP BY order_products.product_id, orders.branch_id
-)
-UPDATE storage
-SET quantity = COALESCE(summed_income.total_income_quantity, 0) - COALESCE(summed_order.total_order_quantity, 0)
-    FROM summed_income
-             FULL OUTER JOIN summed_order ON summed_income.product_id = summed_order.product_id AND summed_income.branch_id = summed_order.branch_id
-WHERE storage.product_id = COALESCE(summed_income.product_id, summed_order.product_id)
-  AND storage.branch_id = COALESCE(summed_income.branch_id, summed_order.branch_id);
+    WITH summed_income AS (
+        SELECT income_products.product_id, incomes.branch_id, SUM(income_products.quantity) AS total_income_quantity
+        FROM income_products
+                 JOIN incomes ON incomes.id = income_products.income_id
+        GROUP BY income_products.product_id, incomes.branch_id
+    ), summed_order AS (
+        SELECT order_products.product_id, orders.branch_id, SUM(order_products.quantity) AS total_order_quantity
+        FROM order_products
+                 JOIN orders ON orders.id = order_products.order_id
+        WHERE orders.status IN ('finished', 'in_process')
+        GROUP BY order_products.product_id, orders.branch_id
+    ), final_quantities AS (
+        SELECT COALESCE(si.product_id, so.product_id) AS product_id,
+               COALESCE(si.branch_id, so.branch_id) AS branch_id,
+               COALESCE(si.total_income_quantity, 0) - COALESCE(so.total_order_quantity, 0) AS net_quantity
+        FROM summed_income si
+                 FULL OUTER JOIN summed_order so ON si.product_id = so.product_id AND si.branch_id = so.branch_id
+    )
+    INSERT INTO storage (id, product_id, branch_id, quantity)
+    SELECT uuid_generate_v4(), product_id, branch_id, net_quantity FROM final_quantities
+    ON CONFLICT (product_id, branch_id) DO UPDATE
+        SET quantity = EXCLUDED.quantity;
 
-RETURN NULL; -- Since this is an AFTER trigger
+    RETURN NULL; -- Since this is an AFTER trigger
 END;
 $$ LANGUAGE plpgsql;
 
