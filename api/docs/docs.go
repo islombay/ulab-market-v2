@@ -2631,8 +2631,7 @@ const docTemplate = `{
                         "collectionFormat": "csv",
                         "description": "Image files (multiple)",
                         "name": "image_files",
-                        "in": "formData",
-                        "required": true
+                        "in": "formData"
                     },
                     {
                         "type": "array",
@@ -2718,11 +2717,7 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "type": "array",
-                        "items": {
-                            "type": "file"
-                        },
-                        "collectionFormat": "csv",
+                        "type": "file",
                         "description": "image files",
                         "name": "media_files",
                         "in": "formData",
@@ -4450,14 +4445,11 @@ const docTemplate = `{
                 "brand_id": {
                     "type": "string"
                 },
-                "brand_information": {
-                    "$ref": "#/definitions/models.Brand"
+                "category": {
+                    "$ref": "#/definitions/models.Category"
                 },
                 "category_id": {
                     "type": "string"
-                },
-                "category_information": {
-                    "$ref": "#/definitions/models.Category"
                 },
                 "created_at": {
                     "type": "string"

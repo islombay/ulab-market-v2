@@ -629,7 +629,7 @@ func (v1 *Handlers) DeleteProduct(c *gin.Context) {
 // @tags product
 // @produce json
 // @param addImageFiles formData models_v1.AddProductMediaFiles true "add product image files"
-// @param media_files formData []file true "image files"
+// @param media_files formData file true "image files"
 // @Success 200 {object} models_v1.Response "Success"
 // @Failure 400 {object} models_v1.Response "Bad request / bad uuid"
 // @Failure 404 {object} models_v1.Response "Product not found"
@@ -640,6 +640,8 @@ func (v1 *Handlers) AddProductImageFiles(c *gin.Context) {
 	var m models_v1.AddProductMediaFiles
 	if err := c.Bind(&m); err != nil {
 		v1.error(c, status.StatusBadRequest)
+		fmt.Println(c.Request.Form)
+		fmt.Println(c.Request.Body)
 		v1.log.Debug("invalid binding request add image files struct", logs.Error(err))
 		return
 	}
@@ -661,58 +663,90 @@ func (v1 *Handlers) AddProductImageFiles(c *gin.Context) {
 		return
 	}
 
-	if len(m.MediaFiles) > v1.cfg.Media.ProductPhotoMaxCount {
-		v1.error(c, status.StatusProductPhotoMaxCount)
-		return
-	}
-	var imageFilesStopped struct {
-		Status *status.Status
-	}
+	// if len(m.MediaFiles) > v1.cfg.Media.ProductPhotoMaxCount {
+	// 	v1.error(c, status.StatusProductPhotoMaxCount)
+	// 	return
+	// }
+	// var imageFilesStopped struct {
+	// 	Status *status.Status
+	// }
 
-	imageFiles := make([]models.ProductMediaFiles, len(m.MediaFiles))
-	for ind, i := range m.MediaFiles {
-		if _, err, msg := helper.IsValidImage(i); err != nil {
-			if errors.Is(err, helper.ErrInvalidImageType) {
-				imageFilesStopped.Status = &status.StatusImageTypeUnkown
-				v1.log.Error("got invalid image extension", logs.String("got", msg))
-				break
-			}
-			imageFilesStopped.Status = &status.StatusInternal
-			v1.log.Error("could not check file for validity", logs.Error(err))
-			break
+	// imageFiles := make([]models.ProductMediaFiles, 1)
+
+	if _, err, msg := helper.IsValidImage(m.MediaFiles); err != nil {
+		if errors.Is(err, helper.ErrInvalidImageType) {
+			v1.error(c, status.StatusImageTypeUnkown)
+			v1.log.Error("got invalid image extension", logs.String("got", msg))
+			return
 		}
-		if i.Size > v1.cfg.Media.ProductPhotoMaxSize {
-			imageFilesStopped.Status = &status.StatusImageMaxSizeExceed
-			break
-		}
-		id := uuid.NewString()
-		url, err := v1.filestore.Create(i, filestore.FolderProduct, id)
-		if err != nil {
-			imageFilesStopped.Status = &status.StatusInternal
-			break
-		}
-		if err := v1.storage.Product().CreateProductImageFile(context.Background(),
-			id, m.ProductID, url,
-		); err != nil {
-			imageFilesStopped.Status = &status.StatusInternal
-			v1.log.Error("could not create product image file in db", logs.Error(err),
-				logs.String("pid", m.ProductID),
-			)
-			break
-		}
-		imageFiles[ind] = models.ProductMediaFiles{
-			ID:        id,
-			ProductID: m.ProductID,
-			MediaFile: v1.filestore.GetURL(url),
-		}
-	}
-	if imageFilesStopped.Status != nil {
-		v1.error(c, *imageFilesStopped.Status)
-		for _, img := range imageFiles {
-			v1.filestore.DeleteFile(img.MediaFile)
-		}
+		v1.error(c, status.StatusInternal)
+		v1.log.Error("could not check file for validity", logs.Error(err))
 		return
 	}
+	if m.MediaFiles.Size > v1.cfg.Media.ProductPhotoMaxSize {
+		v1.error(c, status.StatusImageMaxSizeExceed)
+		return
+	}
+	id := uuid.NewString()
+	url, err := v1.filestore.Create(m.MediaFiles, filestore.FolderProduct, id)
+	if err != nil {
+		v1.error(c, status.StatusInternal)
+		return
+	}
+	if err := v1.storage.Product().CreateProductImageFile(context.Background(),
+		id, m.ProductID, url,
+	); err != nil {
+		v1.error(c, status.StatusInternal)
+		v1.log.Error("could not create product image file in db", logs.Error(err),
+			logs.String("pid", m.ProductID),
+		)
+		return
+	}
+	// for ind, i := range m.MediaFiles {
+	// 	if _, err, msg := helper.IsValidImage(i); err != nil {
+	// 		if errors.Is(err, helper.ErrInvalidImageType) {
+	// 			imageFilesStopped.Status = &status.StatusImageTypeUnkown
+	// 			v1.log.Error("got invalid image extension", logs.String("got", msg))
+	// 			break
+	// 		}
+	// 		imageFilesStopped.Status = &status.StatusInternal
+	// 		v1.log.Error("could not check file for validity", logs.Error(err))
+	// 		break
+	// 	}
+	// 	if i.Size > v1.cfg.Media.ProductPhotoMaxSize {
+	// 		imageFilesStopped.Status = &status.StatusImageMaxSizeExceed
+	// 		break
+	// 	}
+	// 	id := uuid.NewString()
+	// 	url, err := v1.filestore.Create(i, filestore.FolderProduct, id)
+	// 	if err != nil {
+	// 		imageFilesStopped.Status = &status.StatusInternal
+	// 		break
+	// 	}
+	// 	if err := v1.storage.Product().CreateProductImageFile(context.Background(),
+	// 		id, m.ProductID, url,
+	// 	); err != nil {
+	// 		imageFilesStopped.Status = &status.StatusInternal
+	// 		v1.log.Error("could not create product image file in db", logs.Error(err),
+	// 			logs.String("pid", m.ProductID),
+	// 		)
+	// 		break
+	// 	}
+	// 	imageFiles[ind] = models.ProductMediaFiles{
+	// 		ID:        id,
+	// 		ProductID: m.ProductID,
+	// 		MediaFile: v1.filestore.GetURL(url),
+	// 	}
+	// }
+
+	// if imageFilesStopped.Status != nil {
+	// 	v1.error(c, *imageFilesStopped.Status)
+	// 	for _, img := range imageFiles {
+	// 		v1.filestore.DeleteFile(img.MediaFile)
+	// 	}
+	// 	return
+	// }
+
 	v1.response(c, http.StatusOK, models_v1.Response{
 		Code:    200,
 		Message: "Ok",
@@ -737,7 +771,7 @@ func (v1 *Handlers) AddProductImageFiles(c *gin.Context) {
 // @Failure 415 {object} models_v1.Response "Video type is not supported"
 // @Failure 500 {object} models_v1.Response "Internal error"
 func (v1 *Handlers) AddProductVideoFiles(c *gin.Context) {
-	var m models_v1.AddProductMediaFiles
+	var m models_v1.AddProductVideoFiles
 	if err := c.Bind(&m); err != nil {
 		v1.error(c, status.StatusBadRequest)
 		v1.log.Debug("invalid binding request add video files struct", logs.Error(err))

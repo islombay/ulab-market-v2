@@ -56,7 +56,7 @@ type Product struct {
 
 	Price float64 `json:"price,omitempty" obj:"price"`
 
-	Quantity int `json:"quantity,omitempty" obj:"quantity"`
+	Quantity int `json:"quantity" obj:"quantity"`
 
 	CategoryID string `json:"category_id,omitempty" obj:"category_id"`
 	BrandID    string `json:"brand_id,omitempty" obj:"brand_id"`
@@ -80,6 +80,11 @@ type ProductMediaFiles struct {
 }
 
 type AddProductMediaFiles struct {
+	ProductID  string                `form:"product_id" binding:"required"`
+	MediaFiles *multipart.FileHeader `form:"media_files" swaggerignore:"true" binding:"required"`
+}
+
+type AddProductVideoFiles struct {
 	ProductID  string                  `form:"product_id" binding:"required"`
 	MediaFiles []*multipart.FileHeader `form:"media_files" swaggerignore:"true" binding:"required"`
 }
