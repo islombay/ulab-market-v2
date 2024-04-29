@@ -77,10 +77,7 @@ func (db *ProductRepo) GetByID(ctx context.Context, id string) (*models.Product,
 	q := `select
 			id, articul, name_uz, name_ru,
 			description_uz, description_ru,
-			outcome_price, (
-				select coalesce(sum(s.quantity), 0) from storage as s
-				where s.product_id = $1
-			) as quantity, category_id, brand_id,
+			outcome_price, quantity, category_id, brand_id,
 			rating, status, main_image,
 			created_at, updated_at, deleted_at
 	from products where id = $1 and deleted_at is null`
