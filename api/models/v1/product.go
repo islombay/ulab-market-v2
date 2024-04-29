@@ -28,7 +28,7 @@ type CreateProduct struct {
 
 	MainImage *multipart.FileHeader `form:"main_image" binding:"required" swaggerignore:"true"`
 
-	ImageFiles []*multipart.FileHeader `form:"image_files" binding:"required" swaggerignore:"true"`
+	ImageFiles []*multipart.FileHeader `form:"image_files" swaggerignore:"true"`
 	VideoFiles []*multipart.FileHeader `form:"video_files" swaggerignore:"true"`
 }
 
