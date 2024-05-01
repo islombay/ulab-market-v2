@@ -640,8 +640,6 @@ func (v1 *Handlers) AddProductImageFiles(c *gin.Context) {
 	var m models_v1.AddProductMediaFiles
 	if err := c.Bind(&m); err != nil {
 		v1.error(c, status.StatusBadRequest)
-		fmt.Println(c.Request.Form)
-		fmt.Println(c.Request.Body)
 		v1.log.Debug("invalid binding request add image files struct", logs.Error(err))
 		return
 	}
@@ -663,10 +661,17 @@ func (v1 *Handlers) AddProductImageFiles(c *gin.Context) {
 		return
 	}
 
-	// if len(m.MediaFiles) > v1.cfg.Media.ProductPhotoMaxCount {
-	// 	v1.error(c, status.StatusProductPhotoMaxCount)
-	// 	return
-	// }
+	imgFiles, err := v1.storage.Product().GetProductImageFilesByID(context.Background(), m.ProductID)
+	if err != nil {
+		v1.error(c, status.StatusInternal)
+		v1.log.Error("could not get image files for a product", logs.Error(err), logs.String("product_id", m.ProductID))
+		return
+	}
+
+	if len(imgFiles)+1 > v1.cfg.Media.ProductPhotoMaxCount {
+		v1.error(c, status.StatusProductPhotoMaxCount)
+		return
+	}
 	// var imageFilesStopped struct {
 	// 	Status *status.Status
 	// }

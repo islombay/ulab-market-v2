@@ -28,6 +28,7 @@ import (
 // @success 200 {object} models_v1.Response "success"
 // @failure 400 {object} models_v1.Response "bad request / bad uuid"
 // @failure 409 {object} models_v1.Response "already found"
+// @failure 413 {object} models_v1.Response "Kiritilgan quantity bazadagi bor quantity dan kop"
 // @failure 500 {object} models_v1.Response "internal error"
 func (v1 *Handlers) AddToBasket(c *gin.Context) {
 	var m models_v1.AddToBasket
@@ -247,6 +248,7 @@ func (v1 *Handlers) DeleteFromBasket(c *gin.Context) {
 // @param change_basket body models_v1.ChangeBasket true "Change basket body"
 // @success 200 {object} models_v1.Response "Success"
 // @failure 400 {object} models_v1.Response "Bad request / bad quantity / bad id (product)"
+// @failure 413 {object} models_v1.Response "Kiritilgan quantity bazadagi bor quantity dan kop"
 // @failure 500 {object} models_v1.Response "Internal server error"
 func (v1 *Handlers) ChangeBasket(c *gin.Context) {
 	var m models_v1.ChangeBasket

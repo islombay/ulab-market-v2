@@ -4,7 +4,9 @@ do $$
     create type status_order_enum as enum (
         'in_process',
         'finished',
-        'canceled'
+        'canceled',
+        'picking',
+        'delivering'
     );
     end if;
 end$$;
@@ -19,17 +21,39 @@ do $$
         end if;
     end$$;
 
+do $$
+    begin 
+        if not exists (select * from pg_type where typname = 'delivery_order_enum') then
+            create type delivery_order_enum as enum (
+                'deliver'
+            );
+        end if;
+end $$;
+
 create table if not exists orders (
-    id uuid primary key ,
+    id uuid primary key default uuid_generate_v4(),
+    order_id bigint unique not null default (select extract(epoch from now())::int),
     user_id uuid,
+
+    client_first_name varchar(40) not null,
+    client_last_name varchar(40) not null,
+    client_phone_number varchar(12) not null,
+    client_comment text,
+
     branch_id uuid,
     status status_order_enum default 'in_process',
     total_price numeric,
     payment_type payment_order_enum,
+    delivery_type delivery_order_enum not null default 'deliver',
+
+    delivery_addr_lat float not null,
+    delivery_addr_long float not null,
 
     created_at timestamp default now() not null,
     updated_at timestamp default now() not null,
     deleted_at timestamp default null,
+
+    row_order serial,
 
     foreign key (user_id) references clients(id) on delete set null,
     foreign key (branch_id) references branches(id) on delete set null

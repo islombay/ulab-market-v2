@@ -13,29 +13,30 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"net/http"
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v4"
-	"net/http"
-	"time"
 )
 
 // CreateOwner godoc
-// @ID createOwner
-// @Router /api/owner [POST]
-// @Tags owner
-// @Summary Create owner
-// @Description Create owner. Will return error "Already exists" if the owner is already there.
-// @Accept json
-// @Produce json
-// @Security ApiKeyAuth
-// @Param createowner body models_v1.RegisterRequest true "Create owner body"
-// @Success 200 {object} models_v1.Token "Successfully created"
-// @Response 400 {object} models_v1.Response "Bad request/Invalid email/Invalid phone/Invalid password"
-// @Response 401 {object} models_v1.Response "Unauthorized"
-// @Response 403 {object} models_v1.Response "Forbidden. If currect user is not super, this endpoint will return forbidden(403)"
-// @Response 409 {object} models_v1.Response "Already exists"
-// @Failure 500 {object} models_v1.Response "Internal error"
+// @ID 					createOwner
+// @Router 				/api/owner [POST]
+// @Tags 				owner
+// @Summary 			Create owner
+// @Description 		Create owner. Will return error "Already exists" if the owner is already there.
+// @Accept 				json
+// @Produce 			json
+// @Security 			ApiKeyAuth
+// @Param 				createowner body models_v1.RegisterRequest true "Create owner body"
+// @Success 			200 {object} models_v1.Token 	"Successfully created"
+// @Response 			400 {object} models_v1.Response "Bad request/Invalid email/Invalid phone/Invalid password"
+// @Response 			401 {object} models_v1.Response "Unauthorized"
+// @Response 			403 {object} models_v1.Response "Forbidden. If currect user is not super, this endpoint will return forbidden(403)"
+// @Response 			409 {object} models_v1.Response "Already exists"
+// @Failure 			500 {object} models_v1.Response "Internal error"
 func (v1 *Handlers) CreateOwner(c *gin.Context) {
 	var m models_v1.RegisterRequest
 	if c.BindJSON(&m) != nil {

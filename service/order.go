@@ -8,6 +8,8 @@ import (
 	"app/storage"
 	"context"
 	"errors"
+	"strconv"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v4"
@@ -43,9 +45,18 @@ func (srv OrderService) CreateOrder(ctx context.Context, order models_v1.CreateO
 		return nil, &status.StatusUnauthorized
 	}
 	orderModel := models.OrderModel{
-		ID:          uuid.NewString(),
-		PaymentType: order.PaymentType,
-		UserID:      userID,
+		ID:              uuid.NewString(),
+		OrderID:         strconv.FormatInt(time.Now().Unix(), 10),
+		PaymentType:     order.PaymentType,
+		UserID:          userID,
+		ClientFirstName: &order.ClientFirstName,
+		ClientLastName:  &order.ClientLastName,
+		ClientPhone:     &order.ClientPhone,
+		ClientComment:   order.ClientComment,
+
+		DeliveryType:     order.DeliveryType,
+		DeliveryAddrLat:  order.DeliveryAddrLat,
+		DeliveryAddrLong: order.DeliveryAddrLong,
 	}
 
 	userBasket, err := srv.store.Basket().GetAll(ctx, userID)
@@ -90,9 +101,15 @@ func (srv OrderService) CreateOrder(ctx context.Context, order models_v1.CreateO
 			errStatus = &status.StatusInternal
 			break
 		}
+
+		if product.Quantity < basket.Quantity {
+			gotErr = true
+			errStatus = &status.StatusProductQuantityTooMany
+			break
+		}
 		orderProducts = append(orderProducts, models.OrderProductModel{
 			ID:           uuid.NewString(),
-			OrderID:      orderModel.ID,
+			OrderID:      &orderModel.ID,
 			ProductID:    basket.ProductID,
 			Quantity:     basket.Quantity,
 			ProductPrice: product.OutcomePrice,
@@ -170,6 +187,7 @@ func (srv OrderService) GetByID(ctx context.Context, id string) (interface{}, *s
 			logs.String("oid", id))
 		return nil, &status.StatusInternal
 	}
+
 	return model, nil
 }
 

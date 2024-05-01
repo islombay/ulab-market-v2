@@ -12,3 +12,4 @@ drop table if exists orders;
 
 drop type if exists payment_order_enum;
 drop type if exists status_order_enum;
+drop type if exists delivery_order_enum;

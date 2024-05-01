@@ -213,10 +213,15 @@ func (db *CategoryRepo) GetByName(ctx context.Context, name string) (*models.Cat
 }
 
 func (db *CategoryRepo) GetBrands(ctx context.Context, id string) ([]models.Brand, error) {
-	q := `select p.brand_id, b.name from products as p
-			join brands as b on b.id = p.brand_id
-		where p.category_id = $1
-		group by p.brand_id, b.name;`
+	q := `with all_category_ids as(
+				select id from category
+				where (id = $1
+					or parent_id = $1)
+				and deleted_at is null
+			)
+			select p.brand_id, b.name from all_category_ids as c
+				join products as p on p.category_id = c.id
+				join brands as b on p.brand_id = b.id;`
 
 	rows, _ := db.db.Query(ctx, q, id)
 	if rows.Err() != nil {

@@ -4,6 +4,7 @@ import (
 	"app/api/models"
 	"app/pkg/logs"
 	"context"
+
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 

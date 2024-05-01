@@ -634,6 +634,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/models_v1.Response"
                         }
                     },
+                    "413": {
+                        "description": "Kiritilgan quantity bazadagi bor quantity dan kop",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
@@ -686,6 +692,12 @@ const docTemplate = `{
                     },
                     "409": {
                         "description": "already found",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    },
+                    "413": {
+                        "description": "Kiritilgan quantity bazadagi bor quantity dan kop",
                         "schema": {
                             "$ref": "#/definitions/models_v1.Response"
                         }
@@ -3798,13 +3810,37 @@ const docTemplate = `{
         "models.OrderModel": {
             "type": "object",
             "properties": {
+                "client_comment": {
+                    "type": "string"
+                },
+                "client_first_name": {
+                    "type": "string"
+                },
+                "client_last_name": {
+                    "type": "string"
+                },
+                "client_phone_number": {
+                    "type": "string"
+                },
                 "created_at": {
                     "type": "string"
                 },
                 "deleted_at": {
                     "type": "string"
                 },
+                "delivery_addr_lat": {
+                    "type": "number"
+                },
+                "delivery_addr_long": {
+                    "type": "number"
+                },
+                "delivery_type": {
+                    "type": "string"
+                },
                 "id": {
+                    "type": "string"
+                },
+                "order_id": {
                     "type": "string"
                 },
                 "payment_type": {
@@ -4281,9 +4317,36 @@ const docTemplate = `{
         "models_v1.CreateOrder": {
             "type": "object",
             "required": [
+                "client_first_name",
+                "client_last_name",
+                "client_phone_number",
+                "delivery_addr_lat",
+                "delivery_addr_long",
+                "delivery_type",
                 "payment_type"
             ],
             "properties": {
+                "client_comment": {
+                    "type": "string"
+                },
+                "client_first_name": {
+                    "type": "string"
+                },
+                "client_last_name": {
+                    "type": "string"
+                },
+                "client_phone_number": {
+                    "type": "string"
+                },
+                "delivery_addr_lat": {
+                    "type": "number"
+                },
+                "delivery_addr_long": {
+                    "type": "number"
+                },
+                "delivery_type": {
+                    "type": "string"
+                },
                 "payment_type": {
                     "type": "string"
                 }

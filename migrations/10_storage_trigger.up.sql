@@ -10,14 +10,22 @@ BEGIN
         SELECT order_products.product_id, orders.branch_id, SUM(order_products.quantity) AS total_order_quantity
         FROM order_products
                  JOIN orders ON orders.id = order_products.order_id
-        WHERE orders.status IN ('finished', 'in_process')
+        WHERE orders.status IN ('finished',
+                                'in_process',
+                                'picking',
+                                'delivering')
         GROUP BY order_products.product_id, orders.branch_id
     ), final_quantities AS (
         SELECT COALESCE(si.product_id, so.product_id) AS product_id,
                COALESCE(si.branch_id, so.branch_id) AS branch_id,
                COALESCE(si.total_income_quantity, 0) - COALESCE(so.total_order_quantity, 0) AS net_quantity
         FROM summed_income si
-                 FULL OUTER JOIN summed_order so ON si.product_id = so.product_id AND si.branch_id = so.branch_id
+                 FULL OUTER JOIN summed_order so ON si.product_id = so.product_id
+                    -- and si.branch_id = so.branch_id was deleted
+                    -- because, now, branches are ignored.
+                    -- when more branches are added,
+                    -- undo ignore the code below, and update function
+                    -- AND si.branch_id = so.branch_id
     )
     INSERT INTO storage (id, product_id, branch_id, quantity)
     SELECT uuid_generate_v4(), product_id, branch_id, net_quantity FROM final_quantities
