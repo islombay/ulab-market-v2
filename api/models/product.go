@@ -28,6 +28,8 @@ type Product struct {
 	ImageFiles []ProductMediaFiles `json:"image_files,omitempty" obj:"image_files"`
 	VideoFiles []ProductMediaFiles `json:"video_files,omitempty" obj:"video_files"`
 
+	ViewCount int `json:"view_count,omitempty" obj:"view_count"`
+
 	CreatedAt time.Time  `db:"created_at" json:"created_at" obj:"created_at"`
 	UpdatedAt time.Time  `db:"updated_at" json:"updated_at" obj:"updated_at"`
 	DeletedAt *time.Time `db:"deleted_at" json:"deleted_at,omitempty"`

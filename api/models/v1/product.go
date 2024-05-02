@@ -61,8 +61,9 @@ type Product struct {
 	CategoryID string `json:"category_id,omitempty" obj:"category_id"`
 	BrandID    string `json:"brand_id,omitempty" obj:"brand_id"`
 
-	CategoryInformation models.Category `json:"category,omitempty" `
-	// BrandInformation    models.Brand    `json:"brand_information,omitempty"`
+	CategoryInformation models.Category `json:"category,omitempty"`
+
+	ViewCount int `json:"view_count,omitempty" obj:"view_count"`
 
 	MainImage string  `json:"main_image,omitempty" obj:"main_image"`
 	Rating    float32 `json:"rating,omitempty" obj:"rating"`
@@ -92,18 +93,18 @@ type AddProductVideoFiles struct {
 type ChangeProductRequest struct {
 	ID      string `json:"id" binding:"required"`
 	Articul string `json:"articul" binding:"required"`
-	NameUz  string `json:"name_uz"`
-	NameRu  string `json:"name_ru"`
+	NameUz  string `json:"name_uz" binding:"required"`
+	NameRu  string `json:"name_ru" binding:"required"`
 
 	DescriptionUz string `json:"description_uz" binding:"required"`
 	DescriptionRu string `json:"description_ru" binding:"required"`
 
-	// OutcomePrice float64 `json:"outcome_price"binding:"required"`
+	OutcomePrice float64 `json:"outcome_price" binding:"required"`
 
 	CategoryID string `json:"category_id"`
 	BrandID    string `json:"brand_id"`
 
-	// Status string `json:"status" binding:"required"`
+	Status string `json:"status" binding:"required"`
 }
 
 type ChangeProductPrice struct {

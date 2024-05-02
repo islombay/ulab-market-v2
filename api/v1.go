@@ -47,10 +47,6 @@ func NewV1(
 		auth.GET("/tgbot", func(c *gin.Context) {
 			c.JSON(http.StatusOK, gin.H{"url": os.Getenv("auth_tg_bot")})
 		})
-
-		//auth.POST("/register", handler.RegisterClient)
-		//auth.POST("/change_password", handler.ChangePassword)
-		//auth.POST("/request_code", handler.RequestCode)
 	}
 
 	branches := v1.Group("/branch")
@@ -214,6 +210,7 @@ func NewV1(
 
 		product.GET("", handler.GetAllProducts)
 		product.GET("/:id", handler.GetProductByID)
+		product.GET("/admin/:id", handler.MiddlewareIsStaff(), handler.GetProductByIDAdmin)
 	}
 
 	basket := v1.Group("/basket")

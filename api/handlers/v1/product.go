@@ -496,6 +496,95 @@ func (v1 *Handlers) GetProductByID(c *gin.Context) {
 		tmp.MainImage = *product.MainImage
 	}
 
+	if err := v1.storage.Product().IncrementViewCount(context.Background(), tmp.ID); err != nil {
+		v1.log.Error("could not increment view count for product", logs.Error(err),
+			logs.String("product_id", tmp.ID))
+	}
+
+	v1.response(c, http.StatusOK, tmp)
+}
+
+// GetProductByIDAdmin
+// @id GetProductByIDAdmin
+// @router /api/product/admin/{id} [get]
+// @summary get product by id
+// @description get product by id
+// @tags product
+// @security ApiKeyAuth
+// @param id path string true "product id"
+// @produce json
+// @Success 200 {object} models_v1.Product "Success"
+// @Failure 400 {object} models_v1.Response "Bad request / bad uuid"
+// @Failure 404 {object} models_v1.Response "Product not found"
+// @Failure 500 {object} models_v1.Response "Internal error"
+func (v1 *Handlers) GetProductByIDAdmin(c *gin.Context) {
+	id := c.Param("id")
+	if !helper.IsValidUUID(id) {
+		v1.error(c, status.StatusBadUUID)
+		return
+	}
+	product, err := v1.storage.Product().GetByID(context.Background(), id)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			v1.error(c, status.StatusProductNotFount)
+			return
+		}
+		v1.error(c, status.StatusInternal)
+		v1.log.Error("could not find product by id", logs.String("product_id", id),
+			logs.Error(err))
+		return
+	}
+	if product.DeletedAt != nil {
+		v1.error(c, status.StatusProductNotFount)
+		return
+	}
+
+	var tmp models_v1.Product
+
+	imgFiles, err := v1.storage.Product().GetProductImageFilesByID(context.Background(), id)
+	if err != nil {
+		v1.error(c, status.StatusInternal)
+		v1.log.Error("could not get image files for a product", logs.Error(err), logs.String("product_id", id))
+	}
+
+	tmp.ImageFiles = make([]models_v1.ProductMediaFiles, len(imgFiles))
+	for i, _ := range imgFiles {
+		imgFiles[i].MediaFile = v1.filestore.GetURL(imgFiles[i].MediaFile)
+		tmp.ImageFiles[i] = models_v1.ProductMediaFiles{
+			ID:        imgFiles[i].ID,
+			MediaFile: imgFiles[i].MediaFile,
+		}
+	}
+
+	vdFiles, err := v1.storage.Product().GetProductVideoFilesByID(context.Background(), id)
+	if err != nil {
+		v1.error(c, status.StatusInternal)
+		v1.log.Error("could not get video files for a product", logs.Error(err), logs.String("product_id", id))
+	}
+
+	tmp.VideoFiles = make([]models_v1.ProductMediaFiles, len(vdFiles))
+	for i, _ := range vdFiles {
+		vdFiles[i].MediaFile = v1.filestore.GetURL(vdFiles[i].MediaFile)
+		tmp.VideoFiles[i] = models_v1.ProductMediaFiles{
+			ID:        vdFiles[i].ID,
+			MediaFile: vdFiles[i].MediaFile,
+		}
+	}
+
+	if product.MainImage != nil {
+		product.MainImage = models.GetStringAddress(v1.filestore.GetURL(*product.MainImage))
+	}
+
+	if err := helper.Reobject(*product, &tmp, "obj"); err != nil {
+		v1.error(c, status.StatusInternal)
+		v1.log.Error("could not reobject", logs.Error(err))
+		return
+	}
+	tmp.Articul = product.Articul
+
+	if product.MainImage != nil {
+		tmp.MainImage = *product.MainImage
+	}
 	v1.response(c, http.StatusOK, tmp)
 }
 
@@ -858,15 +947,6 @@ func (v1 *Handlers) AddProductVideoFiles(c *gin.Context) {
 	})
 }
 
-func (v1 *Handlers) EditProduct(c *gin.Context) {
-	var m models_v1.ChangeProductRequest
-	if err := c.BindJSON(&m); err != nil {
-		v1.error(c, status.StatusBadRequest)
-		v1.log.Debug("bad request: editproduct", logs.Error(err))
-		return
-	}
-}
-
 // ChangeProductPrice
 // @id ChangeProductPrice
 // @router /api/product/change_price [put]
@@ -908,4 +988,114 @@ func (v1 *Handlers) ChangeProductPrice(c *gin.Context) {
 		Message: "Ok",
 		Code:    200,
 	})
+}
+
+// EditProduct
+// @id			EditProduct
+// @router		/api/product [put]
+// @summary		edit product
+// @description	edit product
+// @tags		product
+// @accept		json
+// @produce		json
+// @security	ApiKeyAuth
+// @param		edit_product body models_v1.ChangeProductRequest true "edit product request"
+// @success		200 {object} models.Product "Successfull edit"
+// @failure		400 {object} models_v1.Response "Bad request/bad id/ bad price/ bad status"
+// @failure		404 {object} models_v1.Response "Product not found/ Category not found/ Brand not found"
+// @failure		500 {object} models_v1.Response "Internal server error"
+func (v1 *Handlers) EditProduct(c *gin.Context) {
+	var m models_v1.ChangeProductRequest
+	if err := c.BindJSON(&m); err != nil {
+		v1.error(c, status.StatusBadRequest)
+		v1.log.Error("bad request", logs.Error(err))
+		return
+	}
+
+	if !helper.IsValidUUID(m.ID) {
+		v1.error(c, status.StatusBadUUID)
+		return
+	}
+
+	_, err := v1.storage.Product().GetByID(context.Background(), m.ID)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			v1.error(c, status.StatusProductNotFount)
+			return
+		}
+		v1.error(c, status.StatusInternal)
+		v1.log.Error("could not find product by id", logs.Error(err),
+			logs.String("pid", m.ID))
+		return
+	}
+
+	if m.OutcomePrice <= 0 {
+		v1.error(c, status.StatusProductPriceInvalid)
+		return
+	}
+
+	m.Status = strings.ToLower(m.Status)
+	if !(m.Status == helper.ProductStatusActive || m.Status == helper.ProductStatusInactive) {
+		v1.error(c, status.StatusProductStatusInvalid)
+		return
+	}
+
+	if m.CategoryID != "" {
+		if !helper.IsValidUUID(m.CategoryID) {
+			v1.error(c, status.StatusBadUUID)
+			return
+		}
+		if _, err := v1.storage.Category().GetByID(context.Background(), m.CategoryID); err != nil {
+			if errors.Is(err, pgx.ErrNoRows) {
+				v1.error(c, status.StatusCategoryNotFound)
+				return
+			}
+			v1.error(c, status.StatusInternal)
+			v1.log.Error("could not get category by id", logs.Error(err),
+				logs.String("cid", m.CategoryID),
+			)
+			return
+		}
+	}
+
+	if m.BrandID != "" {
+		if !helper.IsValidUUID(m.BrandID) {
+			v1.error(c, status.StatusBadUUID)
+			return
+		}
+		if _, err := v1.storage.Brand().GetByID(context.Background(), m.BrandID); err != nil {
+			if errors.Is(err, pgx.ErrNoRows) {
+				v1.error(c, status.StatusBrandNotFound)
+				return
+			}
+			v1.error(c, status.StatusInternal)
+			v1.log.Error("could not get brand by id", logs.Error(err),
+				logs.String("bid", m.BrandID),
+			)
+			return
+		}
+	}
+
+	productModel := models.Product{
+		ID:      m.ID,
+		Articul: m.Articul,
+
+		NameRu: m.NameRu,
+		NameUz: m.NameUz,
+
+		DescriptionUz: m.DescriptionUz,
+		DescriptionRu: m.DescriptionRu,
+
+		OutcomePrice: m.OutcomePrice,
+		CategoryID:   &m.CategoryID,
+		BrandID:      &m.BrandID,
+
+		Status: m.Status,
+	}
+
+	v1.storage.Product().Change(context.Background(), &productModel)
+	if productModel.MainImage != nil {
+		productModel.MainImage = models.GetStringAddress(v1.filestore.GetURL(*productModel.MainImage))
+	}
+	v1.response(c, http.StatusOK, productModel)
 }

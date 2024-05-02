@@ -36,6 +36,18 @@ func (v1 *Handlers) MiddlewareIsStaff() gin.HandlerFunc {
 			v1.log.Debug("forbidden operation", logs.String("need", TokenSuper), logs.String("have", token.Type))
 			return
 		}
+		userID := token.UID
+		_, err := v1.storage.User().GetStaffByID(context.Background(), token.UID)
+		if err != nil {
+			if errors.Is(err, pgx.ErrNoRows) {
+				v1.log.Debug("could not get staff by id", logs.String("uid", userID))
+				v1.error(c, status.StatusUnauthorized)
+				return
+			}
+			v1.error(c, status.StatusInternal)
+			v1.log.Error("could not get staff mem by id", logs.Error(err), logs.String("uid", userID))
+			return
+		}
 		c.Set(UserIDContext, token.UID)
 		c.Set(UserRoleContext, token.Type)
 		c.Next()
@@ -54,6 +66,18 @@ func (v1 *Handlers) MiddlewareIsClient() gin.HandlerFunc {
 			v1.log.Debug("forbidden operation", logs.String("need", TokenClient), logs.String("have", token.Type))
 			return
 		}
+		userID := token.UID
+		_, err := v1.storage.User().GetClientByID(context.Background(), token.UID)
+		if err != nil {
+			if errors.Is(err, pgx.ErrNoRows) {
+				v1.log.Debug("could not get client by id", logs.String("uid", userID))
+				v1.error(c, status.StatusUnauthorized)
+				return
+			}
+			v1.error(c, status.StatusInternal)
+			v1.log.Error("could not get client mem by id", logs.Error(err), logs.String("uid", userID))
+			return
+		}
 		c.Set(UserIDContext, token.UID)
 		c.Next()
 	}
@@ -69,6 +93,19 @@ func (v1 *Handlers) MiddlewareIsSuper() gin.HandlerFunc {
 		if token.Type != TokenSuper {
 			v1.error(c, status.StatusForbidden)
 			v1.log.Debug("forbidden operation", logs.String("need", TokenSuper), logs.String("have", token.Type))
+			return
+		}
+
+		userID := token.UID
+		_, err := v1.storage.User().GetStaffByID(context.Background(), token.UID)
+		if err != nil {
+			if errors.Is(err, pgx.ErrNoRows) {
+				v1.log.Debug("could not get staff by id", logs.String("uid", userID))
+				v1.error(c, status.StatusUnauthorized)
+				return
+			}
+			v1.error(c, status.StatusInternal)
+			v1.log.Error("could not get staff mem by id", logs.Error(err), logs.String("uid", userID))
 			return
 		}
 		c.Set(UserIDContext, token.UID)

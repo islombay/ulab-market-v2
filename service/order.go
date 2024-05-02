@@ -4,6 +4,7 @@ import (
 	"app/api/models"
 	models_v1 "app/api/models/v1"
 	"app/api/status"
+	"app/pkg/helper"
 	"app/pkg/logs"
 	"app/storage"
 	"context"
@@ -44,6 +45,11 @@ func (srv OrderService) CreateOrder(ctx context.Context, order models_v1.CreateO
 		srv.log.Error("invalid user id")
 		return nil, &status.StatusUnauthorized
 	}
+
+	if !helper.IsValidPhone(order.ClientPhone) {
+		return nil, &status.StatusBadPhone
+	}
+
 	orderModel := models.OrderModel{
 		ID:              uuid.NewString(),
 		OrderID:         strconv.FormatInt(time.Now().Unix(), 10),

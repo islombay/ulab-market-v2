@@ -30,6 +30,8 @@ create table if not exists products (
     updated_at timestamp default now(),
     deleted_at timestamp default null,
 
+    view_count int default 0,
+
     foreign key (category_id) references category(id) on delete set null,
     foreign key (brand_id) references brands(id) on delete set null
 );

@@ -56,7 +56,15 @@ func (db *ProductRepo) CreateProduct(ctx context.Context, m models.Product) erro
 }
 
 func (db *ProductRepo) GetByArticul(ctx context.Context, articul string) (*models.Product, error) {
-	q := `select * from products where articul = $1 and deleted_at is null`
+	q := `select
+			id, articul, name_uz, name_ru,
+			description_uz, description_ru,
+			outcome_price, quantity,
+			category_id, brand_id,
+			rating, status, main_image,
+			created_at, updated_at, deleted_at,
+			view_count
+	 from products where articul = $1 and deleted_at is null`
 	var m models.Product
 	if err := db.db.QueryRow(ctx, q, articul).Scan(
 		&m.ID, &m.Articul,
@@ -67,6 +75,7 @@ func (db *ProductRepo) GetByArticul(ctx context.Context, articul string) (*model
 		&m.CategoryID, &m.BrandID,
 		&m.Rating, &m.Status, &m.MainImage,
 		&m.CreatedAt, &m.UpdatedAt, &m.DeletedAt,
+		&m.ViewCount,
 	); err != nil {
 		return nil, err
 	}
@@ -82,7 +91,8 @@ func (db *ProductRepo) GetByID(ctx context.Context, id string) (*models.Product,
 				where s.product_id = $1
 			) as quantity, category_id, brand_id,
 			rating, status, main_image,
-			created_at, updated_at, deleted_at
+			created_at, updated_at, deleted_at,
+			view_count
 	from products where id = $1 and deleted_at is null`
 	var m models.Product
 	if err := db.db.QueryRow(ctx, q, id).Scan(
@@ -94,6 +104,7 @@ func (db *ProductRepo) GetByID(ctx context.Context, id string) (*models.Product,
 		&m.CategoryID, &m.BrandID,
 		&m.Rating, &m.Status, &m.MainImage,
 		&m.CreatedAt, &m.UpdatedAt, &m.DeletedAt,
+		&m.ViewCount,
 	); err != nil {
 		return nil, err
 	}
@@ -202,7 +213,8 @@ func (db *ProductRepo) GetAll(ctx context.Context, query, catid, bid *string, re
 				where s.product_id = p.id
 			) as quantity, category_id, brand_id,
 			rating, status, main_image,
-			created_at, updated_at, deleted_at
+			created_at, updated_at, deleted_at,
+			view_count
 		from products as p`
 	var args []interface{}
 	var whereClause []string
@@ -260,6 +272,7 @@ func (db *ProductRepo) GetAll(ctx context.Context, query, catid, bid *string, re
 			&m.CategoryID, &m.BrandID,
 			&m.Rating, &m.Status, &m.MainImage,
 			&m.CreatedAt, &m.UpdatedAt, &m.DeletedAt,
+			&m.ViewCount,
 		); err != nil {
 			return nil, err
 		}
@@ -344,5 +357,50 @@ func (db *ProductRepo) ChangeMainImage(ctx context.Context, id, url string, now 
 func (db *ProductRepo) ChangeProductPrice(ctx context.Context, id string, price float32) error {
 	q := `update products set outcome_price = $1, updated_at = now() where id = $2`
 	_, err := db.db.Exec(ctx, q, price, id)
+	return err
+}
+
+func (db *ProductRepo) IncrementViewCount(ctx context.Context, id string) error {
+	q := `update products set view_count = view_count+1 where id = $1`
+	_, err := db.db.Exec(ctx, q, id)
+	return err
+}
+
+func (db *ProductRepo) Change(ctx context.Context, m *models.Product) error {
+	q := `update products set
+			articul = $1,
+			name_uz = $2,
+			name_ru = $3,
+			description_ru = $4,
+			description_uz = $5,
+			outcome_price = $6,
+			category_id = $7,
+			brand_id = $8,
+			updated_at = now()
+		where id = $9 and deleted_at is null
+		returning
+			id, articul, name_uz, name_ru,
+			description_uz, description_ru,
+			outcome_price, (
+				select coalesce(sum(s.quantity), 0) from storage as s
+				where s.product_id = $9
+			) as quantity, category_id, brand_id,
+			status, rating, main_image, view_count,
+			created_at, updated_at, deleted_at`
+
+	err := db.db.QueryRow(ctx, q,
+		m.Articul, m.NameUz, m.NameRu,
+		m.DescriptionRu, m.DescriptionUz,
+		m.OutcomePrice, m.CategoryID,
+		m.BrandID, m.ID,
+	).Scan(
+		&m.ID, &m.Articul, &m.NameUz, &m.NameRu,
+		&m.DescriptionUz, &m.DescriptionRu,
+		&m.OutcomePrice, &m.Quantity,
+		&m.CategoryID, &m.BrandID,
+		&m.Status, &m.Rating, &m.MainImage,
+		&m.ViewCount, &m.CreatedAt,
+		&m.UpdatedAt, &m.DeletedAt,
+	)
 	return err
 }

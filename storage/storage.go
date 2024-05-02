@@ -95,6 +95,10 @@ type ProductInterface interface {
 	CreateProductVideoFile(ctx context.Context, id, pid, url string) error
 	GetProductVideoFilesByID(ctx context.Context, id string) ([]models.ProductMediaFiles, error)
 	GetProductImageFilesByID(ctx context.Context, id string) ([]models.ProductMediaFiles, error)
+
+	IncrementViewCount(ctx context.Context, id string) error
+
+	Change(ctx context.Context, m *models.Product) error
 }
 
 type RoleInterface interface {

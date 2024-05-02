@@ -2725,6 +2725,62 @@ const docTemplate = `{
                     }
                 }
             },
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "edit product",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "product"
+                ],
+                "summary": "edit product",
+                "operationId": "EditProduct",
+                "parameters": [
+                    {
+                        "description": "edit product request",
+                        "name": "edit_product",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.ChangeProductRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfull edit",
+                        "schema": {
+                            "$ref": "#/definitions/models.Product"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request/bad id/ bad price/ bad status",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Product not found/ Category not found/ Brand not found",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    }
+                }
+            },
             "post": {
                 "security": [
                     {
@@ -3026,6 +3082,59 @@ const docTemplate = `{
                     },
                     "415": {
                         "description": "Video type is not supported",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal error",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/product/admin/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get product by id",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "product"
+                ],
+                "summary": "get product by id",
+                "operationId": "GetProductByIDAdmin",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "product id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Product"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request / bad uuid",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Product not found",
                         "schema": {
                             "$ref": "#/definitions/models_v1.Response"
                         }
@@ -4168,6 +4277,9 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/models.ProductMediaFiles"
                     }
+                },
+                "view_count": {
+                    "type": "integer"
                 }
             }
         },
@@ -4454,6 +4566,51 @@ const docTemplate = `{
                 },
                 "price": {
                     "type": "number"
+                }
+            }
+        },
+        "models_v1.ChangeProductRequest": {
+            "type": "object",
+            "required": [
+                "articul",
+                "description_ru",
+                "description_uz",
+                "id",
+                "name_ru",
+                "name_uz",
+                "outcome_price",
+                "status"
+            ],
+            "properties": {
+                "articul": {
+                    "type": "string"
+                },
+                "brand_id": {
+                    "type": "string"
+                },
+                "category_id": {
+                    "type": "string"
+                },
+                "description_ru": {
+                    "type": "string"
+                },
+                "description_uz": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name_ru": {
+                    "type": "string"
+                },
+                "name_uz": {
+                    "type": "string"
+                },
+                "outcome_price": {
+                    "type": "number"
+                },
+                "status": {
+                    "type": "string"
                 }
             }
         },
@@ -4749,6 +4906,9 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/models_v1.ProductMediaFiles"
                     }
+                },
+                "view_count": {
+                    "type": "integer"
                 }
             }
         },

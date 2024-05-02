@@ -7,10 +7,11 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"github.com/jackc/pgconn"
-	"github.com/jackc/pgx/v4/pgxpool"
 	"strings"
 	"time"
+
+	"github.com/jackc/pgconn"
+	"github.com/jackc/pgx/v4/pgxpool"
 )
 
 type UserRepo struct {
