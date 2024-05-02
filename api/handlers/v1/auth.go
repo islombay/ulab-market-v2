@@ -173,6 +173,74 @@ func (v1 *Handlers) LoginAdmin(c *gin.Context) {
 	v1.response(c, http.StatusOK, models_v1.Token{Token: token})
 }
 
+// LoginCourier				godoc
+// @ID 						LoginCourier
+// @Router 					/api/auth/login_courier [POST]
+// @Summary 				Login for courier
+// @Description 			Login for courier. This is need to enter for courier panel
+// @Tags 					auth
+// @Accept 					json
+// @Produce 				json
+// @Param 		login_courier body models_v1.LoginAdminRequest true "Login request"
+// @Success 	200 {object} models_v1.Token "Success returning token"
+// @Response 	400 {object} models_v1.Response "Bad request"
+// @Response 	406 {object} models_v1.Response "User not verified"
+// @Response 	417 {object} models_v1.Response "Invalid credentials"
+// @Failure 	500 {object} models_v1.Response "Internal"
+func (v1 *Handlers) LoginCourier(c *gin.Context) {
+	var m models_v1.LoginAdminRequest
+	if c.BindJSON(&m) != nil {
+		v1.error(c, status.StatusBadRequest)
+		return
+	}
+	user, err := v1.storage.User().GetStaffByLogin(context.Background(), m.Login)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			v1.error(c, status.StatusInvalidCredentials)
+			return
+		}
+		v1.error(c, status.StatusInternal)
+		v1.log.Error("could not get user", logs.Error(err), logs.String("login", m.Login))
+		return
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(m.Password))
+	if err != nil {
+		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
+			v1.log.Debug("password does not match", logs.Error(err))
+			v1.error(c, status.StatusInvalidCredentials)
+			return
+		}
+		v1.log.Debug("could not compare hash and password", logs.Error(err))
+		v1.error(c, status.StatusInternal)
+		return
+	}
+
+	r, err := v1.storage.Role().GetRoleByID(context.Background(), user.RoleID)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			v1.log.Error("role specified for user not found", logs.String("rid", user.RoleID))
+		} else {
+			v1.log.Error("could not get role specified for user", logs.Error(err), logs.String("rid", user.RoleID))
+		}
+	}
+
+	if r.ID != auth_lib.RoleCourier.ID {
+		v1.error(c, status.StatusInvalidCredentials)
+		return
+	}
+
+	dur := time.Hour * auth_lib.TokenExpireLife
+	token, err := auth_lib.GenerateToken(user.ID, dur, TokenCourier)
+	if err != nil {
+		v1.log.Error("could not generate token", logs.Error(err))
+		v1.error(c, status.StatusInternal)
+		return
+	}
+	v1.response(c, http.StatusOK, models_v1.Token{Token: token})
+
+}
+
 // RegisterClient godoc
 // @ID register
 // @deprecatedrouter /api/auth/register [POST]

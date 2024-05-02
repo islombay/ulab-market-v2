@@ -2,7 +2,6 @@ create table if not exists storage (
     id uuid primary key not null,
     product_id uuid ,
     branch_id uuid,
-    total_price numeric,
     quantity int,
 
     created_at timestamp default now() not null,

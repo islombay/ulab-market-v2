@@ -41,6 +41,7 @@ func NewV1(
 	{
 		auth.POST("/login", handler.Login)
 		auth.POST("/login_admin", handler.LoginAdmin)
+		auth.POST("/login_courier", handler.LoginCourier)
 		auth.POST("/verify_code", handler.VerifyCode)
 
 		auth.GET("/tgbot", func(c *gin.Context) {
@@ -86,6 +87,18 @@ func NewV1(
 		admin.POST("", handler.MiddlewareStaffPermissionCheck(auth_lib.PermissionAddAdmin), handler.CreateAdmin)
 		admin.DELETE("/:id", handler.MiddlewareStaffPermissionCheck(auth_lib.PermissionDeleteAdmin), handler.DeleteAdmin)
 		admin.PUT("", handler.MiddlewareStaffPermissionCheck(auth_lib.PermissionEditAdmin), handler.ChangeAdmin)
+	}
+
+	courier := v1.Group("/courier")
+	{
+		courier.POST("",
+			handler.MiddlewareStaffPermissionCheck(auth_lib.PermissionAddCourier),
+			handler.CreateCourier,
+		)
+		courier.DELETE("/:id",
+			handler.MiddlewareStaffPermissionCheck(auth_lib.PermissionDeleteCourier),
+			handler.DeleteCourier,
+		)
 	}
 
 	category := v1.Group("/category")

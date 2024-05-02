@@ -21,6 +21,7 @@ const (
 	TokenStaff          = "staff"
 	TokenClient         = "client"
 	TokenSuper          = "super"
+	TokenCourier        = "courier"
 )
 
 func (v1 *Handlers) MiddlewareIsStaff() gin.HandlerFunc {

@@ -12,7 +12,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -235,9 +234,9 @@ func (v1 *Handlers) ChangeOwner(c *gin.Context) {
 		Name:        m.Name,
 		Email:       sql.NullString{Valid: m.Email != "", String: m.Email},
 		PhoneNumber: sql.NullString{Valid: m.Phone != "", String: m.Phone},
+		Password:    m.Password,
 		RoleID:      m.RoleID,
 	}
-	fmt.Println(usr.Email)
 	if err := v1.storage.User().ChangeStaff(context.Background(), usr); err != nil {
 		if errors.Is(err, storage.ErrNoUpdate) {
 			v1.error(c, status.StatusNoUpdateProvided)

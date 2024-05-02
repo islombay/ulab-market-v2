@@ -2,6 +2,7 @@ package auth_lib
 
 import (
 	"app/api/models"
+
 	"github.com/google/uuid"
 )
 

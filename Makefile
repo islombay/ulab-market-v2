@@ -15,6 +15,9 @@ binary-start:
 build:
 	go build -o app cmd/main.go
 
+db:
+	psql -U postgres -W -h localhost -p 5432 -d ulab-market-v2
+
 run: swag run-server
 run-prod: swag binary-start
 install: swag-install swag build
