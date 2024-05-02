@@ -269,8 +269,25 @@ func NewV1(
 			handler.OrderFinish,
 		)
 
-		order.GET("/:id", handler.GetOrderByID)
-		order.GET("", handler.GetOrderAll)
+		order.GET("/:id",
+			handler.MiddlewareIsStaff(),
+			handler.GetOrderByID,
+		)
+
+		order.GET("",
+			handler.MiddlewareIsStaff(),
+			handler.GetOrderAll,
+		)
+
+		order.GET("/archived",
+			handler.MiddlewareIsStaff(),
+			handler.GetArchivedOrder,
+		)
+
+		order.GET("/active",
+			handler.MiddlewareIsStaff(),
+			handler.GetActiveOrder,
+		)
 
 		order.GET("/product/:id", handler.GetOrderProduct)
 		order.GET("/product", handler.GetOrderProductAll)

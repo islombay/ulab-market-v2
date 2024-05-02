@@ -252,8 +252,6 @@ func (db *ProductRepo) GetAll(ctx context.Context, query, catid, bid *string, re
 
 	q += offset + limit
 
-	fmt.Println(q)
-
 	products := []*models.Product{}
 	rows, _ := db.db.Query(ctx, q, args...)
 	if rows.Err() != nil {

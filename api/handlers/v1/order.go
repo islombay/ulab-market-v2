@@ -132,6 +132,7 @@ func (v1 *Handlers) OrderCancel(c *gin.Context) {
 // @summary get order by id
 // @description get order by id
 // @tags order
+// @security ApiKeyAuth
 // @accept json
 // @produce json
 // @param id path string true "Order id"
@@ -163,6 +164,7 @@ func (v1 *Handlers) GetOrderByID(c *gin.Context) {
 // @summary get order all
 // @description get order all
 // @tags order
+// @security ApiKeyAuth
 // @accept json
 // @produce json
 // @success 200 {object} []models.OrderModel "Success"
@@ -250,4 +252,52 @@ func (v1 *Handlers) getUserID(c *gin.Context) (string, interface{}) {
 		return "", status.StatusInternal
 	}
 	return str, nil
+}
+
+// GetArchivedOrder
+// @id GetArchivedOrder
+// @router /api/order/archived [get]
+// @summary get order all archived
+// @description get order all archived
+// @tags order
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @success 200 {object} []models.OrderModel "Success"
+// @failure 404 {object} models_v1.Response "Order not found"
+// @failure 500 {object} models_v1.Response "Internal server error"
+func (v1 *Handlers) GetArchivedOrder(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+
+	res, errStatus := v1.service.Order().GetAllGroup(ctx, "archived")
+	if errStatus != nil {
+		v1.error(c, *errStatus)
+		return
+	}
+	v1.response(c, http.StatusOK, res)
+}
+
+// GetActiveOrder
+// @id GetActiveOrder
+// @router /api/order/active [get]
+// @summary get order all active
+// @description get order all active
+// @tags order
+// @security ApiKeyAuth
+// @accept json
+// @produce json
+// @success 200 {object} []models.OrderModel "Success"
+// @failure 404 {object} models_v1.Response "Order not found"
+// @failure 500 {object} models_v1.Response "Internal server error"
+func (v1 *Handlers) GetActiveOrder(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+
+	res, errStatus := v1.service.Order().GetAllGroup(ctx, "acttive")
+	if errStatus != nil {
+		v1.error(c, *errStatus)
+		return
+	}
+	v1.response(c, http.StatusOK, res)
 }

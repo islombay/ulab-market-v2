@@ -230,3 +230,19 @@ func (srv OrderService) GetProductAll(ctx context.Context) (interface{}, *status
 
 	return model, nil
 }
+
+func (srv OrderService) GetAllGroup(ctx context.Context, t string) (interface{}, *status.Status) {
+	var model []models.OrderModel
+	var err error
+	if t == "archived" {
+		model, err = srv.store.Order().GetArchived(ctx)
+	} else {
+		model, err = srv.store.Order().GetActive(ctx)
+	}
+	if err != nil {
+		srv.log.Error("could not get order all archived", logs.Error(err))
+		return nil, &status.StatusInternal
+	}
+
+	return model, nil
+}
