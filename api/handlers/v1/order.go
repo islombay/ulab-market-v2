@@ -167,14 +167,16 @@ func (v1 *Handlers) GetOrderByID(c *gin.Context) {
 // @security ApiKeyAuth
 // @accept json
 // @produce json
+// @param status query string false "Order status (active or archive)"
 // @success 200 {object} []models.OrderModel "Success"
 // @failure 404 {object} models_v1.Response "Order not found"
 // @failure 500 {object} models_v1.Response "Internal server error"
 func (v1 *Handlers) GetOrderAll(c *gin.Context) {
+	status := c.Query("status")
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 
-	res, errStatus := v1.service.Order().GetAll(ctx)
+	res, errStatus := v1.service.Order().GetAll(ctx, status)
 	if errStatus != nil {
 		v1.error(c, *errStatus)
 	} else {

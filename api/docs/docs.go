@@ -2117,6 +2117,14 @@ const docTemplate = `{
                 ],
                 "summary": "get order all",
                 "operationId": "GetOrderAll",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Order status (active or archive)",
+                        "name": "status",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Success",

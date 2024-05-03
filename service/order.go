@@ -197,10 +197,18 @@ func (srv OrderService) GetByID(ctx context.Context, id string) (interface{}, *s
 	return model, nil
 }
 
-func (srv OrderService) GetAll(ctx context.Context) (interface{}, *status.Status) {
-	model, err := srv.store.Order().GetAll(ctx)
+func (srv OrderService) GetAll(ctx context.Context, orderStatus string) (interface{}, *status.Status) {
+	var model []models.OrderModel
+	var err error
+	if orderStatus == "archive" {
+		model, err = srv.store.Order().GetArchived(ctx)
+	} else if orderStatus == "active" {
+		model, err = srv.store.Order().GetActive(ctx)
+	} else {
+		model, err = srv.store.Order().GetAll(ctx)
+	}
 	if err != nil {
-		srv.log.Error("could not get order all", logs.Error(err))
+		srv.log.Error("could not get order all archived", logs.Error(err))
 		return nil, &status.StatusInternal
 	}
 
