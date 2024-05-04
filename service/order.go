@@ -194,6 +194,13 @@ func (srv OrderService) GetByID(ctx context.Context, id string) (interface{}, *s
 		return nil, &status.StatusInternal
 	}
 
+	orderProducts, errStatus := srv.GetOrderProducts(ctx, model.ID)
+	if errStatus != nil {
+		return nil, errStatus
+	}
+
+	model.Products = orderProducts.([]models.OrderProductModel)
+
 	return model, nil
 }
 
@@ -212,6 +219,16 @@ func (srv OrderService) GetAll(ctx context.Context, orderStatus string) (interfa
 		return nil, &status.StatusInternal
 	}
 
+	return model, nil
+}
+
+func (srv OrderService) GetOrderProducts(ctx context.Context, order_id string) (interface{}, *status.Status) {
+	model, err := srv.store.OrderProduct().GetOrderProducts(ctx, order_id)
+	if err != nil {
+		srv.log.Error("could not get products of order", logs.Error(err),
+			logs.String("order_id", order_id))
+		return nil, &status.StatusInternal
+	}
 	return model, nil
 }
 

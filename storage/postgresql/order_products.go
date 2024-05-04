@@ -90,3 +90,31 @@ func (db *OrderProductsRepo) GetAll(ctx context.Context) ([]models.OrderProductM
 
 	return res, nil
 }
+
+func (db *OrderProductsRepo) GetOrderProducts(ctx context.Context, order_id string) ([]models.OrderProductModel, error) {
+	q := `select
+			id, product_id, quantity, product_price, total_price,
+			created_at, updated_at, deleted_at
+		from order_products where order_id = $1`
+
+	var res []models.OrderProductModel
+	rows, _ := db.db.Query(ctx, q, order_id)
+	if rows.Err() != nil {
+		return nil, rows.Err()
+	}
+
+	for rows.Next() {
+		var tmp models.OrderProductModel
+		if err := rows.Scan(
+			&tmp.ID, &tmp.ProductID,
+			&tmp.Quantity, &tmp.ProductPrice,
+			&tmp.TotalPrice, &tmp.CreatedAt,
+			&tmp.UpdatedAt, &tmp.DeletedAt,
+		); err != nil {
+			return nil, err
+		}
+		res = append(res, tmp)
+	}
+
+	return res, nil
+}

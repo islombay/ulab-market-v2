@@ -30,7 +30,7 @@ type OrderModel struct {
 
 type OrderProductModel struct {
 	ID           string  `db:"id" json:"id"`
-	OrderID      *string `db:"order_id" json:"order_id"`
+	OrderID      *string `db:"order_id" json:"order_id,omitempty"`
 	ProductID    string  `db:"product_id" json:"product_id"`
 	Quantity     int     `db:"quantity" json:"quantity"`
 	ProductPrice float64 `db:"product_price" json:"product_price"`
@@ -38,5 +38,5 @@ type OrderProductModel struct {
 
 	CreatedAt time.Time  `db:"created_at" json:"created_at"`
 	UpdatedAt time.Time  `db:"updated_at" json:"updated_at"`
-	DeletedAt *time.Time `db:"deleted_at" json:"deleted_at"`
+	DeletedAt *time.Time `db:"deleted_at" json:"deleted_at,omitempty"`
 }

@@ -40,6 +40,8 @@ type OrderProductI interface {
 	GetByID(ctx context.Context, id string) (*models.OrderProductModel, error)
 	Create(ctx context.Context, m []models.OrderProductModel) error
 	GetAll(ctx context.Context) ([]models.OrderProductModel, error)
+
+	GetOrderProducts(ctx context.Context, order_id string) ([]models.OrderProductModel, error)
 }
 
 type OrderI interface {
