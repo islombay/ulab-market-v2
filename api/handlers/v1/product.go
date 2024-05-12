@@ -313,9 +313,9 @@ func (v1 *Handlers) CreateProduct(c *gin.Context) {
 	pr.VideoFiles = videoFiles
 
 	incomeCreate := models_v1.CreateIncome{
-		BranchID:   m.BranchID,
-		Comment:    "created during product create",
-		TotalPrice: m.IncomePrice * float32(m.Quantity),
+		BranchID: m.BranchID,
+		Comment:  "created during product create",
+		// TotalPrice: m.IncomePrice * float32(m.Quantity),
 		Products: []models_v1.CreateIncomeProduct{
 			models_v1.CreateIncomeProduct{
 				ProductID:    pr.ID,

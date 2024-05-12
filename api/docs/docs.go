@@ -2098,6 +2098,149 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/income": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get all incomes list",
+                "tags": [
+                    "income"
+                ],
+                "summary": "Get all incomes",
+                "operationId": "GetIncomeList",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Limit of income output",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Search inside the income",
+                        "name": "search",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success body",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.IncomeResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal error",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Create income. Products must be given inside json body",
+                "tags": [
+                    "income"
+                ],
+                "summary": "Create income",
+                "operationId": "create income",
+                "parameters": [
+                    {
+                        "description": "Create income body model",
+                        "name": "createIncome",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.CreateIncome"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success body",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Income"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal error",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/income/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get income",
+                "tags": [
+                    "income"
+                ],
+                "summary": "Get income",
+                "operationId": "GetIncomeByID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "product id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success body",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Income"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal error",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/api/order": {
             "get": {
                 "security": [
@@ -4750,6 +4893,46 @@ const docTemplate = `{
                 }
             }
         },
+        "models_v1.CreateIncome": {
+            "type": "object",
+            "required": [
+                "branch_id",
+                "products"
+            ],
+            "properties": {
+                "branch_id": {
+                    "type": "string"
+                },
+                "comment": {
+                    "type": "string"
+                },
+                "products": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models_v1.CreateIncomeProduct"
+                    }
+                }
+            }
+        },
+        "models_v1.CreateIncomeProduct": {
+            "type": "object",
+            "required": [
+                "product_id",
+                "product_price",
+                "quantity"
+            ],
+            "properties": {
+                "product_id": {
+                    "type": "string"
+                },
+                "product_price": {
+                    "type": "number"
+                },
+                "quantity": {
+                    "type": "integer"
+                }
+            }
+        },
         "models_v1.CreateNewRole": {
             "type": "object",
             "required": [
@@ -4918,6 +5101,20 @@ const docTemplate = `{
                 },
                 "updated_at": {
                     "type": "string"
+                }
+            }
+        },
+        "models_v1.IncomeResponse": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer"
+                },
+                "incomes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models_v1.Income"
+                    }
                 }
             }
         },

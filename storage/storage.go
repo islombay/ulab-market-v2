@@ -186,6 +186,6 @@ type IncomeInterface interface {
 	GetList(context.Context, models_v1.IncomeRequest) (models_v1.IncomeResponse, error)
 
 	CreateIncomeProduct(context.Context, models_v1.CreateIncomeProduct) (models_v1.IncomeProduct, error)
-	GetByIncomeProductID(context.Context, string) (models_v1.IncomeProduct, error)
+	GetProductsByIncomeID(context.Context, string) ([]models_v1.IncomeProduct, error)
 	GetIncomeProductsList(context.Context, models_v1.IncomeProductRequest) (models_v1.IncomeProductResponse, error)
 }

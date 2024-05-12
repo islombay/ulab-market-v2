@@ -41,6 +41,9 @@ var (
 			PermissionCategoryEdit,
 			PermissionCategoryDelete,
 
+			PermissionIncomeAdd,
+			PermissionIncomeSee,
+
 			PermissionAddAdmin,
 			PermissionDeleteAdmin,
 			PermissionEditAdmin,
@@ -124,6 +127,11 @@ var (
 )
 
 var (
+	PermissionIncomeAdd = models.PermissionModel{ID: uuid.NewString(), Name: "can_add_income"}
+	PermissionIncomeSee = models.PermissionModel{ID: uuid.NewString(), Name: "can_income_see"}
+)
+
+var (
 	PermissionAddToBasket      = models.PermissionModel{ID: uuid.NewString(), Name: "can_add_to_basket"}
 	PermissionRemoveFromBasket = models.PermissionModel{ID: uuid.NewString(), Name: "can_remove_from_basket"}
 )
@@ -200,6 +208,9 @@ var PermissionsList = []*models.PermissionModel{
 
 	&PermissionAddToBasket,
 	&PermissionRemoveFromBasket,
+
+	&PermissionIncomeAdd,
+	&PermissionIncomeSee,
 
 	&PermissionCanAddRole,
 	&PermissionCanEditRole,

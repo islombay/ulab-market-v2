@@ -49,6 +49,22 @@ func NewV1(
 		})
 	}
 
+	income := v1.Group("/income")
+	{
+		income.POST("",
+			handler.MiddlewareStaffPermissionCheck(auth_lib.PermissionIncomeAdd),
+			handler.CreateIncome,
+		)
+		income.GET("",
+			handler.MiddlewareStaffPermissionCheck(auth_lib.PermissionIncomeSee),
+			handler.GetIncomeList,
+		)
+		income.GET("/:id",
+			handler.MiddlewareStaffPermissionCheck(auth_lib.PermissionIncomeSee),
+			handler.GetIncomeByID,
+		)
+	}
+
 	branches := v1.Group("/branch")
 	{
 		branches.POST("",
