@@ -1,3 +1,5 @@
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
 create table if not exists roles (
     id uuid primary key,
     name varchar(40) not null,

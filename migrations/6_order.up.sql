@@ -32,7 +32,7 @@ end $$;
 
 create table if not exists orders (
     id uuid primary key default uuid_generate_v4(),
-    order_id bigint unique not null default (select extract(epoch from now())::int),
+    order_id bigint unique not null default extract(epoch from now())::int,
     user_id uuid,
 
     client_first_name varchar(40) not null,
