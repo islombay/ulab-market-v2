@@ -271,3 +271,13 @@ func (srv OrderService) GetAllGroup(ctx context.Context, t string) (interface{},
 
 	return model, nil
 }
+
+func (srv OrderService) GetNewList(ctx context.Context) (interface{}, *status.Status) {
+	model, err := srv.store.Order().GetNew(ctx)
+	if err != nil {
+		srv.log.Error("could not get new orders list", logs.Error(err))
+		return nil, &status.StatusInternal
+	}
+
+	return model, nil
+}

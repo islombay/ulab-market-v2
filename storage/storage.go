@@ -53,6 +53,7 @@ type OrderI interface {
 	GetByID(ctx context.Context, id string) (*models.OrderModel, error)
 	GetArchived(ctx context.Context) ([]models.OrderModel, error)
 	GetActive(ctx context.Context) ([]models.OrderModel, error)
+	GetNew(ctx context.Context) ([]models.OrderModel, error)
 }
 
 type BranchInterface interface {

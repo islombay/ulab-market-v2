@@ -2581,6 +2581,44 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/order/new": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get list of all new orders (especially for couriers)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "order"
+                ],
+                "summary": "Get all new orders list",
+                "operationId": "GetNewOrdersList",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.OrderModel"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/api/order/product": {
             "get": {
                 "description": "get order product all",

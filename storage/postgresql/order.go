@@ -215,3 +215,41 @@ func (db *OrderRepo) GetActive(ctx context.Context) ([]models.OrderModel, error)
 	}
 	return res, nil
 }
+
+func (db *OrderRepo) GetNew(ctx context.Context) ([]models.OrderModel, error) {
+	q := `select
+			id, user_id, status,
+			total_price,payment_type,
+			created_at, updated_at, deleted_at,
+			order_id, client_first_name,
+			client_last_name, client_phone_number,
+			client_comment, delivery_type,
+			delivery_addr_lat, delivery_addr_long
+		from orders where status in ('in_process')`
+
+	rows, _ := db.db.Query(ctx, q)
+	if rows.Err() != nil {
+		return nil, rows.Err()
+	}
+
+	res := []models.OrderModel{}
+
+	for rows.Next() {
+		var tmp_order_id int64
+		var tmp models.OrderModel
+		if err := rows.Scan(
+			&tmp.ID, &tmp.UserID, &tmp.Status,
+			&tmp.TotalPrice, &tmp.PaymentType,
+			&tmp.CreatedAt, &tmp.UpdatedAt, &tmp.DeletedAt,
+			&tmp_order_id, &tmp.ClientFirstName,
+			&tmp.ClientLastName, &tmp.ClientPhone,
+			&tmp.ClientComment, &tmp.DeliveryType,
+			&tmp.DeliveryAddrLat, &tmp.DeliveryAddrLong,
+		); err != nil {
+			return nil, err
+		}
+		tmp.OrderID = strconv.FormatInt(tmp_order_id, 10)
+		res = append(res, tmp)
+	}
+	return res, nil
+}

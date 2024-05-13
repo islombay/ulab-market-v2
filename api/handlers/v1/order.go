@@ -287,6 +287,7 @@ func (v1 *Handlers) GetArchivedOrder(c *gin.Context) {
 // @description get order all active
 // @tags order
 // @security ApiKeyAuth
+// postgres://ulab_market_admin:txhTivSBM9rGMM8Z36KzZd9R8yrAvk3F@dpg-cnpt8sa1hbls738hskmg-a.oregon-postgres.render.com/ulab_market
 // @accept json
 // @produce json
 // @success 200 {object} []models.OrderModel "Success"
@@ -297,6 +298,29 @@ func (v1 *Handlers) GetActiveOrder(c *gin.Context) {
 	defer cancel()
 
 	res, errStatus := v1.service.Order().GetAllGroup(ctx, "acttive")
+	if errStatus != nil {
+		v1.error(c, *errStatus)
+		return
+	}
+	v1.response(c, http.StatusOK, res)
+}
+
+// GetNewOrdersList
+// @id			GetNewOrdersList
+// @router		/api/order/new [get]
+// @summary		Get all new orders list
+// @description	Get list of all new orders (especially for couriers)
+// @tags 		order
+// @security	ApiKeyAuth
+// @accept		json
+// @produce		json
+// @success		200	{object}	[]models.OrderModel "Success"
+// @failure		500	{object}	models_v1.Response	"Internal server error"
+func (v1 *Handlers) GetNewOrdersList(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+
+	res, errStatus := v1.service.Order().GetNewList(ctx)
 	if errStatus != nil {
 		v1.error(c, *errStatus)
 		return

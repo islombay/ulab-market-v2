@@ -439,13 +439,14 @@ func (v1 *Handlers) Login(c *gin.Context) {
 	}
 
 	var identityFunc func(ctx context.Context, l string) (*models.Client, error)
-	if m.Type == auth_lib.VerificationEmail {
-		if !helper.IsValidEmail(m.Source) {
-			v1.error(c, status.StatusBadEmail)
-			return
-		}
-		identityFunc = v1.storage.User().GetClientByEmail
-	} else if m.Type == auth_lib.VerificationPhone {
+	// if m.Type == auth_lib.VerificationEmail {
+	// 	if !helper.IsValidEmail(m.Source) {
+	// 		v1.error(c, status.StatusBadEmail)
+	// 		return
+	// 	}
+	// 	identityFunc = v1.storage.User().GetClientByEmail
+	// } else
+	if m.Type == auth_lib.VerificationPhone {
 		if !helper.IsValidPhone(m.Source) {
 			v1.error(c, status.StatusBadPhone)
 			return

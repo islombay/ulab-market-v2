@@ -307,6 +307,11 @@ func NewV1(
 
 		order.GET("/product/:id", handler.GetOrderProduct)
 		order.GET("/product", handler.GetOrderProductAll)
+
+		order.GET("/new",
+			handler.MiddlewareIsCourier(),
+			handler.GetNewOrdersList,
+		)
 	}
 
 	storeTable := v1.Group("/storage")
