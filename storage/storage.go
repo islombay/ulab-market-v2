@@ -149,7 +149,7 @@ type CategoryInterface interface {
 	ChangeCategory(ctx context.Context, m models.Category) error
 
 	GetSubcategories(ctx context.Context, id string) ([]*models.Category, error)
-	GetAll(ctx context.Context) ([]*models.Category, error)
+	GetAll(ctx context.Context, onlySub bool) ([]*models.Category, error)
 	GetByName(ctx context.Context, name string) (*models.Category, error)
 
 	GetBrands(ctx context.Context, id string) ([]models.Brand, error)

@@ -67,12 +67,17 @@ func (db *CategoryRepo) GetByID(ctx context.Context, id string) (*models.Categor
 	return &m, nil
 }
 
-func (db *CategoryRepo) GetAll(ctx context.Context) ([]*models.Category, error) {
+func (db *CategoryRepo) GetAll(ctx context.Context, onlySub bool) ([]*models.Category, error) {
 	q := `select
     	id, name_uz, name_ru,
     	image, icon_id, parent_id,
     	created_at, updated_at, deleted_at
-    	from category where parent_id is null and deleted_at is null`
+    	from category where deleted_at is null`
+	if onlySub {
+		q += ` and parent_id is not null`
+	} else {
+		q += ` and parent_id is null`
+	}
 	m := []*models.Category{}
 	rows, _ := db.db.Query(ctx, q)
 	if rows.Err() != nil {

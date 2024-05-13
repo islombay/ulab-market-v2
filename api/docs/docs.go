@@ -1334,6 +1334,14 @@ const docTemplate = `{
                 ],
                 "summary": "get category all",
                 "operationId": "getAllCategory",
+                "parameters": [
+                    {
+                        "type": "boolean",
+                        "description": "Only subcategory",
+                        "name": "only_sub",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "category returned",

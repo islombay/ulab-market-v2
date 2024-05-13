@@ -403,11 +403,17 @@ func (v1 *Handlers) GetCategoryByID(c *gin.Context) {
 // @accept json
 // @produce json
 // @summary get category all
+// @param only_sub query bool false "Only subcategory"
 // @description get category, returns translations, and subcategories for all category
 // @success 200 {object} []models.CategorySwagger "category returned"
 // @failure 500 {object} models_v1.Response "Internal error"
 func (v1 *Handlers) GetAllCategory(c *gin.Context) {
-	res, err := v1.storage.Category().GetAll(context.Background())
+	var params models_v1.GetAllCategory
+	if err := c.ShouldBind(&params); err != nil {
+		v1.log.Error("bad request", logs.Error(err))
+	}
+
+	res, err := v1.storage.Category().GetAll(context.Background(), params.OnlySub)
 	if err != nil {
 		v1.log.Error("could not get all categories", logs.Error(err))
 		v1.error(c, status.StatusInternal)

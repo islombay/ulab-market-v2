@@ -22,3 +22,7 @@ type ChangeCategory struct {
 	NameRu   string `json:"name_ru" binding:"required"`
 	ParentID string `json:"parent_id"`
 }
+
+type GetAllCategory struct {
+	OnlySub bool `form:"only_sub"`
+}
