@@ -13,6 +13,7 @@ binary-start:
 	./app
 
 build:
+	go mod tidy
 	go build -o app cmd/main.go
 
 db:
