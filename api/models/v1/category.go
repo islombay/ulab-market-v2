@@ -7,7 +7,7 @@ type CreateCategory struct {
 	NameRu   string                `form:"name_ru" json:"name_ru" binding:"required"`
 	IconID   *string               `form:"icon_id" json:"icon_id"`
 	Image    *multipart.FileHeader `form:"image" swaggerignore:"true"`
-	ParentID string                `form:"parent_id" json:"parent_id`
+	ParentID string                `form:"parent_id" json:"parent_id"`
 }
 
 type ChangeCategoryImage struct {
