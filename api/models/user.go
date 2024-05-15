@@ -1,32 +1,42 @@
 package models
 
 import (
-	"database/sql"
 	"time"
 )
 
 type Client struct {
-	ID          string         `json:"id" obj:"id"`
-	Name        string         `json:"name" obj:""`
-	PhoneNumber sql.NullString `json:"phone_number"`
-	Email       sql.NullString `json:"email"`
+	ID          string  `json:"id" obj:"id"`
+	Name        string  `json:"name" obj:""`
+	PhoneNumber *string `json:"phone_number"`
+	Email       *string `json:"email"`
 
-	CreatedAt time.Time    `json:"created_at" obj:"created_at"`
-	UpdatedAt time.Time    `json:"updated_at"`
-	DeletedAt sql.NullTime `json:"deleted_at"`
+	CreatedAt time.Time  `json:"created_at" obj:"created_at"`
+	UpdatedAt time.Time  `json:"updated_at"`
+	DeletedAt *time.Time `json:"deleted_at,omitempty"`
+}
+
+type ClientSwagger struct {
+	ID          string `json:"id" obj:"id"`
+	Name        string `json:"name" obj:""`
+	PhoneNumber string `json:"phone_number"`
+	Email       string `json:"email"`
+
+	CreatedAt time.Time  `json:"created_at" obj:"created_at"`
+	UpdatedAt time.Time  `json:"updated_at"`
+	DeletedAt *time.Time `json:"deleted_at,omitempty"`
 }
 
 type Staff struct {
-	ID          string         `json:"id"`
-	Name        string         `json:"name"`
-	PhoneNumber sql.NullString `json:"phone_number"`
-	Email       sql.NullString `json:"email"`
-	Password    string         `json:"password"`
-	RoleID      string         `json:"role_id"`
+	ID          string  `json:"id"`
+	Name        string  `json:"name"`
+	PhoneNumber *string `json:"phone_number"`
+	Email       *string `json:"email"`
+	Password    string  `json:"password"`
+	RoleID      string  `json:"role_id"`
 
-	CreatedAt time.Time    `json:"created_at"`
-	UpdatedAt time.Time    `json:"updated_at"`
-	DeletedAt sql.NullTime `json:"deleted_at"`
+	CreatedAt time.Time  `json:"created_at"`
+	UpdatedAt time.Time  `json:"updated_at"`
+	DeletedAt *time.Time `json:"deleted_at"`
 }
 
 type ClientAddress struct {

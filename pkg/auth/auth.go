@@ -41,6 +41,8 @@ var (
 			PermissionCategoryEdit,
 			PermissionCategoryDelete,
 
+			PermissionCanSeeClients,
+
 			PermissionIncomeAdd,
 			PermissionIncomeSee,
 
@@ -94,6 +96,7 @@ var (
 			PermissionAddCourier,
 			PermissionEditCourier,
 			PermissionDeleteCourier,
+			PermissionCanSeeClients,
 
 			PermissionCreateStore,
 			PermissionGetStoreByID,
@@ -119,6 +122,10 @@ var (
 			PermissionDeleteIconToList,
 		},
 	}
+)
+
+var (
+	PermissionCanSeeClients = models.PermissionModel{ID: uuid.NewString(), Name: "can_see_clients"}
 )
 
 var (
@@ -208,6 +215,8 @@ var PermissionsList = []*models.PermissionModel{
 
 	&PermissionAddToBasket,
 	&PermissionRemoveFromBasket,
+
+	&PermissionCanSeeClients,
 
 	&PermissionIncomeAdd,
 	&PermissionIncomeSee,

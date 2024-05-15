@@ -276,11 +276,11 @@ func (v1 *Handlers) RegisterClient(c *gin.Context) {
 	m := models.Client{
 		ID:          uuid.New().String(),
 		Name:        model.Name,
-		PhoneNumber: sql.NullString{Valid: true, String: model.Phone},
-		Email:       sql.NullString{Valid: true, String: model.Email},
+		PhoneNumber: models.GetStringAddress(model.Phone),
+		Email:       models.GetStringAddress(model.Email),
 		CreatedAt:   time.Now(),
 		UpdatedAt:   time.Now(),
-		DeletedAt:   sql.NullTime{Valid: false},
+		DeletedAt:   nil,
 	}
 	if err := v1.storage.User().CreateClient(context.Background(), m); err != nil {
 		if errors.Is(err, storage.ErrAlreadyExists) {
@@ -297,11 +297,11 @@ func (v1 *Handlers) RegisterClient(c *gin.Context) {
 	}
 
 	verificationType := auth_lib.VerificationEmail
-	verificationSource := m.Email.String
+	verificationSource := m.Email
 
 	oneTimeCodeDuration := 3 * time.Hour
 
-	if err, _ := auth_lib.SendVerificationCode(verificationSource, verificationType,
+	if err, _ := auth_lib.SendVerificationCode(*verificationSource, verificationType,
 		auth_lib.CodeLength,
 		v1.cache, v1.smtp,
 		oneTimeCodeDuration,
@@ -316,7 +316,7 @@ func (v1 *Handlers) RegisterClient(c *gin.Context) {
 	}
 
 	v1.response(c, http.StatusOK, models_v1.RequestCode{
-		Email:    verificationSource,
+		Email:    *verificationSource,
 		NeedCode: true,
 	})
 }
@@ -386,9 +386,9 @@ func (v1 *Handlers) VerifyCode(c *gin.Context) {
 func (v1 *Handlers) verifyCode(model *models.Client, reqCode string, deleteAfterCheck bool, vType string) error {
 	var src string
 	if vType == auth_lib.VerificationEmail {
-		src = model.Email.String
+		src = *model.Email
 	} else if vType == auth_lib.VerificationPhone {
-		src = model.PhoneNumber.String
+		src = *model.PhoneNumber
 	}
 	code, exp, err := v1.cache.Code().GetCode(context.Background(), src)
 	if err != nil {
@@ -412,7 +412,7 @@ func (v1 *Handlers) verifyCode(model *models.Client, reqCode string, deleteAfter
 
 	if deleteAfterCheck {
 		v1.log.Debug("deleting verification code", logs.String("code", code))
-		v1.cache.Code().DeleteCode(context.Background(), model.Email.String)
+		v1.cache.Code().DeleteCode(context.Background(), *model.Email)
 	}
 	return nil
 }
@@ -461,13 +461,17 @@ func (v1 *Handlers) Login(c *gin.Context) {
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			user = &models.Client{
-				ID:          uuid.NewString(),
-				Name:        "",
-				PhoneNumber: sql.NullString{Valid: m.Type == auth_lib.VerificationPhone, String: m.Source},
-				Email:       sql.NullString{Valid: m.Type == auth_lib.VerificationEmail, String: m.Source},
-				CreatedAt:   time.Now(),
-				UpdatedAt:   time.Now(),
-				DeletedAt:   sql.NullTime{Valid: false},
+				ID:        uuid.NewString(),
+				Name:      "",
+				CreatedAt: time.Now(),
+				UpdatedAt: time.Now(),
+				DeletedAt: nil,
+			}
+
+			if m.Type == auth_lib.VerificationPhone {
+				user.PhoneNumber = &m.Source
+			} else if m.Type == auth_lib.VerificationEmail {
+				user.Email = &m.Source
 			}
 			if err := v1.storage.User().CreateClient(context.Background(), *user); err != nil {
 				v1.log.Error("could not register client", logs.Error(err))

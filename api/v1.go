@@ -49,6 +49,14 @@ func NewV1(
 		})
 	}
 
+	client := v1.Group("/client")
+	{
+		client.GET("",
+			handler.MiddlewareStaffPermissionCheck(auth_lib.PermissionCanSeeClients),
+			handler.GetClientList,
+		)
+	}
+
 	income := v1.Group("/income")
 	{
 		income.POST("",

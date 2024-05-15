@@ -4,7 +4,6 @@ import (
 	"app/api/models"
 	"app/storage"
 	"context"
-	"database/sql"
 	"errors"
 	"fmt"
 	"strings"
@@ -53,8 +52,8 @@ func (db *UserRepo) CreateClient(ctx context.Context, m models.Client) error {
 }
 
 func (db *UserRepo) CreateStaff(ctx context.Context, m models.Staff) error {
-	usr, _ := db.GetStaffByLogin(ctx, m.Email.String)
-	usr2, _ := db.GetStaffByLogin(ctx, m.PhoneNumber.String)
+	usr, _ := db.GetStaffByLogin(ctx, models.GetStringValue(m.Email))
+	usr2, _ := db.GetStaffByLogin(ctx, models.GetStringValue(m.PhoneNumber))
 	if usr != nil || usr2 != nil {
 		return storage.ErrAlreadyExists
 	}
@@ -199,13 +198,13 @@ func (db *UserRepo) GetStaffByRole(ctx context.Context, roleID string) ([]models
 		mt := models.Staff{
 			ID:          "",
 			Name:        "",
-			PhoneNumber: sql.NullString{},
-			Email:       sql.NullString{},
+			PhoneNumber: nil,
+			Email:       nil,
 			Password:    "",
 			RoleID:      "",
 			CreatedAt:   time.Time{},
 			UpdatedAt:   time.Time{},
-			DeletedAt:   sql.NullTime{},
+			DeletedAt:   nil,
 		}
 		err := rows.Scan(&mt.ID,
 			&mt.Name, &mt.PhoneNumber, &mt.Email, &mt.Password,
@@ -245,11 +244,11 @@ func (db *UserRepo) ChangeStaff(ctx context.Context, m models.Staff) error {
 	if m.Name != "" {
 		updateFields["name"] = m.Name
 	}
-	if m.Email.Valid {
-		updateFields["email"] = m.Email.String
+	if m.Email != nil {
+		updateFields["email"] = m.Email
 	}
-	if m.PhoneNumber.Valid {
-		updateFields["phone_number"] = m.PhoneNumber.String
+	if m.PhoneNumber != nil {
+		updateFields["phone_number"] = m.PhoneNumber
 	}
 	if m.RoleID != "" {
 		updateFields["role_id"] = m.RoleID
@@ -279,4 +278,36 @@ func (db *UserRepo) ChangeStaff(ctx context.Context, m models.Staff) error {
 		return err
 	}
 	return nil
+}
+
+func (db *UserRepo) GetClientList(ctx context.Context) ([]models.Client, error) {
+	q := `select
+			id, name, phone_number,
+			email, created_at, updated_at
+		from clients
+		where deleted_at is null
+		order by created_at desc`
+
+	var res []models.Client
+
+	rows, _ := db.db.Query(ctx, q)
+	if rows.Err() != nil {
+		return nil, rows.Err()
+	}
+
+	for rows.Next() {
+		var tmp models.Client
+
+		if err := rows.Scan(
+			&tmp.ID, &tmp.Name,
+			&tmp.PhoneNumber, &tmp.Email,
+			&tmp.CreatedAt, &tmp.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+
+		res = append(res, tmp)
+	}
+
+	return res, nil
 }

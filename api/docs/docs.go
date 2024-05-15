@@ -1718,6 +1718,38 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/client": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get list of clients ( all information )",
+                "tags": [
+                    "client"
+                ],
+                "summary": "Get list of clients ( only staff )",
+                "operationId": "GetClientList",
+                "responses": {
+                    "200": {
+                        "description": "List of clients",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.ClientSwagger"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/api/courier": {
             "post": {
                 "security": [
@@ -4365,6 +4397,32 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/models.SubCategorySwagger"
                     }
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.ClientSwagger": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone_number": {
+                    "type": "string"
                 },
                 "updated_at": {
                     "type": "string"

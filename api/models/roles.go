@@ -20,6 +20,13 @@ func GetStringAddress(s string) *string {
 	return &s
 }
 
+func GetStringValue(s *string) string {
+	if s == nil {
+		return ""
+	}
+	return *s
+}
+
 func GetIntAddress(i int) *int {
 	return &i
 }

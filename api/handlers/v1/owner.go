@@ -10,7 +10,6 @@ import (
 	"app/pkg/start"
 	"app/storage"
 	"context"
-	"database/sql"
 	"errors"
 	"net/http"
 	"time"
@@ -82,13 +81,13 @@ func (v1 *Handlers) CreateOwner(c *gin.Context) {
 	usr := models.Staff{
 		ID:          uuid.New().String(),
 		Name:        m.Name,
-		PhoneNumber: sql.NullString{Valid: true, String: m.Phone},
-		Email:       sql.NullString{Valid: true, String: m.Email},
+		PhoneNumber: models.GetStringAddress(m.Phone),
+		Email:       models.GetStringAddress(m.Email),
 		Password:    h,
 		RoleID:      auth_lib.RoleOwner.ID,
 		CreatedAt:   time.Now(),
 		UpdatedAt:   time.Now(),
-		DeletedAt:   sql.NullTime{Valid: false},
+		DeletedAt:   nil,
 	}
 	if err := v1.storage.User().CreateStaff(context.Background(), usr); err != nil {
 		if errors.Is(err, storage.ErrAlreadyExists) {
@@ -232,8 +231,8 @@ func (v1 *Handlers) ChangeOwner(c *gin.Context) {
 	usr := models.Staff{
 		ID:          m.ID,
 		Name:        m.Name,
-		Email:       sql.NullString{Valid: m.Email != "", String: m.Email},
-		PhoneNumber: sql.NullString{Valid: m.Phone != "", String: m.Phone},
+		Email:       &m.Email,
+		PhoneNumber: &m.Phone,
 		Password:    m.Password,
 		RoleID:      m.RoleID,
 	}

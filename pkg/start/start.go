@@ -10,9 +10,10 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"github.com/google/uuid"
 	"os"
 	"time"
+
+	"github.com/google/uuid"
 
 	"github.com/golang-migrate/migrate"
 	_ "github.com/golang-migrate/migrate/database/postgres"
@@ -145,13 +146,13 @@ func defaultUser(db storage.UserInterface, log logs.LoggerInterface) error {
 	if err := db.CreateStaff(context.Background(), models.Staff{
 		ID:          uuid.New().String(),
 		Name:        "Super",
-		PhoneNumber: sql.NullString{Valid: false},
-		Email:       sql.NullString{Valid: true, String: superEmail},
+		PhoneNumber: nil,
+		Email:       &superEmail,
 		Password:    pwd,
 		RoleID:      auth_lib.RoleSuper.ID,
 		CreatedAt:   time.Now(),
 		UpdatedAt:   time.Now(),
-		DeletedAt:   sql.NullTime{Valid: false},
+		DeletedAt:   nil,
 	}); err != nil {
 		if !errors.Is(err, storage.ErrAlreadyExists) {
 			log.Error("error to create staff in db", logs.Error(err))

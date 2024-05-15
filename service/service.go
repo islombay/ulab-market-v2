@@ -12,6 +12,7 @@ type IServiceManager interface {
 	Favourite() *FavouriteService
 	Income() *IncomeService
 	Courier() *courierService
+	Client() *clientService
 }
 
 type Service struct {
@@ -21,6 +22,7 @@ type Service struct {
 
 	income  *IncomeService
 	courier *courierService
+	client  *clientService
 }
 
 func New(str storage.StoreInterface, log logs.LoggerInterface, filestorage storage.FileStorageInterface, cache storage.CacheInterface, stmp smtp.SMTPInterface) IServiceManager {
@@ -31,6 +33,7 @@ func New(str storage.StoreInterface, log logs.LoggerInterface, filestorage stora
 	srv.favourite = NewFavouriteService(str, log)
 	srv.income = NewIncomeService(str, log)
 	srv.courier = NewCourierService(str, log)
+	srv.client = NewClientService(str, log)
 
 	return &srv
 }
@@ -45,6 +48,10 @@ func (s *Service) Store() *storeService {
 
 func (s *Service) Favourite() *FavouriteService {
 	return s.favourite
+}
+
+func (s *Service) Client() *clientService {
+	return s.client
 }
 
 func (s *Service) Income() *IncomeService {

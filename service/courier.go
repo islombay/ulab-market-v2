@@ -9,7 +9,6 @@ import (
 	"app/pkg/logs"
 	"app/storage"
 	"context"
-	"database/sql"
 	"errors"
 	"time"
 
@@ -52,13 +51,13 @@ func (srv *courierService) CreateCourier(m models_v1.RegisterRequest) (interface
 	usr := models.Staff{
 		ID:          uuid.New().String(),
 		Name:        m.Name,
-		PhoneNumber: sql.NullString{Valid: true, String: m.Phone},
-		Email:       sql.NullString{Valid: true, String: m.Email},
+		PhoneNumber: models.GetStringAddress(m.Phone),
+		Email:       models.GetStringAddress(m.Email),
 		Password:    h,
 		RoleID:      auth_lib.RoleCourier.ID,
 		CreatedAt:   time.Now(),
 		UpdatedAt:   time.Now(),
-		DeletedAt:   sql.NullTime{Valid: false},
+		DeletedAt:   nil,
 	}
 
 	if err := srv.store.User().CreateStaff(context.Background(), usr); err != nil {
