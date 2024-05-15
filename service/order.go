@@ -9,6 +9,7 @@ import (
 	"app/storage"
 	"context"
 	"errors"
+	"net/http"
 	"strconv"
 	"time"
 
@@ -34,9 +35,11 @@ func NewOrderService(store storage.StoreInterface,
 }
 
 const (
-	OrderStatusInProcess = "in_process"
-	OrderStatusFinished  = "finished"
-	OrderStatusCanceled  = "canceled"
+	OrderStatusInProcess  = "in_process"
+	OrderStatusFinished   = "finished"
+	OrderStatusCanceled   = "canceled"
+	OrderStatusDelivering = "delivering"
+	OrderStatusPicked     = "picked"
 )
 
 func (srv OrderService) CreateOrder(ctx context.Context, order models_v1.CreateOrder) (interface{}, *status.Status) {
@@ -290,4 +293,44 @@ func (srv OrderService) GetNewList(ctx context.Context) (interface{}, *status.St
 	}
 
 	return model, nil
+}
+
+func (srv OrderService) MakePicked(ctx context.Context, order_id, userID string) (interface{}, *status.Status) {
+	// check the status
+	// if order.status in (delivering, picked, finished, canceled)
+	//		return error (not able to change)
+
+	// check if order exists and not deleted
+	model, err := srv.store.Order().GetByID(ctx, order_id)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, &status.StatusNotFound
+		}
+		srv.log.Error("could not find order by id", logs.Error(err),
+			logs.String("order_id", order_id))
+		return nil, &status.StatusInternal
+	}
+
+	if model.DeletedAt != nil {
+		return nil, &status.StatusNotFound
+	}
+
+	if model.Status == OrderStatusDelivering ||
+		model.Status == OrderStatusPicked ||
+		model.Status == OrderStatusFinished ||
+		model.Status == OrderStatusCanceled {
+		return nil, &status.StatusNotChangable
+	}
+
+	// set picked_at, picker_user_id, and status to picked
+	if err := srv.store.Order().MarkPicked(ctx, order_id, userID, time.Now()); err != nil {
+		srv.log.Error("could not mark order as picked", logs.Error(err),
+			logs.String("order_id", order_id))
+		return nil, &status.StatusInternal
+	}
+
+	return status.Status{
+		Message: "OK",
+		Code:    http.StatusOK,
+	}, nil
 }

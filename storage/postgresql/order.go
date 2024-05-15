@@ -7,6 +7,7 @@ import (
 	"context"
 	"errors"
 	"strconv"
+	"time"
 
 	"github.com/jackc/pgconn"
 	"github.com/jackc/pgx/v4/pgxpool"
@@ -255,7 +256,7 @@ func (db *OrderRepo) GetNew(ctx context.Context) ([]models.OrderModel, error) {
 }
 
 func (db *OrderRepo) GetUserOrdersCount(ctx context.Context, user_id string) (int, error) {
-	q := `select count(*) from orders where user_id = $1`
+	q := `select count(*) from orders where user_id = $1 and deleted_at is null`
 
 	var res int
 	err := db.db.QueryRow(ctx, q, user_id).Scan(&res)
@@ -263,4 +264,15 @@ func (db *OrderRepo) GetUserOrdersCount(ctx context.Context, user_id string) (in
 		return 0, err
 	}
 	return res, nil
+}
+
+func (db *OrderRepo) MarkPicked(ctx context.Context, order_id, picker_id string, picked_at time.Time) error {
+	q := `update orders set
+			updated_at = $1, picked_at = $1,
+			picker_user_id = $2, status = 'picked'
+		where id = $3 and deleted_at is null`
+
+	_, err := db.db.Exec(ctx, q, picked_at, picker_id, order_id)
+
+	return err
 }

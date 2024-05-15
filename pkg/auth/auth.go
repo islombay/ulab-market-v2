@@ -97,6 +97,7 @@ var (
 			PermissionEditCourier,
 			PermissionDeleteCourier,
 			PermissionCanSeeClients,
+			PermissionCanMakeOrderPicked,
 
 			PermissionCreateStore,
 			PermissionGetStoreByID,
@@ -129,8 +130,9 @@ var (
 )
 
 var (
-	PermissionCanFinishOrder = models.PermissionModel{ID: uuid.NewString(), Name: "finish_order"}
-	PermissionCanCancelOrder = models.PermissionModel{ID: uuid.NewString(), Name: "cancel_order"}
+	PermissionCanMakeOrderPicked = models.PermissionModel{ID: uuid.NewString(), Name: "can_make_order_picked"}
+	PermissionCanFinishOrder     = models.PermissionModel{ID: uuid.NewString(), Name: "finish_order"}
+	PermissionCanCancelOrder     = models.PermissionModel{ID: uuid.NewString(), Name: "cancel_order"}
 )
 
 var (
@@ -253,6 +255,7 @@ var PermissionsList = []*models.PermissionModel{
 
 	&PermissionCanFinishOrder,
 	&PermissionCanCancelOrder,
+	&PermissionCanMakeOrderPicked,
 
 	&PermissionCreateStore,
 	&PermissionGetStoreByID,

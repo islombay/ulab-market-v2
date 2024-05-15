@@ -45,10 +45,13 @@ create table if not exists orders (
     status status_order_enum default 'in_process',
     total_price numeric,
     payment_type payment_order_enum,
+    
     delivery_type delivery_order_enum not null default 'deliver',
-
     delivery_addr_lat float not null,
     delivery_addr_long float not null,
+
+    picker_user_id uuid default null,
+    picked_at timestamp default null,
 
     created_at timestamp default now() not null,
     updated_at timestamp default now() not null,
@@ -57,7 +60,8 @@ create table if not exists orders (
     row_order serial,
 
     foreign key (user_id) references clients(id) on delete set null,
-    foreign key (branch_id) references branches(id) on delete set null
+    foreign key (branch_id) references branches(id) on delete set null,
+    foreign key (picker_user_id) references staff(id) on delete set null
 );
 
 create table if not exists order_products (

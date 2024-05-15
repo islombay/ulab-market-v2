@@ -327,3 +327,27 @@ func (v1 *Handlers) GetNewOrdersList(c *gin.Context) {
 	}
 	v1.response(c, http.StatusOK, res)
 }
+
+func (v1 *Handlers) OrderPicked(c *gin.Context) {
+	order_id := c.Param("id")
+	if !helper.IsValidUUID(order_id) {
+		v1.error(c, status.StatusBadUUID)
+		return
+	}
+
+	userID, err := v1.getUserID(c)
+	if err != nil {
+		v1.error(c, err.(status.Status))
+		return
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+
+	res, errStatus := v1.service.Order().MakePicked(ctx, order_id, userID)
+	if errStatus != nil {
+		v1.error(c, *errStatus)
+		return
+	}
+	v1.response(c, http.StatusOK, res)
+}
