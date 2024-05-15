@@ -4444,6 +4444,9 @@ const docTemplate = `{
                 "status": {
                     "type": "string"
                 },
+                "status_id": {
+                    "type": "integer"
+                },
                 "total_price": {
                     "type": "number"
                 },

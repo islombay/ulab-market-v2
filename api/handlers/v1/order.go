@@ -297,7 +297,7 @@ func (v1 *Handlers) GetActiveOrder(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 
-	res, errStatus := v1.service.Order().GetAllGroup(ctx, "acttive")
+	res, errStatus := v1.service.Order().GetAllGroup(ctx, "active")
 	if errStatus != nil {
 		v1.error(c, *errStatus)
 		return

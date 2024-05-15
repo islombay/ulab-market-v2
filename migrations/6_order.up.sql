@@ -6,6 +6,7 @@ do $$
         'finished',
         'canceled',
         'picking',
+        'picked',
         'delivering'
     );
     end if;

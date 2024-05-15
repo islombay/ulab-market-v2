@@ -2,6 +2,15 @@ package models
 
 import "time"
 
+var OrderStatusIndexes = map[string]int{
+	"in_process": 1,
+	"picking":    2,
+	"picked":     3,
+	"delivering": 4,
+	"finished":   5,
+	"canceled":   6,
+}
+
 type OrderModel struct {
 	ID      string `db:"id" json:"id"`
 	OrderID string `json:"order_id"`
@@ -13,6 +22,7 @@ type OrderModel struct {
 	ClientComment   *string `json:"client_comment"`
 
 	Status     string  `db:"status" json:"status"`
+	StatusID   int     `json:"status_id"`
 	TotalPrice float64 `db:"total_price" json:"total_price"`
 
 	PaymentType string `db:"payment_type" json:"payment_type"`

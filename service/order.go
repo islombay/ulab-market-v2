@@ -194,6 +194,10 @@ func (srv OrderService) GetByID(ctx context.Context, id string) (interface{}, *s
 		return nil, &status.StatusInternal
 	}
 
+	if orderStatusID, exists := models.OrderStatusIndexes[model.Status]; exists {
+		model.StatusID = orderStatusID
+	}
+
 	orderProducts, errStatus := srv.GetOrderProducts(ctx, model.ID)
 	if errStatus != nil {
 		return nil, errStatus
@@ -217,6 +221,12 @@ func (srv OrderService) GetAll(ctx context.Context, orderStatus string) (interfa
 	if err != nil {
 		srv.log.Error("could not get order all archived", logs.Error(err))
 		return nil, &status.StatusInternal
+	}
+
+	for i, _ := range model {
+		if orderStatusID, exists := models.OrderStatusIndexes[model[i].Status]; exists {
+			model[i].StatusID = orderStatusID
+		}
 	}
 
 	return model, nil
