@@ -2651,6 +2651,62 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/order/picked/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "mark the order as picked",
+                "tags": [
+                    "order"
+                ],
+                "summary": "mark the order as picked (pickers)",
+                "operationId": "orderPicked",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Order id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad id",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    },
+                    "405": {
+                        "description": "Can not change the status",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/api/order/product": {
             "get": {
                 "description": "get order product all",
@@ -4494,6 +4550,12 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "payment_type": {
+                    "type": "string"
+                },
+                "picked_at": {
+                    "type": "string"
+                },
+                "picker_user_id": {
                     "type": "string"
                 },
                 "products": {

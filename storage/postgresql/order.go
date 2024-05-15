@@ -82,7 +82,8 @@ func (db *OrderRepo) GetByID(ctx context.Context, id string) (*models.OrderModel
 			order_id, client_first_name,
 			client_last_name, client_phone_number,
 			client_comment, delivery_type,
-			delivery_addr_lat, delivery_addr_long
+			delivery_addr_lat, delivery_addr_long,
+			picker_user_id, picked_at
 		from orders where id = $1`
 
 	var res models.OrderModel
@@ -95,6 +96,7 @@ func (db *OrderRepo) GetByID(ctx context.Context, id string) (*models.OrderModel
 		&res.ClientLastName, &res.ClientPhone,
 		&res.ClientComment, &res.DeliveryType,
 		&res.DeliveryAddrLat, &res.DeliveryAddrLong,
+		&res.PickerUserID, &res.PickedAt,
 	); err != nil {
 		return nil, err
 	}

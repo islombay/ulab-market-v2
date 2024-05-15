@@ -218,6 +218,7 @@ func (v1 *Handlers) MiddlewareStaffPermissionCheck(permission models.PermissionM
 			v1.error(c, status.StatusForbidden)
 			return
 		}
+		c.Set(UserIDContext, userID)
 		c.Next()
 	}
 }

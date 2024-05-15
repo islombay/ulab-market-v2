@@ -287,7 +287,6 @@ func (v1 *Handlers) GetArchivedOrder(c *gin.Context) {
 // @description get order all active
 // @tags order
 // @security ApiKeyAuth
-// postgres://ulab_market_admin:txhTivSBM9rGMM8Z36KzZd9R8yrAvk3F@dpg-cnpt8sa1hbls738hskmg-a.oregon-postgres.render.com/ulab_market
 // @accept json
 // @produce json
 // @success 200 {object} []models.OrderModel "Success"
@@ -328,6 +327,19 @@ func (v1 *Handlers) GetNewOrdersList(c *gin.Context) {
 	v1.response(c, http.StatusOK, res)
 }
 
+// OrderPicked
+// @id 			orderPicked
+// @router		/api/order/picked/{id} [get]
+// @summary		mark the order as picked (pickers)
+// @description mark the order as picked
+// @tags		order
+// @security	ApiKeyAuth
+// @param		id	path	string	true "Order id"
+// @success		200	{object}	models_v1.Response	"Success"
+// @failure		400	{object}	models_v1.Response	"Bad id"
+// @failure		404 {object}	models_v1.Response	"Not found"
+// @failure		405 {object}	models_v1.Response	"Can not change the status"
+// @failure		500	{object}	models_v1.Response	"Internal server error"
 func (v1 *Handlers) OrderPicked(c *gin.Context) {
 	order_id := c.Param("id")
 	if !helper.IsValidUUID(order_id) {

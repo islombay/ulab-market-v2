@@ -329,7 +329,7 @@ func (srv OrderService) MakePicked(ctx context.Context, order_id, userID string)
 		return nil, &status.StatusInternal
 	}
 
-	return status.Status{
+	return models_v1.Response{
 		Message: "OK",
 		Code:    http.StatusOK,
 	}, nil
