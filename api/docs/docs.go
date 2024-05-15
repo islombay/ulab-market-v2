@@ -4421,6 +4421,9 @@ const docTemplate = `{
                 "name": {
                     "type": "string"
                 },
+                "order_count": {
+                    "type": "integer"
+                },
                 "phone_number": {
                     "type": "string"
                 },

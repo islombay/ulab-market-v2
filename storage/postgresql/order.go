@@ -253,3 +253,14 @@ func (db *OrderRepo) GetNew(ctx context.Context) ([]models.OrderModel, error) {
 	}
 	return res, nil
 }
+
+func (db *OrderRepo) GetUserOrdersCount(ctx context.Context, user_id string) (int, error) {
+	q := `select count(*) from orders where user_id = $1`
+
+	var res int
+	err := db.db.QueryRow(ctx, q, user_id).Scan(&res)
+	if err != nil {
+		return 0, err
+	}
+	return res, nil
+}

@@ -54,6 +54,8 @@ type OrderI interface {
 	GetArchived(ctx context.Context) ([]models.OrderModel, error)
 	GetActive(ctx context.Context) ([]models.OrderModel, error)
 	GetNew(ctx context.Context) ([]models.OrderModel, error)
+
+	GetUserOrdersCount(ctx context.Context, user_id string) (int, error)
 }
 
 type BranchInterface interface {

@@ -6,24 +6,25 @@ import (
 
 type Client struct {
 	ID          string  `json:"id" obj:"id"`
-	Name        string  `json:"name" obj:""`
-	PhoneNumber *string `json:"phone_number"`
-	Email       *string `json:"email"`
+	Name        string  `json:"name" obj:"name"`
+	PhoneNumber *string `json:"phone_number" obj:"phone_number"`
+	Email       *string `json:"email" obj:"email"`
 
 	CreatedAt time.Time  `json:"created_at" obj:"created_at"`
-	UpdatedAt time.Time  `json:"updated_at"`
-	DeletedAt *time.Time `json:"deleted_at,omitempty"`
+	UpdatedAt time.Time  `json:"updated_at" obj:"updated_at"`
+	DeletedAt *time.Time `json:"deleted_at,omitempty" obj:"deleted_at"`
 }
 
 type ClientSwagger struct {
 	ID          string `json:"id" obj:"id"`
-	Name        string `json:"name" obj:""`
-	PhoneNumber string `json:"phone_number"`
-	Email       string `json:"email"`
+	Name        string `json:"name" obj:"name"`
+	PhoneNumber string `json:"phone_number" obj:"phone_number"`
+	Email       string `json:"email" obj:"email"`
+	OrderCount  int    `json:"order_count" obj:"order_count"`
 
-	CreatedAt time.Time  `json:"created_at" obj:"created_at"`
-	UpdatedAt time.Time  `json:"updated_at"`
-	DeletedAt *time.Time `json:"deleted_at,omitempty"`
+	CreatedAt time.Time `json:"created_at" obj:"created_at"`
+	UpdatedAt time.Time `json:"updated_at" obj:"updated_at"`
+	DeletedAt time.Time `json:"deleted_at,omitempty" obj:"deleted_at"`
 }
 
 type Staff struct {
