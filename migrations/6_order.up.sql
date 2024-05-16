@@ -53,6 +53,9 @@ create table if not exists orders (
     picker_user_id uuid default null,
     picked_at timestamp default null,
 
+    delivering_user_id uuid default null,
+    delivered_at timestamp default null,
+
     created_at timestamp default now() not null,
     updated_at timestamp default now() not null,
     deleted_at timestamp default null,
@@ -61,7 +64,8 @@ create table if not exists orders (
 
     foreign key (user_id) references clients(id) on delete set null,
     foreign key (branch_id) references branches(id) on delete set null,
-    foreign key (picker_user_id) references staff(id) on delete set null
+    foreign key (picker_user_id) references staff(id) on delete set null,
+    foreign key (delivering_user_id) references staff(id) on delete set null
 );
 
 create table if not exists order_products (

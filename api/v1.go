@@ -321,6 +321,11 @@ func NewV1(
 			handler.GetNewOrdersList,
 		)
 
+		order.GET("/courier",
+			handler.MiddlewareIsCourier(),
+			handler.GetAvailableOrdersCourier,
+		)
+
 		order.GET("/picked/:id",
 			handler.MiddlewareStaffPermissionCheck(auth_lib.PermissionCanMakeOrderPicked),
 			handler.OrderPicked,

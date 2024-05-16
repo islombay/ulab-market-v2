@@ -34,6 +34,9 @@ type OrderModel struct {
 	PickerUserID *string    `json:"picker_user_id,omitempty"`
 	PickedAt     *time.Time `json:"picked_at,omitempty"`
 
+	DeliverUserID *string    `json:"delivering_user_id,omitempty"`
+	DeliveredAt   *time.Time `json:"delivered_at,omitempty"`
+
 	CreatedAt time.Time  `db:"created_at" json:"created_at"`
 	UpdatedAt time.Time  `db:"updated_at" json:"updated_at"`
 	DeletedAt *time.Time `db:"deleted_at" json:"deleted_at"`

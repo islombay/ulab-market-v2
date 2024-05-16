@@ -2545,6 +2545,44 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/order/courier": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get list of all new orders (especially for couriers)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "order"
+                ],
+                "summary": "Get all new orders list for couriers",
+                "operationId": "GetAvailableOrdersCourier",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.OrderModel"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/api/order/finish/{id}": {
             "post": {
                 "security": [
@@ -2620,7 +2658,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Get list of all new orders (especially for couriers)",
+                "description": "Get list of all new orders (especially for pickers)",
                 "consumes": [
                     "application/json"
                 ],
@@ -3202,11 +3240,6 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "name": "category_id",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
                         "name": "description_ru",
                         "in": "formData",
                         "required": true
@@ -3250,6 +3283,11 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "name": "status",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "name": "subcategory_id",
                         "in": "formData"
                     },
                     {
@@ -4532,6 +4570,12 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "deleted_at": {
+                    "type": "string"
+                },
+                "delivered_at": {
+                    "type": "string"
+                },
+                "delivering_user_id": {
                     "type": "string"
                 },
                 "delivery_addr_lat": {

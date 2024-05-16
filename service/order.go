@@ -285,11 +285,17 @@ func (srv OrderService) GetAllGroup(ctx context.Context, t string) (interface{},
 	return model, nil
 }
 
-func (srv OrderService) GetNewList(ctx context.Context) (interface{}, *status.Status) {
-	model, err := srv.store.Order().GetNew(ctx)
+func (srv OrderService) GetNewList(ctx context.Context, forCourier bool) (interface{}, *status.Status) {
+	model, err := srv.store.Order().GetNew(ctx, forCourier)
 	if err != nil {
 		srv.log.Error("could not get new orders list", logs.Error(err))
 		return nil, &status.StatusInternal
+	}
+
+	for i, _ := range model {
+		if orderStatusID, exists := models.OrderStatusIndexes[model[i].Status]; exists {
+			model[i].StatusID = orderStatusID
+		}
 	}
 
 	return model, nil
