@@ -160,7 +160,7 @@ func (db *CategoryRepo) GetSubcategories(ctx context.Context, id string) ([]*mod
 	q := `select id, name_uz, name_ru,
        image, icon_id, parent_id, created_at,
        updated_at, deleted_at
-       from category where parent_id = $1`
+       from category where parent_id = $1 and deleted_at is null`
 	var m []*models.Category
 	row, _ := db.db.Query(ctx, q, id)
 	if row.Err() != nil {
