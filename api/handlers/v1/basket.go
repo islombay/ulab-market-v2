@@ -156,26 +156,33 @@ func (v1 *Handlers) GetBasket(c *gin.Context) {
 		product, err := v1.storage.Product().GetByID(context.Background(), e.ProductID)
 		if err != nil {
 			if errors.Is(err, pgx.ErrNoRows) {
-				v1.error(c, status.StatusInternal)
+				// v1.error(c, status.StatusInternal)
+				v1.log.Error("product from basket not found or was deleted",
+					logs.String("product_id", e.ProductID),
+				)
+				// return
+			} else {
 				v1.log.Error("product from basket not found",
 					logs.String("product_id", e.ProductID),
 				)
+				v1.error(c, status.StatusInternal)
 				return
 			}
-		}
-		tmp := models_v1.GetBasketProduct{
-			ID:       product.ID,
-			NameRu:   product.NameRu,
-			NameUz:   product.NameUz,
-			Price:    product.OutcomePrice,
-			Quantity: e.Quantity,
-		}
-		if product.MainImage != nil {
-			tmp.MainImage = models.GetStringAddress(v1.filestore.GetURL(*product.MainImage))
-		}
+		} else {
+			tmp := models_v1.GetBasketProduct{
+				ID:       product.ID,
+				NameRu:   product.NameRu,
+				NameUz:   product.NameUz,
+				Price:    product.OutcomePrice,
+				Quantity: e.Quantity,
+			}
+			if product.MainImage != nil {
+				tmp.MainImage = models.GetStringAddress(v1.filestore.GetURL(*product.MainImage))
+			}
 
-		resBody.Products = append(resBody.Products, tmp)
-		resBody.TotalPrice += tmp.Price * float64(tmp.Quantity)
+			resBody.Products = append(resBody.Products, tmp)
+			resBody.TotalPrice += tmp.Price * float64(tmp.Quantity)
+		}
 	}
 	v1.response(c, http.StatusOK, resBody)
 }
