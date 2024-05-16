@@ -225,7 +225,13 @@ func (db *ProductRepo) GetAll(ctx context.Context, query, catid, bid *string, re
 	)
 
 	if catid != nil {
-		whereClause = append(whereClause, fmt.Sprintf("category_id = $%d", len(args)+1))
+		q = fmt.Sprintf(`with subcategory_ids as (
+			select id from category
+			where (parent_id = $%d or id = $%d)
+			and deleted_at is null
+		)`, len(args)+1, len(args)+1) + q
+
+		whereClause = append(whereClause, "category_id in (select id from subcategory_ids)")
 		args = append(args, *catid)
 	}
 	if bid != nil {
