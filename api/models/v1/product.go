@@ -21,7 +21,7 @@ type CreateProduct struct {
 	Quantity uint   `json:"quantity" form:"quantity" binding:"required"`
 	BranchID string `json:"branch_id" form:"branch_id" binding:"required"`
 
-	CategoryID string `json:"category_id" form:"category_id"`
+	CategoryID string `json:"subcategory_id" form:"subcategory_id"`
 	BrandID    string `json:"brand_id" form:"brand_id"`
 
 	Status string `json:"status" form:"status"`
