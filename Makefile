@@ -12,7 +12,7 @@ swag-install:
 binary-start:
 	./app
 
-build:
+build: swag-install
 	go mod tidy
 	go build -o app cmd/main.go
 
