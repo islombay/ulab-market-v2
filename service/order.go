@@ -142,7 +142,7 @@ func (srv OrderService) CreateOrder(ctx context.Context, order models_v1.CreateO
 	}
 
 	for _, product_basket := range orderProducts {
-		srv.store.Basket().Delete(ctx, userID, product_basket.ID)
+		srv.store.Basket().Delete(ctx, userID, product_basket.ProductID)
 	}
 
 	return models_v1.Response{
