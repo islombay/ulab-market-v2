@@ -5,8 +5,9 @@ import (
 	"app/pkg/logs"
 	"app/storage"
 	"fmt"
-	"github.com/redis/go-redis/v9"
 	"os"
+
+	"github.com/redis/go-redis/v9"
 )
 
 type RedisStore struct {
@@ -25,6 +26,7 @@ func NewRedisStore(cfg *config.RedisConfig, log logs.LoggerInterface) storage.Ca
 		Addr:     fmt.Sprintf("%s:%s", cfg.Host, cfg.Port),
 		Password: os.Getenv("REDIS_PWD"),
 		DB:       0,
+		Username: os.Getenv("REDIS_USER"),
 	})
 	return &RedisStore{
 		redis: client,

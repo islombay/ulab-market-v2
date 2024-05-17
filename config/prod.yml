@@ -9,7 +9,7 @@ db:
   sslmode: "require"
   migrations: "migrations"
 redis:
-  host: "red-cp3e81vsc6pc73fn8qfg"
+  host: "oregon-redis.render.com"
   port: "6379"
 smtp:
   email:
