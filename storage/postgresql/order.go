@@ -85,7 +85,8 @@ func (db *OrderRepo) GetByID(ctx context.Context, id string) (*models.OrderModel
 			client_comment, delivery_type,
 			delivery_addr_lat, delivery_addr_long,
 			picker_user_id, picked_at,
-			delivering_user_id, delivered_at
+			delivering_user_id, delivered_at,
+			delivery_addr_name
 		from orders where id = $1`
 
 	var res models.OrderModel
@@ -100,6 +101,7 @@ func (db *OrderRepo) GetByID(ctx context.Context, id string) (*models.OrderModel
 		&res.DeliveryAddrLat, &res.DeliveryAddrLong,
 		&res.PickerUserID, &res.PickedAt,
 		&res.DeliverUserID, &res.DeliveredAt,
+		&res.DeliveryAddrName,
 	); err != nil {
 		return nil, err
 	}
@@ -117,7 +119,8 @@ func (db *OrderRepo) GetAll(ctx context.Context) ([]models.OrderModel, error) {
 			client_last_name, client_phone_number,
 			client_comment, delivery_type,
 			delivery_addr_lat, delivery_addr_long,
-			delivering_user_id, delivered_at
+			delivering_user_id, delivered_at,
+			delivery_addr_name
 		from orders
 		where deleted_at is null
 		order by created_at desc`
@@ -141,6 +144,7 @@ func (db *OrderRepo) GetAll(ctx context.Context) ([]models.OrderModel, error) {
 			&tmp.ClientComment, &tmp.DeliveryType,
 			&tmp.DeliveryAddrLat, &tmp.DeliveryAddrLong,
 			&tmp.DeliverUserID, &tmp.DeliveredAt,
+			&tmp.DeliveryAddrName,
 		); err != nil {
 			return nil, err
 		}
@@ -159,7 +163,8 @@ func (db *OrderRepo) GetArchived(ctx context.Context) ([]models.OrderModel, erro
 			client_last_name, client_phone_number,
 			client_comment, delivery_type,
 			delivery_addr_lat, delivery_addr_long,
-			delivering_user_id, delivered_at
+			delivering_user_id, delivered_at,
+			deliver_addr_name
 		from orders where status in ('finished', 'canceled')`
 
 	rows, _ := db.db.Query(ctx, q)
@@ -181,6 +186,7 @@ func (db *OrderRepo) GetArchived(ctx context.Context) ([]models.OrderModel, erro
 			&tmp.ClientComment, &tmp.DeliveryType,
 			&tmp.DeliveryAddrLat, &tmp.DeliveryAddrLong,
 			&tmp.DeliverUserID, &tmp.DeliveredAt,
+			&tmp.DeliveryAddrName,
 		); err != nil {
 			return nil, err
 		}
@@ -199,7 +205,8 @@ func (db *OrderRepo) GetActive(ctx context.Context) ([]models.OrderModel, error)
 			client_last_name, client_phone_number,
 			client_comment, delivery_type,
 			delivery_addr_lat, delivery_addr_long,
-			delivering_user_id, delivered_at
+			delivering_user_id, delivered_at,
+			deliver_addr_name
 		from orders where status in ('in_process', 'picking', 'delivering')`
 
 	rows, _ := db.db.Query(ctx, q)
@@ -221,6 +228,7 @@ func (db *OrderRepo) GetActive(ctx context.Context) ([]models.OrderModel, error)
 			&tmp.ClientComment, &tmp.DeliveryType,
 			&tmp.DeliveryAddrLat, &tmp.DeliveryAddrLong,
 			&tmp.DeliverUserID, &tmp.DeliveredAt,
+			&tmp.DeliveryAddrName,
 		); err != nil {
 			return nil, err
 		}
@@ -238,7 +246,8 @@ func (db *OrderRepo) GetNew(ctx context.Context, forCourier bool) ([]models.Orde
 			order_id, client_first_name,
 			client_last_name, client_phone_number,
 			client_comment, delivery_type,
-			delivery_addr_lat, delivery_addr_long
+			delivery_addr_lat, delivery_addr_long,
+			deliver_addr_name
 		from orders
 		where status in ('in_process') and deleted_at is null
 		order by created_at desc`
@@ -265,6 +274,7 @@ func (db *OrderRepo) GetNew(ctx context.Context, forCourier bool) ([]models.Orde
 			&tmp.ClientLastName, &tmp.ClientPhone,
 			&tmp.ClientComment, &tmp.DeliveryType,
 			&tmp.DeliveryAddrLat, &tmp.DeliveryAddrLong,
+			&tmp.DeliveryAddrName,
 		); err != nil {
 			return nil, err
 		}
