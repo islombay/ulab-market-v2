@@ -3,8 +3,9 @@ package postgresql
 import (
 	"app/api/models"
 	"context"
-	"github.com/jackc/pgx/v4/pgxpool"
 	"time"
+
+	"github.com/jackc/pgx/v4/pgxpool"
 )
 
 type BasketRepo struct {

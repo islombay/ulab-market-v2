@@ -141,6 +141,10 @@ func (srv OrderService) CreateOrder(ctx context.Context, order models_v1.CreateO
 		return nil, &status.StatusInternal
 	}
 
+	for _, product_basket := range orderProducts {
+		srv.store.Basket().Delete(ctx, userID, product_basket.ID)
+	}
+
 	return models_v1.Response{
 		Code:    200,
 		Message: "Ok",
