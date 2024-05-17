@@ -386,3 +386,5 @@ func (v1 *Handlers) OrderPicked(c *gin.Context) {
 	}
 	v1.response(c, http.StatusOK, res)
 }
+
+func (v1 *Handers) OrderMarkPickedByCourier
