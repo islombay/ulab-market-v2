@@ -216,7 +216,7 @@ func (db *ProductRepo) GetAll(ctx context.Context, query, catid, bid *string, re
 			created_at, updated_at, deleted_at,
 			view_count
 		from products as p
-		order by created_at desc`
+		order by p.created_at desc`
 	var args []interface{}
 	var whereClause []string
 
