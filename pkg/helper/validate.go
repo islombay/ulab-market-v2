@@ -36,11 +36,11 @@ var (
 )
 
 func IsValidPhone(phone string) bool {
-	// if containsPlus := strings.Contains(phone, "+"); containsPlus {
-	// 	return false
-	// }
+	if containsPlus := strings.Contains(phone, "+"); containsPlus {
+		return false
+	}
 
-	phone = strings.Replace(phone, "+", "", -1)
+	// phone = strings.Replace(phone, "+", "", -1)
 	r := regexp.MustCompile(`^998[0-9]{2}[0-9]{7}$`)
 	return r.MatchString(phone)
 }

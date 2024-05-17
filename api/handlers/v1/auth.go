@@ -14,6 +14,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -451,6 +452,8 @@ func (v1 *Handlers) Login(c *gin.Context) {
 			v1.error(c, status.StatusBadPhone)
 			return
 		}
+
+		m.Source = strings.Replace(m.Source, "+", "", -1)
 		identityFunc = v1.storage.User().GetClientByPhone
 	} else {
 		v1.error(c, status.StatusVerificationTypeNotFound)
