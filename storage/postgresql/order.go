@@ -236,7 +236,8 @@ func (db *OrderRepo) GetNew(ctx context.Context, forCourier bool) ([]models.Orde
 			client_last_name, client_phone_number,
 			client_comment, delivery_type,
 			delivery_addr_lat, delivery_addr_long
-		from orders where status in ('in_process')`
+		from orders where status in ('in_process')
+		order by created_at desc`
 
 	if forCourier {
 		q += ` and delivering_user_id is null`
