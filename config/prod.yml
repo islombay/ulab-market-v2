@@ -3,7 +3,7 @@ server:
   port: "10000"
   public_host: "https://ulab-market-backend.onrender.com"
 db:
-  host: "dpg-cnpt8sa1hbls738hskmg-a"
+  host: "dpg-cnpt8sa1hbls738hskmg-a.oregon-postgres.render.com" 
   port: "5432"
   dbname: "ulab_market"
   sslmode: "disable"
