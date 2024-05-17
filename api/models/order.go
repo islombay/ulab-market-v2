@@ -48,6 +48,9 @@ type OrderModel struct {
 type OrderProductModel struct {
 	ID           string  `db:"id" json:"id"`
 	OrderID      *string `db:"order_id" json:"order_id,omitempty"`
+	NameUz       string  `json:"name_uz"`
+	NameRu       string  `json:"name_ru"`
+	Aricul       string  `json:"articul"`
 	ProductID    string  `db:"product_id" json:"product_id"`
 	Quantity     int     `db:"quantity" json:"quantity"`
 	ProductPrice float64 `db:"product_price" json:"product_price"`

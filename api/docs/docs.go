@@ -4584,6 +4584,9 @@ const docTemplate = `{
                 "delivery_addr_long": {
                     "type": "number"
                 },
+                "delivery_addr_name": {
+                    "type": "string"
+                },
                 "delivery_type": {
                     "type": "string"
                 },
@@ -4628,6 +4631,9 @@ const docTemplate = `{
         "models.OrderProductModel": {
             "type": "object",
             "properties": {
+                "articul": {
+                    "type": "string"
+                },
                 "created_at": {
                     "type": "string"
                 },
@@ -4635,6 +4641,12 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "id": {
+                    "type": "string"
+                },
+                "name_ru": {
+                    "type": "string"
+                },
+                "name_uz": {
                     "type": "string"
                 },
                 "order_id": {
@@ -5196,6 +5208,9 @@ const docTemplate = `{
                 },
                 "delivery_addr_long": {
                     "type": "number"
+                },
+                "delivery_name": {
+                    "type": "string"
                 },
                 "delivery_type": {
                     "type": "string"

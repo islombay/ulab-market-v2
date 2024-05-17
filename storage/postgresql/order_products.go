@@ -93,9 +93,11 @@ func (db *OrderProductsRepo) GetAll(ctx context.Context) ([]models.OrderProductM
 
 func (db *OrderProductsRepo) GetOrderProducts(ctx context.Context, order_id string) ([]models.OrderProductModel, error) {
 	q := `select
-			id, product_id, quantity, product_price, total_price,
-			created_at, updated_at, deleted_at
-		from order_products where order_id = $1`
+			op.id, op.product_id, op.quantity, op.product_price, op.total_price,
+			op.created_at, op.updated_at, op.deleted_at, p.articul, p.name_uz, p.name_ru
+		from order_products as op
+		join products as p on p.id = op.product_id
+		where order_id = $1`
 
 	var res []models.OrderProductModel
 	rows, _ := db.db.Query(ctx, q, order_id)
@@ -110,6 +112,7 @@ func (db *OrderProductsRepo) GetOrderProducts(ctx context.Context, order_id stri
 			&tmp.Quantity, &tmp.ProductPrice,
 			&tmp.TotalPrice, &tmp.CreatedAt,
 			&tmp.UpdatedAt, &tmp.DeletedAt,
+			&tmp.Aricul, &tmp.NameUz, &tmp.NameRu,
 		); err != nil {
 			return nil, err
 		}
