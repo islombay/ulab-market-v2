@@ -164,7 +164,7 @@ func (db *OrderRepo) GetArchived(ctx context.Context) ([]models.OrderModel, erro
 			client_comment, delivery_type,
 			delivery_addr_lat, delivery_addr_long,
 			delivering_user_id, delivered_at,
-			deliver_addr_name
+			delivery_addr_name
 		from orders where status in ('finished', 'canceled')`
 
 	rows, _ := db.db.Query(ctx, q)
@@ -206,7 +206,7 @@ func (db *OrderRepo) GetActive(ctx context.Context) ([]models.OrderModel, error)
 			client_comment, delivery_type,
 			delivery_addr_lat, delivery_addr_long,
 			delivering_user_id, delivered_at,
-			deliver_addr_name
+			delivery_addr_name
 		from orders where status in ('in_process', 'picking', 'delivering')`
 
 	rows, _ := db.db.Query(ctx, q)
@@ -247,7 +247,7 @@ func (db *OrderRepo) GetNew(ctx context.Context, forCourier bool) ([]models.Orde
 			client_last_name, client_phone_number,
 			client_comment, delivery_type,
 			delivery_addr_lat, delivery_addr_long,
-			deliver_addr_name
+			delivery_addr_name
 		from orders
 		where status in ('in_process') and deleted_at is null
 		order by created_at desc`
