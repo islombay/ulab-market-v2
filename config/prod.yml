@@ -1,7 +1,7 @@
 server:
   host: "0.0.0.0"
   port: "10000"
-  public_host: "https://ulab-market-v2-n6zf.onrender.com/"
+  public_host: "https://ulab-market-v2-n6zf.onrender.com"
 db:
   host: "dpg-cnpt8sa1hbls738hskmg-a.oregon-postgres.render.com" 
   port: "5432"
