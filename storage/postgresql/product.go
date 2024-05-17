@@ -64,7 +64,8 @@ func (db *ProductRepo) GetByArticul(ctx context.Context, articul string) (*model
 			rating, status, main_image,
 			created_at, updated_at, deleted_at,
 			view_count
-	 from products where articul = $1 and deleted_at is null`
+	 from products
+	 where articul = $1 and deleted_at is null`
 	var m models.Product
 	if err := db.db.QueryRow(ctx, q, articul).Scan(
 		&m.ID, &m.Articul,
@@ -215,8 +216,7 @@ func (db *ProductRepo) GetAll(ctx context.Context, query, catid, bid *string, re
 			rating, status, main_image,
 			created_at, updated_at, deleted_at,
 			view_count
-		from products as p
-		order by p.created_at desc`
+		from products as p`
 	var args []interface{}
 	var whereClause []string
 
@@ -256,6 +256,8 @@ func (db *ProductRepo) GetAll(ctx context.Context, query, catid, bid *string, re
 	if len(whereClause) > 0 {
 		q += " where " + strings.Join(whereClause, " and ")
 	}
+
+	q += ` order by p.created_at desc`
 
 	q += offset + limit
 
