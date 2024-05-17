@@ -6,7 +6,7 @@ db:
   host: "dpg-cnpt8sa1hbls738hskmg-a.oregon-postgres.render.com" 
   port: "5432"
   dbname: "ulab_market"
-  sslmode: "disable"
+  sslmode: "require"
   migrations: "migrations"
 redis:
   host: "red-cp3e81vsc6pc73fn8qfg"
