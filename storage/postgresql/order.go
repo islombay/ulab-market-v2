@@ -207,7 +207,7 @@ func (db *OrderRepo) GetActive(ctx context.Context) ([]models.OrderModel, error)
 			delivery_addr_lat, delivery_addr_long,
 			delivering_user_id, delivered_at,
 			delivery_addr_name
-		from orders where status in ('in_process', 'picking', 'delivering')`
+		from orders where status in ('in_process', 'picked', 'delivering')`
 
 	rows, _ := db.db.Query(ctx, q)
 	if rows.Err() != nil {

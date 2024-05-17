@@ -38,9 +38,12 @@ func SendVerificationCode(source, sourceType string, codeLength int,
 			}
 			return err, ""
 		}
+	} else if sourceType == VerificationPhone {
+		if err := smtp.Phone().SendVerificationCode(source, oneTimeCode); err != nil {
+			return err, ""
+		}
 	} else {
-		// ignore
-		// return ErrUnimplemented
+		return ErrUnimplemented, ""
 	}
 	return nil, oneTimeCode
 }

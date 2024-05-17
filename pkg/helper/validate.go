@@ -10,6 +10,7 @@ import (
 
 var (
 	ErrInvalidEmail     = fmt.Errorf("invalid_email")
+	ErrInvalidPhone     = fmt.Errorf("invalid_phone")
 	ErrInvalidImageType = fmt.Errorf("invalid_image_type")
 	ErrInvalidVideoType = fmt.Errorf("invalid_video_type")
 	ErrInvalidIconType  = fmt.Errorf("invalid_icon_type")

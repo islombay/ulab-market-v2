@@ -500,6 +500,8 @@ func (v1 *Handlers) Login(c *gin.Context) {
 	); err != nil {
 		if errors.Is(err, helper.ErrInvalidEmail) {
 			v1.error(c, status.StatusBadEmail)
+		} else if errors.Is(err, helper.ErrInvalidPhone) {
+			v1.error(c, status.StatusBadPhone)
 		} else {
 			v1.error(c, status.StatusFailedSendCode)
 		}
