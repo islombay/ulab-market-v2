@@ -9,7 +9,7 @@ db:
   sslmode: "disable"
   migrations: "migrations"
 redis:
-  host: "red-cnpua0gl5elc73cvmic0"
+  host: "red-cp3e81vsc6pc73fn8qfg"
   port: "6379"
 smtp:
   email:
