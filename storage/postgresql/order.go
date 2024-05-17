@@ -31,9 +31,9 @@ func (db *OrderRepo) Create(ctx context.Context, m models.OrderModel) error {
 				order_id, client_first_name,
 				client_last_name, client_phone_number,
 				client_comment, delivery_addr_lat,
-				delivery_addr_long
+				delivery_addr_long, delivery_addr_name
 				)
-			values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`
+			values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`
 
 	_, err := db.db.Exec(ctx, q,
 		m.ID, m.PaymentType, m.UserID,
@@ -41,6 +41,7 @@ func (db *OrderRepo) Create(ctx context.Context, m models.OrderModel) error {
 		m.ClientLastName, m.ClientPhone,
 		m.ClientComment, m.DeliveryAddrLat,
 		m.DeliveryAddrLong,
+		m.DeliveryAddrName,
 	)
 	if err != nil {
 		var pgcon *pgconn.PgError
@@ -117,7 +118,9 @@ func (db *OrderRepo) GetAll(ctx context.Context) ([]models.OrderModel, error) {
 			client_comment, delivery_type,
 			delivery_addr_lat, delivery_addr_long,
 			delivering_user_id, delivered_at
-		from orders`
+		from orders
+		where deleted_at is null
+		order by created_at desc`
 
 	rows, _ := db.db.Query(ctx, q)
 	if rows.Err() != nil {
@@ -236,7 +239,8 @@ func (db *OrderRepo) GetNew(ctx context.Context, forCourier bool) ([]models.Orde
 			client_last_name, client_phone_number,
 			client_comment, delivery_type,
 			delivery_addr_lat, delivery_addr_long
-		from orders where status in ('in_process')
+		from orders
+		where status in ('in_process') and deleted_at is null
 		order by created_at desc`
 
 	if forCourier {

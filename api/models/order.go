@@ -30,6 +30,7 @@ type OrderModel struct {
 	DeliveryType     string  `json:"delivery_type"`
 	DeliveryAddrLat  float64 `json:"delivery_addr_lat"`
 	DeliveryAddrLong float64 `json:"delivery_addr_long"`
+	DeliveryAddrName *string `json:"delivery_addr_name"`
 
 	PickerUserID *string    `json:"picker_user_id,omitempty"`
 	PickedAt     *time.Time `json:"picked_at,omitempty"`

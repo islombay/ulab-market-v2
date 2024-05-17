@@ -11,4 +11,5 @@ type CreateOrder struct {
 	DeliveryType     string  `json:"delivery_type" binding:"required"`
 	DeliveryAddrLat  float64 `json:"delivery_addr_lat" binding:"required"`
 	DeliveryAddrLong float64 `json:"delivery_addr_long" binding:"required"`
+	DeliverAddrName  *string `json:"delivery_addr_name"`
 }

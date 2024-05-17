@@ -49,6 +49,7 @@ create table if not exists orders (
     delivery_type delivery_order_enum not null default 'deliver',
     delivery_addr_lat float not null,
     delivery_addr_long float not null,
+    delivery_addr_name varchar(255) default null,
 
     picker_user_id uuid default null,
     picked_at timestamp default null,

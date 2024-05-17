@@ -66,6 +66,7 @@ func (srv OrderService) CreateOrder(ctx context.Context, order models_v1.CreateO
 		DeliveryType:     order.DeliveryType,
 		DeliveryAddrLat:  order.DeliveryAddrLat,
 		DeliveryAddrLong: order.DeliveryAddrLong,
+		DeliveryAddrName: order.DeliverAddrName,
 	}
 
 	userBasket, err := srv.store.Basket().GetAll(ctx, userID)
