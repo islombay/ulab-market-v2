@@ -2623,6 +2623,35 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/order/myorders": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get the list of orders of client (client request)",
+                "tags": [
+                    "order"
+                ],
+                "summary": "get the list of orders of client (client request)",
+                "operationId": "ClientOrders",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/api/order/new": {
             "get": {
                 "security": [

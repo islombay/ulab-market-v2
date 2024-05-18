@@ -383,3 +383,36 @@ func (v1 *Handlers) OrderMarkPickedByCourier(c *gin.Context) {
 	}
 	v1.response(c, http.StatusOK, res)
 }
+
+// ClientOrders
+// @id 			ClientOrders
+// @router		/api/order/myorders [get]
+// @summary		get the list of orders of client (client request)
+// @description get the list of orders of client (client request)
+// @tags		order
+// @security	ApiKeyAuth
+// @param page 	query int false "Page value. Default 1"
+// @param limit query int false "Limit value. Default 10"
+// @success		200	{object}	models.Response		"Success"
+// @failure		500	{object}	models_v1.Response	"Internal server error"
+func (v1 *Handlers) ClientOrders(c *gin.Context) {
+	var m models.Pagination
+	c.ShouldBind(&m)
+	m.Fix()
+
+	userID, err := v1.getUserID(c)
+	if err != nil {
+		v1.error(c, err.(status.Status))
+		return
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+
+	res, errStatus := v1.service.Order().GetOrderAllByClient(ctx, userID, m)
+	if errStatus != nil {
+		v1.error(c, *errStatus)
+		return
+	}
+	v1.response(c, http.StatusOK, res)
+}

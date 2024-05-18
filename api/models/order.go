@@ -14,7 +14,7 @@ var OrderStatusIndexes = map[string]int{
 type OrderModel struct {
 	ID      string `db:"id" json:"id"`
 	OrderID string `json:"order_id"`
-	UserID  string `db:"user_id" json:"user_id"`
+	UserID  string `db:"user_id" json:"user_id,omitempty"`
 
 	ClientFirstName *string `json:"client_first_name"`
 	ClientLastName  *string `json:"client_last_name"`
@@ -39,10 +39,10 @@ type OrderModel struct {
 	DeliveredAt   *time.Time `json:"delivered_at,omitempty"`
 
 	CreatedAt time.Time  `db:"created_at" json:"created_at"`
-	UpdatedAt time.Time  `db:"updated_at" json:"updated_at"`
+	UpdatedAt time.Time  `db:"updated_at" json:"updated_at,omitempty"`
 	DeletedAt *time.Time `db:"deleted_at" json:"deleted_at,omitempty"`
 
-	Products []OrderProductModel `json:"products"`
+	Products []OrderProductModel `json:"products,omitempty"`
 }
 
 type OrderProductModel struct {

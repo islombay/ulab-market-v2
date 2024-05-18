@@ -341,3 +341,24 @@ func (srv OrderService) MakePicked(ctx context.Context, order_id, userID, user_t
 		Code:    http.StatusOK,
 	}, nil
 }
+
+func (srv OrderService) GetOrderAllByClient(ctx context.Context, userID string, pagination models.Pagination) (interface{}, *status.Status) {
+	model, count, err := srv.store.Order().GetAllByClient(ctx, userID, pagination)
+	if err != nil {
+		srv.log.Error("could not get the list of orders by client", logs.Error(err),
+			logs.String("user_id", userID))
+		return nil, &status.StatusInternal
+	}
+
+	for i := range model {
+		if val, exists := models.OrderStatusIndexes[model[i].Status]; exists {
+			model[i].StatusID = val
+		}
+	}
+
+	return models.Response{
+		StatusCode: 200,
+		Data:       model,
+		Count:      count,
+	}, nil
+}

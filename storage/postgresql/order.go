@@ -249,3 +249,49 @@ func (db *OrderRepo) MarkPickedByCourier(ctx context.Context, order_id, courier_
 
 	return err
 }
+
+func (db *OrderRepo) GetAllByClient(ctx context.Context, user_id string, pagination models.Pagination) ([]models.OrderModel, int, error) {
+	q := fmt.Sprintf(`select
+			id, client_first_name,
+			cast(order_id as text) as order_id,
+			client_last_name, client_phone_number,
+			client_comment, status, total_price, payment_type,
+			delivery_type, delivery_addr_lat, delivery_addr_long,
+			delivery_addr_name, created_at,
+			(	select
+					count(*)
+				from orders
+				where deleted_at is null and user_id = $1
+			) as total_count
+		from orders
+		where deleted_at is null and user_id = $1
+		order by created_at desc
+		limit %d offset %d`, pagination.Limit, pagination.Offset)
+
+	row, _ := db.db.Query(ctx, q, user_id)
+	if row.Err() != nil {
+		return nil, 0, row.Err()
+	}
+
+	var res []models.OrderModel
+
+	var count int
+
+	for row.Next() {
+		var tmp models.OrderModel
+		if err := row.Scan(
+			&tmp.ID, &tmp.ClientFirstName, &tmp.OrderID,
+			&tmp.ClientLastName, &tmp.ClientPhone,
+			&tmp.ClientComment, &tmp.Status, &tmp.TotalPrice,
+			&tmp.PaymentType, &tmp.DeliveryType, &tmp.DeliveryAddrLat,
+			&tmp.DeliveryAddrLong, &tmp.DeliveryAddrName, &tmp.CreatedAt,
+			&count,
+		); err != nil {
+			return nil, 0, err
+		}
+
+		res = append(res, tmp)
+	}
+
+	return res, count, nil
+}

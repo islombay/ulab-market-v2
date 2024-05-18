@@ -335,6 +335,11 @@ func NewV1(
 			handler.MiddlewareIsCourier(),
 			handler.OrderMarkPickedByCourier,
 		)
+
+		order.GET("/myorders",
+			handler.MiddlewareIsClient(),
+			handler.ClientOrders,
+		)
 	}
 
 	storeTable := v1.Group("/storage")
