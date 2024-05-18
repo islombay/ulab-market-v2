@@ -379,7 +379,7 @@ func (v1 *Handlers) OrderPicked(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 
-	res, errStatus := v1.service.Order().MakePicked(ctx, order_id, userID)
+	res, errStatus := v1.service.Order().MakePicked(ctx, order_id, userID, "picker")
 	if errStatus != nil {
 		v1.error(c, *errStatus)
 		return
@@ -387,4 +387,39 @@ func (v1 *Handlers) OrderPicked(c *gin.Context) {
 	v1.response(c, http.StatusOK, res)
 }
 
-// func (v1 *Handers) OrderMarkPickedByCourier
+// OrderMarkPickedByCourier
+// @id 			OrderMarkPickedByCourier
+// @router		/api/order/picked_deliver/{id} [get]
+// @summary		mark the order as picked (courier)
+// @description mark the order as picked for couriers (shu zakazni men olaman degan mano)
+// @tags		order
+// @security	ApiKeyAuth
+// @param		id	path	string	true "Order id"
+// @success		200	{object}	models_v1.Response	"Success"
+// @failure		400	{object}	models_v1.Response	"Bad id"
+// @failure		404 {object}	models_v1.Response	"Not found"
+// @failure		405 {object}	models_v1.Response	"Can not change the status"
+// @failure		500	{object}	models_v1.Response	"Internal server error"
+func (v1 *Handlers) OrderMarkPickedByCourier(c *gin.Context) {
+	order_id := c.Param("id")
+	if !helper.IsValidUUID(order_id) {
+		v1.error(c, status.StatusBadUUID)
+		return
+	}
+
+	userID, err := v1.getUserID(c)
+	if err != nil {
+		v1.error(c, err.(status.Status))
+		return
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+
+	res, errStatus := v1.service.Order().MakePicked(ctx, order_id, userID, "courier")
+	if errStatus != nil {
+		v1.error(c, *errStatus)
+		return
+	}
+	v1.response(c, http.StatusOK, res)
+}

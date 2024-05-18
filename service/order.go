@@ -306,7 +306,7 @@ func (srv OrderService) GetNewList(ctx context.Context, forCourier bool) (interf
 	return model, nil
 }
 
-func (srv OrderService) MakePicked(ctx context.Context, order_id, userID string) (interface{}, *status.Status) {
+func (srv OrderService) MakePicked(ctx context.Context, order_id, userID, user_type string) (interface{}, *status.Status) {
 	// check the status
 	// if order.status in (delivering, picked, finished, canceled)
 	//		return error (not able to change)

@@ -1877,6 +1877,54 @@ const docTemplate = `{
             }
         },
         "/api/favourite": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get all from favourite",
+                "tags": [
+                    "favourite"
+                ],
+                "summary": "Get all from favourite",
+                "operationId": "GetAllFavourite",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.FavouriteModel"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Product not found",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    }
+                }
+            },
             "post": {
                 "security": [
                     {
@@ -2702,6 +2750,62 @@ const docTemplate = `{
                 ],
                 "summary": "mark the order as picked (pickers)",
                 "operationId": "orderPicked",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Order id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad id",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    },
+                    "405": {
+                        "description": "Can not change the status",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/order/picked_deliver/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "mark the order as picked for couriers (shu zakazni men olaman degan mano)",
+                "tags": [
+                    "order"
+                ],
+                "summary": "mark the order as picked (courier)",
+                "operationId": "OrderMarkPickedByCourier",
                 "parameters": [
                     {
                         "type": "string",

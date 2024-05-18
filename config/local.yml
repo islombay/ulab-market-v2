@@ -4,24 +4,24 @@ server:
   public_host: "http://localhost:8123"
 db:
   # For server
-  # host: "dpg-cnpt8sa1hbls738hskmg-a.oregon-postgres.render.com"
+  host: "dpg-cnpt8sa1hbls738hskmg-a.oregon-postgres.render.com"
 
   # For localhost
-  host: "localhost"
+  # host: "localhost"
 
   port: "5432"
 
   # For localhost
-  dbname: "ulab-market-v2"
+  # dbname: "ulab-market-v2"
 
   # For server
-  # dbname: "ulab_market"
+  dbname: "ulab_market"
   
   # For localhost
-  sslmode: "disable"
+  # sslmode: "disable"
 
   # For server
-  # sslmode: "require"
+  sslmode: "require"
   migrations: "migrations"
 redis:
   host: "localhost"
