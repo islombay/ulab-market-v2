@@ -327,17 +327,27 @@ func (srv OrderService) MakePicked(ctx context.Context, order_id, userID, user_t
 	}
 
 	if model.Status == OrderStatusDelivering ||
-		model.Status == OrderStatusPicked ||
 		model.Status == OrderStatusFinished ||
 		model.Status == OrderStatusCanceled {
 		return nil, &status.StatusNotChangable
 	}
 
-	// set picked_at, picker_user_id, and status to picked
-	if err := srv.store.Order().MarkPicked(ctx, order_id, userID, time.Now()); err != nil {
-		srv.log.Error("could not mark order as picked", logs.Error(err),
-			logs.String("order_id", order_id))
-		return nil, &status.StatusInternal
+	if user_type == "picker" {
+		if model.Status == OrderStatusPicked {
+			return nil, &status.StatusNotChangable
+		}
+		// set picked_at, picker_user_id, and status to picked
+		if err := srv.store.Order().MarkPicked(ctx, order_id, userID, time.Now()); err != nil {
+			srv.log.Error("could not mark order as picked", logs.Error(err),
+				logs.String("order_id", order_id))
+			return nil, &status.StatusInternal
+		}
+	} else if user_type == "courier" {
+		if err := srv.store.Order().MarkPickedByCourier(ctx, order_id, userID, time.Now()); err != nil {
+			srv.log.Error("could not mark order as picked by courier", logs.Error(err),
+				logs.String("order_id", order_id))
+			return nil, &status.StatusInternal
+		}
 	}
 
 	return models_v1.Response{

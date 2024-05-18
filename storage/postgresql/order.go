@@ -86,7 +86,7 @@ func (db *OrderRepo) GetByID(ctx context.Context, id string) (*models.OrderModel
 			delivery_addr_lat, delivery_addr_long,
 			picker_user_id, picked_at,
 			delivering_user_id, delivered_at,
-			delivery_addr_name
+			delivery_addr_name, delivering_user_id
 		from orders where id = $1`
 
 	var res models.OrderModel
@@ -101,7 +101,7 @@ func (db *OrderRepo) GetByID(ctx context.Context, id string) (*models.OrderModel
 		&res.DeliveryAddrLat, &res.DeliveryAddrLong,
 		&res.PickerUserID, &res.PickedAt,
 		&res.DeliverUserID, &res.DeliveredAt,
-		&res.DeliveryAddrName,
+		&res.DeliveryAddrName, &res.DeliverUserID,
 	); err != nil {
 		return nil, err
 	}
@@ -120,7 +120,7 @@ func (db *OrderRepo) GetAll(ctx context.Context) ([]models.OrderModel, error) {
 			client_comment, delivery_type,
 			delivery_addr_lat, delivery_addr_long,
 			delivering_user_id, delivered_at,
-			delivery_addr_name
+			delivery_addr_name, delivering_user_id
 		from orders
 		where deleted_at is null
 		order by created_at desc`
@@ -144,7 +144,7 @@ func (db *OrderRepo) GetAll(ctx context.Context) ([]models.OrderModel, error) {
 			&tmp.ClientComment, &tmp.DeliveryType,
 			&tmp.DeliveryAddrLat, &tmp.DeliveryAddrLong,
 			&tmp.DeliverUserID, &tmp.DeliveredAt,
-			&tmp.DeliveryAddrName,
+			&tmp.DeliveryAddrName, &tmp.DeliverUserID,
 		); err != nil {
 			return nil, err
 		}
@@ -164,7 +164,7 @@ func (db *OrderRepo) GetArchived(ctx context.Context) ([]models.OrderModel, erro
 			client_comment, delivery_type,
 			delivery_addr_lat, delivery_addr_long,
 			delivering_user_id, delivered_at,
-			delivery_addr_name
+			delivery_addr_name, delivering_user_id
 		from orders where status in ('finished', 'canceled')
 		order by created_at desc`
 
@@ -187,7 +187,7 @@ func (db *OrderRepo) GetArchived(ctx context.Context) ([]models.OrderModel, erro
 			&tmp.ClientComment, &tmp.DeliveryType,
 			&tmp.DeliveryAddrLat, &tmp.DeliveryAddrLong,
 			&tmp.DeliverUserID, &tmp.DeliveredAt,
-			&tmp.DeliveryAddrName,
+			&tmp.DeliveryAddrName, &tmp.DeliverUserID,
 		); err != nil {
 			return nil, err
 		}
@@ -207,7 +207,7 @@ func (db *OrderRepo) GetActive(ctx context.Context) ([]models.OrderModel, error)
 			client_comment, delivery_type,
 			delivery_addr_lat, delivery_addr_long,
 			delivering_user_id, delivered_at,
-			delivery_addr_name
+			delivery_addr_name, delivering_user_id
 		from orders where status in ('in_process', 'picked', 'delivering')
 		order by created_at desc`
 
@@ -230,7 +230,7 @@ func (db *OrderRepo) GetActive(ctx context.Context) ([]models.OrderModel, error)
 			&tmp.ClientComment, &tmp.DeliveryType,
 			&tmp.DeliveryAddrLat, &tmp.DeliveryAddrLong,
 			&tmp.DeliverUserID, &tmp.DeliveredAt,
-			&tmp.DeliveryAddrName,
+			&tmp.DeliveryAddrName, &tmp.DeliverUserID,
 		); err != nil {
 			return nil, err
 		}
@@ -242,21 +242,22 @@ func (db *OrderRepo) GetActive(ctx context.Context) ([]models.OrderModel, error)
 
 func (db *OrderRepo) GetNew(ctx context.Context, forCourier bool) ([]models.OrderModel, error) {
 	q := `select
-			id, user_id, status,
+			id, user_id, status,	
 			total_price,payment_type,
 			created_at, updated_at, deleted_at,
 			order_id, client_first_name,
 			client_last_name, client_phone_number,
 			client_comment, delivery_type,
 			delivery_addr_lat, delivery_addr_long,
-			delivery_addr_name
+			delivery_addr_name, delivering_user_id
 		from orders
-		where status in ('in_process') and deleted_at is null
-		order by created_at desc`
+		where status in ('in_process') and deleted_at is null`
 
 	if forCourier {
 		q += ` and delivering_user_id is null`
 	}
+
+	q += ` order by created_at desc`
 
 	rows, _ := db.db.Query(ctx, q)
 	if rows.Err() != nil {
@@ -276,7 +277,7 @@ func (db *OrderRepo) GetNew(ctx context.Context, forCourier bool) ([]models.Orde
 			&tmp.ClientLastName, &tmp.ClientPhone,
 			&tmp.ClientComment, &tmp.DeliveryType,
 			&tmp.DeliveryAddrLat, &tmp.DeliveryAddrLong,
-			&tmp.DeliveryAddrName,
+			&tmp.DeliveryAddrName, &tmp.DeliverUserID,
 		); err != nil {
 			return nil, err
 		}
@@ -304,6 +305,17 @@ func (db *OrderRepo) MarkPicked(ctx context.Context, order_id, picker_id string,
 		where id = $3 and deleted_at is null`
 
 	_, err := db.db.Exec(ctx, q, picked_at, picker_id, order_id)
+
+	return err
+}
+
+func (db *OrderRepo) MarkPickedByCourier(ctx context.Context, order_id, courier_id string, picked_at time.Time) error {
+	q := `update orders set
+			updated_at = $1,
+			delivering_user_id = $2
+		where id = $3 and deleted_at is null`
+
+	_, err := db.db.Exec(ctx, q, picked_at, courier_id, order_id)
 
 	return err
 }

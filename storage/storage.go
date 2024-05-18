@@ -57,6 +57,7 @@ type OrderI interface {
 
 	GetUserOrdersCount(ctx context.Context, user_id string) (int, error)
 	MarkPicked(ctx context.Context, order_id, picker_id string, picked_at time.Time) error
+	MarkPickedByCourier(ctx context.Context, order_id, courier_id string, picked_at time.Time) error
 }
 
 type BranchInterface interface {
