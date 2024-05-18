@@ -13,3 +13,8 @@ type CreateOrder struct {
 	DeliveryAddrLong float64 `json:"delivery_addr_long" binding:"required"`
 	DeliverAddrName  *string `json:"delivery_name"`
 }
+
+type GetOrderAll struct {
+	Limit int `form:"limit"`
+	Page  int `form:"page"`
+}

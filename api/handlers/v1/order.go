@@ -168,15 +168,20 @@ func (v1 *Handlers) GetOrderByID(c *gin.Context) {
 // @accept json
 // @produce json
 // @param status query string false "Order status (active or archive)"
+// @param limit  query int    false "Response limit"
 // @success 200 {object} []models.OrderModel "Success"
 // @failure 404 {object} models_v1.Response "Order not found"
 // @failure 500 {object} models_v1.Response "Internal server error"
 func (v1 *Handlers) GetOrderAll(c *gin.Context) {
 	status := c.Query("status")
+
+	var m models_v1.GetOrderAll
+	c.ShouldBind(&m)
+
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 
-	res, errStatus := v1.service.Order().GetAll(ctx, status)
+	res, errStatus := v1.service.Order().GetAll(ctx, status, m)
 	if errStatus != nil {
 		v1.error(c, *errStatus)
 	} else {

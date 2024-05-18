@@ -216,8 +216,13 @@ func (srv OrderService) GetByID(ctx context.Context, id string) (interface{}, *s
 	return model, nil
 }
 
-func (srv OrderService) GetAll(ctx context.Context, orderStatus string) (interface{}, *status.Status) {
+func (srv OrderService) GetAll(ctx context.Context, orderStatus string, queryParams models_v1.GetOrderAll) (interface{}, *status.Status) {
 	var model []models.OrderModel
+
+	if queryParams.Limit == 0 {
+		queryParams.Limit = 10
+	}
+
 	var err error
 	if orderStatus == "archive" {
 		model, err = srv.store.Order().GetArchived(ctx)
