@@ -1,6 +1,7 @@
 package handlersv1
 
 import (
+	"app/api/models"
 	models_v1 "app/api/models/v1"
 	"app/api/status"
 	"app/pkg/helper"
@@ -168,15 +169,17 @@ func (v1 *Handlers) GetOrderByID(c *gin.Context) {
 // @accept json
 // @produce json
 // @param status query string false "Order status (active or archive)"
-// @param limit  query int    false "Response limit"
+// @param page 	query int false "Page value. Default 1"
+// @param limit query int false "Limit value. Default 10"
 // @success 200 {object} []models.OrderModel "Success"
 // @failure 404 {object} models_v1.Response "Order not found"
 // @failure 500 {object} models_v1.Response "Internal server error"
 func (v1 *Handlers) GetOrderAll(c *gin.Context) {
 	status := c.Query("status")
 
-	var m models_v1.GetOrderAll
+	var m models.Pagination
 	c.ShouldBind(&m)
+	m.Fix()
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
@@ -259,54 +262,6 @@ func (v1 *Handlers) getUserID(c *gin.Context) (string, interface{}) {
 		return "", status.StatusInternal
 	}
 	return str, nil
-}
-
-// GetArchivedOrder
-// @id GetArchivedOrder
-// @router /api/order/archived [get]
-// @summary get order all archived
-// @description get order all archived
-// @tags order
-// @security ApiKeyAuth
-// @accept json
-// @produce json
-// @success 200 {object} []models.OrderModel "Success"
-// @failure 404 {object} models_v1.Response "Order not found"
-// @failure 500 {object} models_v1.Response "Internal server error"
-func (v1 *Handlers) GetArchivedOrder(c *gin.Context) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
-	defer cancel()
-
-	res, errStatus := v1.service.Order().GetAllGroup(ctx, "archived")
-	if errStatus != nil {
-		v1.error(c, *errStatus)
-		return
-	}
-	v1.response(c, http.StatusOK, res)
-}
-
-// GetActiveOrder
-// @id GetActiveOrder
-// @router /api/order/active [get]
-// @summary get order all active
-// @description get order all active
-// @tags order
-// @security ApiKeyAuth
-// @accept json
-// @produce json
-// @success 200 {object} []models.OrderModel "Success"
-// @failure 404 {object} models_v1.Response "Order not found"
-// @failure 500 {object} models_v1.Response "Internal server error"
-func (v1 *Handlers) GetActiveOrder(c *gin.Context) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
-	defer cancel()
-
-	res, errStatus := v1.service.Order().GetAllGroup(ctx, "active")
-	if errStatus != nil {
-		v1.error(c, *errStatus)
-		return
-	}
-	v1.response(c, http.StatusOK, res)
 }
 
 // GetNewOrdersList

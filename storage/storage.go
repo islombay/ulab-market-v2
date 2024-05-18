@@ -49,10 +49,8 @@ type OrderI interface {
 	Delete(ctx context.Context, id string) error
 	ChangeStatus(ctx context.Context, id, status string) error
 
-	GetAll(ctx context.Context) ([]models.OrderModel, error)
+	GetAll(ctx context.Context, pagination models.Pagination, statuses []string) ([]models.OrderModel, error)
 	GetByID(ctx context.Context, id string) (*models.OrderModel, error)
-	GetArchived(ctx context.Context) ([]models.OrderModel, error)
-	GetActive(ctx context.Context) ([]models.OrderModel, error)
 	GetNew(ctx context.Context, forCourier bool) ([]models.OrderModel, error)
 
 	GetUserOrdersCount(ctx context.Context, user_id string) (int, error)

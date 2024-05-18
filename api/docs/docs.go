@@ -2354,6 +2354,18 @@ const docTemplate = `{
                         "description": "Order status (active or archive)",
                         "name": "status",
                         "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page value. Default 1",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Limit value. Default 10",
+                        "name": "limit",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -2424,94 +2436,6 @@ const docTemplate = `{
                     },
                     "411": {
                         "description": "Basket is empty",
-                        "schema": {
-                            "$ref": "#/definitions/models_v1.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "schema": {
-                            "$ref": "#/definitions/models_v1.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/order/active": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "get order all active",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "order"
-                ],
-                "summary": "get order all active",
-                "operationId": "GetActiveOrder",
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.OrderModel"
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Order not found",
-                        "schema": {
-                            "$ref": "#/definitions/models_v1.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "schema": {
-                            "$ref": "#/definitions/models_v1.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/order/archived": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "get order all archived",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "order"
-                ],
-                "summary": "get order all archived",
-                "operationId": "GetArchivedOrder",
-                "responses": {
-                    "200": {
-                        "description": "Success",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.OrderModel"
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Order not found",
                         "schema": {
                             "$ref": "#/definitions/models_v1.Response"
                         }
@@ -4890,11 +4814,14 @@ const docTemplate = `{
         "models.Response": {
             "type": "object",
             "properties": {
+                "count": {
+                    "type": "integer"
+                },
                 "data": {},
                 "description": {
                     "type": "string"
                 },
-                "statusCode": {
+                "status_code": {
                     "type": "integer"
                 }
             }

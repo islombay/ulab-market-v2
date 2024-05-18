@@ -216,20 +216,17 @@ func (srv OrderService) GetByID(ctx context.Context, id string) (interface{}, *s
 	return model, nil
 }
 
-func (srv OrderService) GetAll(ctx context.Context, orderStatus string, queryParams models_v1.GetOrderAll) (interface{}, *status.Status) {
+func (srv OrderService) GetAll(ctx context.Context, orderStatus string, pagination models.Pagination) (interface{}, *status.Status) {
 	var model []models.OrderModel
-
-	if queryParams.Limit == 0 {
-		queryParams.Limit = 10
-	}
 
 	var err error
 	if orderStatus == "archive" {
-		model, err = srv.store.Order().GetArchived(ctx)
+		model, err = srv.store.Order().GetAll(ctx, pagination, []string{"finished", "canceled"})
 	} else if orderStatus == "active" {
-		model, err = srv.store.Order().GetActive(ctx)
+		// model, err = srv.store.Order().GetActive(ctx)
+		model, err = srv.store.Order().GetAll(ctx, pagination, []string{"in_process", "picked", "delivering"})
 	} else {
-		model, err = srv.store.Order().GetAll(ctx)
+		model, err = srv.store.Order().GetAll(ctx, pagination, []string{})
 	}
 	if err != nil {
 		srv.log.Error("could not get order all archived", logs.Error(err))
@@ -273,22 +270,6 @@ func (srv OrderService) GetProductAll(ctx context.Context) (interface{}, *status
 	model, err := srv.store.OrderProduct().GetAll(ctx)
 	if err != nil {
 		srv.log.Error("could not get order all", logs.Error(err))
-		return nil, &status.StatusInternal
-	}
-
-	return model, nil
-}
-
-func (srv OrderService) GetAllGroup(ctx context.Context, t string) (interface{}, *status.Status) {
-	var model []models.OrderModel
-	var err error
-	if t == "archived" {
-		model, err = srv.store.Order().GetArchived(ctx)
-	} else {
-		model, err = srv.store.Order().GetActive(ctx)
-	}
-	if err != nil {
-		srv.log.Error("could not get order all archived", logs.Error(err))
 		return nil, &status.StatusInternal
 	}
 

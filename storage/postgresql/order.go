@@ -6,7 +6,9 @@ import (
 	"app/storage"
 	"context"
 	"errors"
+	"fmt"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/jackc/pgconn"
@@ -110,8 +112,15 @@ func (db *OrderRepo) GetByID(ctx context.Context, id string) (*models.OrderModel
 	return &res, nil
 }
 
-func (db *OrderRepo) GetAll(ctx context.Context) ([]models.OrderModel, error) {
-	q := `select
+func (db *OrderRepo) GetAll(ctx context.Context, pagination models.Pagination, statuses []string) ([]models.OrderModel, error) {
+	whereClause := "where deleted_at is null"
+
+	if len(statuses) > 0 {
+		inClause := "'" + strings.Join(statuses, "', '") + "'"
+		whereClause += fmt.Sprintf(" and status in (%s)", inClause)
+	}
+
+	q := fmt.Sprintf(`select
 			id, user_id, status,
 			total_price,payment_type,
 			created_at, updated_at, deleted_at,
@@ -120,15 +129,19 @@ func (db *OrderRepo) GetAll(ctx context.Context) ([]models.OrderModel, error) {
 			client_comment, delivery_type,
 			delivery_addr_lat, delivery_addr_long,
 			delivering_user_id, delivered_at,
-			delivery_addr_name, delivering_user_id
-		from orders
-		where deleted_at is null
-		order by created_at desc`
+			delivery_addr_name, delivering_user_id,
+			(select count(*) from orders %s) as total_count
+		from orders %s
+		order by created_at desc`, whereClause, whereClause)
+
+	q += fmt.Sprintf(" limit %d offset %d", pagination.Limit, pagination.Offset)
 
 	rows, _ := db.db.Query(ctx, q)
 	if rows.Err() != nil {
 		return nil, rows.Err()
 	}
+
+	var count int
 
 	res := []models.OrderModel{}
 
@@ -145,104 +158,21 @@ func (db *OrderRepo) GetAll(ctx context.Context) ([]models.OrderModel, error) {
 			&tmp.DeliveryAddrLat, &tmp.DeliveryAddrLong,
 			&tmp.DeliverUserID, &tmp.DeliveredAt,
 			&tmp.DeliveryAddrName, &tmp.DeliverUserID,
+			&count,
 		); err != nil {
 			return nil, err
 		}
 		tmp.OrderID = strconv.FormatInt(tmp_order_id, 10)
 		res = append(res, tmp)
 	}
-	return res, nil
-}
 
-func (db *OrderRepo) GetArchived(ctx context.Context) ([]models.OrderModel, error) {
-	q := `select
-			id, user_id, status,
-			total_price,payment_type,
-			created_at, updated_at, deleted_at,
-			order_id, client_first_name,
-			client_last_name, client_phone_number,
-			client_comment, delivery_type,
-			delivery_addr_lat, delivery_addr_long,
-			delivering_user_id, delivered_at,
-			delivery_addr_name, delivering_user_id
-		from orders where status in ('finished', 'canceled')
-		order by created_at desc`
-
-	rows, _ := db.db.Query(ctx, q)
-	if rows.Err() != nil {
-		return nil, rows.Err()
-	}
-
-	res := []models.OrderModel{}
-
-	for rows.Next() {
-		var tmp_order_id int64
-		var tmp models.OrderModel
-		if err := rows.Scan(
-			&tmp.ID, &tmp.UserID, &tmp.Status,
-			&tmp.TotalPrice, &tmp.PaymentType,
-			&tmp.CreatedAt, &tmp.UpdatedAt, &tmp.DeletedAt,
-			&tmp_order_id, &tmp.ClientFirstName,
-			&tmp.ClientLastName, &tmp.ClientPhone,
-			&tmp.ClientComment, &tmp.DeliveryType,
-			&tmp.DeliveryAddrLat, &tmp.DeliveryAddrLong,
-			&tmp.DeliverUserID, &tmp.DeliveredAt,
-			&tmp.DeliveryAddrName, &tmp.DeliverUserID,
-		); err != nil {
-			return nil, err
-		}
-		tmp.OrderID = strconv.FormatInt(tmp_order_id, 10)
-		res = append(res, tmp)
-	}
-	return res, nil
-}
-
-func (db *OrderRepo) GetActive(ctx context.Context) ([]models.OrderModel, error) {
-	q := `select
-			id, user_id, status,
-			total_price,payment_type,
-			created_at, updated_at, deleted_at,
-			order_id, client_first_name,
-			client_last_name, client_phone_number,
-			client_comment, delivery_type,
-			delivery_addr_lat, delivery_addr_long,
-			delivering_user_id, delivered_at,
-			delivery_addr_name, delivering_user_id
-		from orders where status in ('in_process', 'picked', 'delivering')
-		order by created_at desc`
-
-	rows, _ := db.db.Query(ctx, q)
-	if rows.Err() != nil {
-		return nil, rows.Err()
-	}
-
-	res := []models.OrderModel{}
-
-	for rows.Next() {
-		var tmp_order_id int64
-		var tmp models.OrderModel
-		if err := rows.Scan(
-			&tmp.ID, &tmp.UserID, &tmp.Status,
-			&tmp.TotalPrice, &tmp.PaymentType,
-			&tmp.CreatedAt, &tmp.UpdatedAt, &tmp.DeletedAt,
-			&tmp_order_id, &tmp.ClientFirstName,
-			&tmp.ClientLastName, &tmp.ClientPhone,
-			&tmp.ClientComment, &tmp.DeliveryType,
-			&tmp.DeliveryAddrLat, &tmp.DeliveryAddrLong,
-			&tmp.DeliverUserID, &tmp.DeliveredAt,
-			&tmp.DeliveryAddrName, &tmp.DeliverUserID,
-		); err != nil {
-			return nil, err
-		}
-		tmp.OrderID = strconv.FormatInt(tmp_order_id, 10)
-		res = append(res, tmp)
-	}
+	fmt.Println(count)
 	return res, nil
 }
 
 func (db *OrderRepo) GetNew(ctx context.Context, forCourier bool) ([]models.OrderModel, error) {
 	q := `select
-			id, user_id, status,	
+			id, user_id, status,
 			total_price,payment_type,
 			created_at, updated_at, deleted_at,
 			order_id, client_first_name,
