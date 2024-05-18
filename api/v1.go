@@ -330,6 +330,11 @@ func NewV1(
 			handler.MiddlewareStaffPermissionCheck(auth_lib.PermissionCanMakeOrderPicked),
 			handler.OrderPicked,
 		)
+
+		order.GET("/picked_deliver/:id",
+			handler.MiddlewareIsCourier(),
+			handler.OrderMarkPickedByCourier,
+		)
 	}
 
 	storeTable := v1.Group("/storage")

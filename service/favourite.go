@@ -70,3 +70,15 @@ func (srv *FavouriteService) AddFavourite(ctx context.Context, m models_v1.AddTo
 		ProductID: m.ProductID,
 	}, nil
 }
+
+func (srv *FavouriteService) GetAll(ctx context.Context, user_id string) ([]models.FavouriteModel, *status.Status) {
+	model, err := srv.store.Favourite().GetAll(ctx, user_id)
+
+	if err != nil {
+		srv.log.Error("could not get favourite list of user", logs.Error(err),
+			logs.String("uid", user_id))
+		return nil, &status.StatusInternal
+	}
+
+	return model, nil
+}

@@ -34,3 +34,27 @@ func (db *FavouriteRepo) Get(ctx context.Context, uid, pid string) (*models.Favo
 	}
 	return &fav, nil
 }
+
+func (db *FavouriteRepo) GetAll(ctx context.Context, uid string) ([]models.FavouriteModel, error) {
+	q := `select user_id, product_id from favourite where user_id = $1`
+
+	row, _ := db.db.Query(ctx, q, uid)
+	if row.Err() != nil {
+		return nil, row.Err()
+	}
+
+	var res []models.FavouriteModel
+
+	for row.Next() {
+		var tmp models.FavouriteModel
+		if err := row.Scan(
+			&tmp.UserID, &tmp.ProductID,
+		); err != nil {
+			return nil, err
+		}
+
+		res = append(res, tmp)
+	}
+
+	return res, nil
+}

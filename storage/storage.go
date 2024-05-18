@@ -183,6 +183,7 @@ type StoragesInterface interface {
 type FavouriteI interface {
 	Create(context.Context, string, string) error
 	Get(context.Context, string, string) (*models.FavouriteModel, error)
+	GetAll(ctx context.Context, uid string) ([]models.FavouriteModel, error)
 }
 
 type IncomeInterface interface {

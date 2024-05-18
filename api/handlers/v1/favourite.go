@@ -63,6 +63,35 @@ func (v1 *Handlers) DeleteFromFavourite(c *gin.Context) {
 
 }
 
+// GetAllFavourite
+// @id 			GetAllFavourite
+// @router		/api/favourite [get]
+// @summary		Get all from favourite
+// @description	get all from favourite
+// @tags		favourite
+// @security	ApiKeyAuth
+// @success		200 {object} []models.FavouriteModel 	"Success"
+// @failure		400 {object} models_v1.Response		"Bad request"
+// @failure		401 {object} models_v1.Response		"Unauthorized"
+// @failure		404 {object} models_v1.Response		"Product not found"
+// @failure		500 {object} models_v1.Response		"Internal server error"
 func (v1 *Handlers) GetAllFavourite(c *gin.Context) {
+	str, st := v1.getUserID(c)
+	if st != nil {
+		v1.error(c, st.(status.Status))
+		return
+	}
 
+	ctx, cancel := context.WithTimeout(
+		context.Background(),
+		time.Second*5,
+	)
+	defer cancel()
+
+	res, errStatus := v1.service.Favourite().GetAll(ctx, str)
+	if errStatus != nil {
+		v1.error(c, *errStatus)
+	} else {
+		v1.response(c, http.StatusOK, res)
+	}
 }
