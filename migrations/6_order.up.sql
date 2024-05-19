@@ -31,9 +31,29 @@ do $$
         end if;
 end $$;
 
+-- Create a function to generate the order ID
+CREATE OR REPLACE FUNCTION generate_order_id() RETURNS TEXT AS $$
+DECLARE
+    unix_time BIGINT;
+    random_letters TEXT;
+BEGIN
+    -- Get current Unix time
+    unix_time := EXTRACT(EPOCH FROM NOW())::BIGINT;
+    
+    -- Remove first 3 digits
+    unix_time := unix_time % 1000000000;
+    
+    -- Generate random letters
+    random_letters := CHR(ASCII('a') + floor(random() * 26)) || CHR(ASCII('a') + floor(random() * 26));
+
+    -- Concatenate letters and modified Unix time
+    RETURN random_letters || unix_time;
+END;
+$$ LANGUAGE plpgsql;
+
 create table if not exists orders (
     id uuid primary key default uuid_generate_v4(),
-    order_id bigint unique not null default extract(epoch from now())::int,
+    order_id text unique not null default generate_order_id(),
     user_id uuid,
 
     client_first_name varchar(40) not null,

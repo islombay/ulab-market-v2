@@ -146,13 +146,12 @@ func (db *OrderRepo) GetAll(ctx context.Context, pagination models.Pagination, s
 	res := []models.OrderModel{}
 
 	for rows.Next() {
-		var tmp_order_id int64
 		var tmp models.OrderModel
 		if err := rows.Scan(
 			&tmp.ID, &tmp.UserID, &tmp.Status,
 			&tmp.TotalPrice, &tmp.PaymentType,
 			&tmp.CreatedAt, &tmp.UpdatedAt, &tmp.DeletedAt,
-			&tmp_order_id, &tmp.ClientFirstName,
+			&tmp.OrderID, &tmp.ClientFirstName,
 			&tmp.ClientLastName, &tmp.ClientPhone,
 			&tmp.ClientComment, &tmp.DeliveryType,
 			&tmp.DeliveryAddrLat, &tmp.DeliveryAddrLong,
@@ -162,7 +161,6 @@ func (db *OrderRepo) GetAll(ctx context.Context, pagination models.Pagination, s
 		); err != nil {
 			return nil, err
 		}
-		tmp.OrderID = strconv.FormatInt(tmp_order_id, 10)
 		res = append(res, tmp)
 	}
 
@@ -181,10 +179,13 @@ func (db *OrderRepo) GetNew(ctx context.Context, forCourier bool) ([]models.Orde
 			delivery_addr_lat, delivery_addr_long,
 			delivery_addr_name, delivering_user_id
 		from orders
-		where status in ('in_process') and deleted_at is null`
+		where deleted_at is null`
 
 	if forCourier {
+		q += ` and status in ('in_process', 'picked')`
 		q += ` and delivering_user_id is null`
+	} else {
+		q += ` and status in ('in_process')`
 	}
 
 	q += ` order by created_at desc`
@@ -197,13 +198,12 @@ func (db *OrderRepo) GetNew(ctx context.Context, forCourier bool) ([]models.Orde
 	res := []models.OrderModel{}
 
 	for rows.Next() {
-		var tmp_order_id int64
 		var tmp models.OrderModel
 		if err := rows.Scan(
 			&tmp.ID, &tmp.UserID, &tmp.Status,
 			&tmp.TotalPrice, &tmp.PaymentType,
 			&tmp.CreatedAt, &tmp.UpdatedAt, &tmp.DeletedAt,
-			&tmp_order_id, &tmp.ClientFirstName,
+			&tmp.OrderID, &tmp.ClientFirstName,
 			&tmp.ClientLastName, &tmp.ClientPhone,
 			&tmp.ClientComment, &tmp.DeliveryType,
 			&tmp.DeliveryAddrLat, &tmp.DeliveryAddrLong,
@@ -211,13 +211,12 @@ func (db *OrderRepo) GetNew(ctx context.Context, forCourier bool) ([]models.Orde
 		); err != nil {
 			return nil, err
 		}
-		tmp.OrderID = strconv.FormatInt(tmp_order_id, 10)
 		res = append(res, tmp)
 	}
 	return res, nil
 }
 
-func (db *OrderRepo) GetUserOrdersCount(ctx context.Context, user_id string) (int, error) {
+func (db *OrderRepo) OrdersCount(ctx context.Context, user_id string) (int, error) {
 	q := `select count(*) from orders where user_id = $1 and deleted_at is null`
 
 	var res int
@@ -252,8 +251,7 @@ func (db *OrderRepo) MarkPickedByCourier(ctx context.Context, order_id, courier_
 
 func (db *OrderRepo) GetAllByClient(ctx context.Context, user_id string, pagination models.Pagination) ([]models.OrderModel, int, error) {
 	q := fmt.Sprintf(`select
-			id, client_first_name,
-			cast(order_id as text) as order_id,
+			id, client_first_name, order_id,
 			client_last_name, client_phone_number,
 			client_comment, status, total_price, payment_type,
 			delivery_type, delivery_addr_lat, delivery_addr_long,

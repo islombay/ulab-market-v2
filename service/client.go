@@ -56,7 +56,7 @@ func (srv *clientService) GetList(ctx context.Context) (interface{}, *status.Sta
 }
 
 func (srv *clientService) getOrdersCount(ctx context.Context, user_id string) (int, *status.Status) {
-	count, err := srv.store.Order().GetUserOrdersCount(ctx, user_id)
+	count, err := srv.store.Order().OrdersCount(ctx, user_id)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return 0, &status.StatusNotFound
