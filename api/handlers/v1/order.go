@@ -7,6 +7,7 @@ import (
 	"app/pkg/helper"
 	"app/service"
 	"context"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -33,6 +34,7 @@ func (v1 *Handlers) CreateOrder(c *gin.Context) {
 		v1.error(c, status.StatusBadRequest)
 		return
 	}
+	fmt.Println(m)
 
 	str, st := v1.getUserID(c)
 	if st != nil {
