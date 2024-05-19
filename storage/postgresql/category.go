@@ -78,6 +78,8 @@ func (db *CategoryRepo) GetAll(ctx context.Context, onlySub bool) ([]*models.Cat
 	} else {
 		q += ` and parent_id is null`
 	}
+
+	q += " order by created_at desc"
 	m := []*models.Category{}
 	rows, _ := db.db.Query(ctx, q)
 	if rows.Err() != nil {
@@ -160,7 +162,8 @@ func (db *CategoryRepo) GetSubcategories(ctx context.Context, id string) ([]*mod
 	q := `select id, name_uz, name_ru,
        image, icon_id, parent_id, created_at,
        updated_at, deleted_at
-       from category where parent_id = $1 and deleted_at is null`
+       from category where parent_id = $1 and deleted_at is null
+	   order by created_at desc`
 	var m []*models.Category
 	row, _ := db.db.Query(ctx, q, id)
 	if row.Err() != nil {
