@@ -61,7 +61,7 @@ func (db *BrandRepo) GetByName(ctx context.Context, name string) (*models.Brand,
 	q := `select 
 			id, name, image, created_at,
 			updated_at, deleted_at 
-		from brands where name = $1 and deleted_at is null`
+		from brands where name = $1 and deleted_at is null limit 1`
 	var m models.Brand
 	if err := db.db.QueryRow(ctx, q, name).Scan(
 		&m.ID,
@@ -94,7 +94,8 @@ func (db *BrandRepo) GetAll(ctx context.Context) ([]*models.Brand, error) {
 	q := `select 
 			id, name, image, created_at,
 			updated_at, deleted_at
-		from brands where deleted_at is null`
+		from brands where deleted_at is null
+		order by created_at desc`
 	rows, _ := db.db.Query(ctx, q)
 	if rows.Err() != nil {
 		return nil, rows.Err()
