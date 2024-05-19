@@ -46,12 +46,17 @@ type OrderModel struct {
 }
 
 type OrderProductModel struct {
-	ID           string  `db:"id" json:"id"`
-	OrderID      *string `db:"order_id" json:"order_id,omitempty"`
-	NameUz       string  `json:"name_uz"`
-	NameRu       string  `json:"name_ru"`
-	Aricul       string  `json:"articul"`
-	ProductID    string  `db:"product_id" json:"product_id"`
+	ID      string  `db:"id" json:"id"`
+	OrderID *string `db:"order_id" json:"order_id,omitempty"`
+
+	NameUz string `json:"name_uz"`
+	NameRu string `json:"name_ru"`
+
+	Aricul string `json:"articul"`
+
+	ProductID        string  `db:"product_id" json:"product_id"`
+	ProductMainImage *string `json:"main_image"`
+
 	Quantity     int     `db:"quantity" json:"quantity"`
 	ProductPrice float64 `db:"product_price" json:"product_price"`
 	TotalPrice   float64 `db:"total_price" json:"total_price"`

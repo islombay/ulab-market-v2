@@ -2636,6 +2636,20 @@ const docTemplate = `{
                 ],
                 "summary": "get the list of orders of client (client request)",
                 "operationId": "ClientOrders",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page value. Default 1",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Limit value. Default 10",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Success",
@@ -4698,6 +4712,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "id": {
+                    "type": "string"
+                },
+                "main_image": {
                     "type": "string"
                 },
                 "name_ru": {

@@ -283,9 +283,24 @@ func (srv OrderService) GetNewList(ctx context.Context, forCourier bool) (interf
 		return nil, &status.StatusInternal
 	}
 
-	for i, _ := range model {
+	for i := range model {
 		if orderStatusID, exists := models.OrderStatusIndexes[model[i].Status]; exists {
 			model[i].StatusID = orderStatusID
+		}
+
+		if forCourier {
+
+			products, err := srv.store.OrderProduct().GetOrderProducts(ctx, model[i].ID)
+			if err != nil {
+				srv.log.Error("could not get products of order", logs.Error(err), logs.String("order_id", model[i].ID))
+				return nil, &status.StatusInternal
+			}
+
+			for i := range products {
+				products[i].ProductMainImage = models.GetStringAddress(srv.filestorage.GetURL(*products[i].ProductMainImage))
+			}
+
+			model[i].Products = products
 		}
 	}
 
