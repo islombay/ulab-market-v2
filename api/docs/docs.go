@@ -2568,6 +2568,44 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/order/delivered/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "mark the order as delivered",
+                "tags": [
+                    "order"
+                ],
+                "summary": "mark the order as delivered",
+                "operationId": "orderDelivered",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID of order",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/api/order/finish/{id}": {
             "post": {
                 "security": [

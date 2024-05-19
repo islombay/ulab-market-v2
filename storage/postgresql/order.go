@@ -290,3 +290,18 @@ func (db *OrderRepo) GetAllByClient(ctx context.Context, user_id string, paginat
 
 	return res, count, nil
 }
+
+func (db *OrderRepo) MarkDelivered(ctx context.Context, order_id string) error {
+	q := `update orders set
+			status = 'finished',
+			updated_at = now(),
+			delivered_at = now()
+		where id = $1`
+
+	_, err := db.db.Exec(ctx, q, order_id)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

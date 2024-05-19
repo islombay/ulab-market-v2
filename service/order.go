@@ -380,3 +380,35 @@ func (srv OrderService) GetOrderAllByClient(ctx context.Context, userID string, 
 		Count:      count,
 	}, nil
 }
+
+func (srv OrderService) OrderDelivered(ctx context.Context, userID, orderID string) (interface{}, *status.Status) {
+	order, err := srv.store.Order().GetByID(ctx, orderID)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			srv.log.Error("could not find the the order by id in mark delivered method", logs.String("order_id", orderID))
+			return nil, &status.StatusNotFound
+		}
+
+		srv.log.Error("could not get by id order", logs.Error(err), logs.String("order_id", orderID))
+		return nil, &status.StatusInternal
+	}
+
+	if order.DeletedAt != nil {
+		return nil, &status.StatusNotFound
+	}
+
+	if order.Status == OrderStatusCanceled ||
+		order.Status == OrderStatusFinished {
+		return nil, &status.StatusNotChangable
+	}
+
+	if err := srv.store.Order().MarkDelivered(ctx, orderID); err != nil {
+		srv.log.Error("could not mark the order as delivered", logs.Error(err), logs.String("order_id", orderID))
+		return nil, &status.StatusInternal
+	}
+
+	return models_v1.Response{
+		Message: "Ok",
+		Code:    http.StatusOK,
+	}, nil
+}
