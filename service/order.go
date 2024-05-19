@@ -9,6 +9,7 @@ import (
 	"app/storage"
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -81,6 +82,8 @@ func (srv OrderService) CreateOrder(ctx context.Context, order models_v1.CreateO
 	if len(userBasket) == 0 {
 		return nil, &status.StatusBasketIsEmpty
 	}
+
+	fmt.Println(orderModel)
 
 	if err := srv.store.Order().Create(ctx, orderModel); err != nil {
 		srv.log.Error("could not create order", logs.Error(err))
