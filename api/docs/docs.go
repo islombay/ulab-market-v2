@@ -1122,13 +1122,22 @@ const docTemplate = `{
                 "operationId": "changeBrand",
                 "parameters": [
                     {
-                        "description": "change brand",
-                        "name": "changeBrand",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models_v1.ChangeBrand"
-                        }
+                        "type": "string",
+                        "name": "id",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "name": "name",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "image",
+                        "name": "image",
+                        "in": "formData"
                     }
                 ],
                 "responses": {
@@ -5046,9 +5055,6 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
-        },
-        "models_v1.ChangeBrand": {
-            "type": "object"
         },
         "models_v1.ChangeCategory": {
             "type": "object",

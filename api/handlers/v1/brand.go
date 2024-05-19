@@ -130,14 +130,15 @@ func (v1 *Handlers) GetBrandByID(c *gin.Context) {
 // @security ApiKeyAuth
 // @accept json
 // @produce json
-// @param changeBrand body models_v1.ChangeBrand true "change brand"
+// @param changeBrand formData models_v1.ChangeBrand true "change brand"
+// @param image formData file false "image"
 // @Success 200 {object} models_v1.Response "Success"
 // @Failure 400 {object} models_v1.Response "Bad request / bad uuid / no update provided"
 // @Failure 404 {object} models_v1.Response "Brand not found"
 // @Failure 500 {object} models_v1.Response "Internal error"
 func (v1 *Handlers) ChangeBrand(c *gin.Context) {
 	var m models_v1.ChangeBrand
-	if c.BindJSON(&m) != nil {
+	if c.Bind(&m) != nil {
 		v1.error(c, status.StatusBadRequest)
 		return
 	}
@@ -161,9 +162,36 @@ func (v1 *Handlers) ChangeBrand(c *gin.Context) {
 		return
 	}
 	b = &models.Brand{
-		ID:   m.ID,
-		Name: m.Name,
+		ID:    m.ID,
+		Name:  m.Name,
+		Image: nil,
 	}
+
+	if m.Image != nil {
+		if m.Image.Size > v1.cfg.Media.CategoryPhotoMaxSize {
+			v1.error(c, status.StatusImageMaxSizeExceed)
+			return
+		}
+
+		if valid, err, _ := helper.IsValidImage(m.Image); !valid && err != nil {
+			if errors.Is(err, helper.ErrInvalidImageType) {
+				v1.error(c, status.StatusImageTypeUnkown)
+				return
+			}
+			v1.error(c, status.StatusInternal)
+			v1.log.Error("could not check the image type", logs.Error(err))
+			return
+		}
+
+		url, err := v1.filestore.Create(m.Image, filestore.FolderCategory, b.ID)
+		if err != nil {
+			v1.log.Error("could not create brand image file", logs.Error(err))
+			v1.error(c, status.StatusInternal)
+			return
+		}
+		b.Image = &url
+	}
+
 	if err := v1.storage.Brand().Change(context.Background(), *b); err != nil {
 		v1.error(c, status.StatusInternal)
 		v1.log.Error("could not update brand", logs.Error(err), logs.String("bid", m.ID))
