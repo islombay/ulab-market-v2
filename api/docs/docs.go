@@ -1178,13 +1178,17 @@ const docTemplate = `{
                 "operationId": "createBrand",
                 "parameters": [
                     {
-                        "description": "Create brand request",
-                        "name": "create_brand",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models_v1.CreateBrand"
-                        }
+                        "type": "string",
+                        "name": "name",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "Brand image",
+                        "name": "image",
+                        "in": "formData",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -4479,6 +4483,9 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
+                "image": {
+                    "type": "string"
+                },
                 "name": {
                     "type": "string"
                 },
@@ -5041,19 +5048,7 @@ const docTemplate = `{
             }
         },
         "models_v1.ChangeBrand": {
-            "type": "object",
-            "required": [
-                "id",
-                "name"
-            ],
-            "properties": {
-                "id": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                }
-            }
+            "type": "object"
         },
         "models_v1.ChangeCategory": {
             "type": "object",
@@ -5183,17 +5178,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "open_time": {
-                    "type": "string"
-                }
-            }
-        },
-        "models_v1.CreateBrand": {
-            "type": "object",
-            "required": [
-                "name"
-            ],
-            "properties": {
-                "name": {
                     "type": "string"
                 }
             }

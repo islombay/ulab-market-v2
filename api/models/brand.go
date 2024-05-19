@@ -3,8 +3,9 @@ package models
 import "time"
 
 type Brand struct {
-	ID   string `json:"id" db:"id"`
-	Name string `json:"name" db:"name"`
+	ID    string  `json:"id" db:"id"`
+	Name  string  `json:"name" db:"name"`
+	Image *string `json:"image,omitempty"`
 
 	CreatedAt time.Time  `db:"created_at" json:"created_at,omitempty"`
 	UpdatedAt time.Time  `db:"updated_at" json:"updated_at,omitempty"`

@@ -5,6 +5,7 @@ import (
 	"app/storage"
 	"context"
 	"errors"
+
 	"github.com/jackc/pgconn"
 	"github.com/jackc/pgx/v4/pgxpool"
 )
@@ -18,8 +19,8 @@ func NewBrandRepo(db *pgxpool.Pool) storage.BrandInterface {
 }
 
 func (db *BrandRepo) Create(ctx context.Context, m models.Brand) error {
-	q := `insert into brands (id, name) values ($1, $2)`
-	r, err := db.db.Exec(ctx, q, m.ID, m.Name)
+	q := `insert into brands (id, name, image) values ($1, $2, $3)`
+	r, err := db.db.Exec(ctx, q, m.ID, m.Name, m.Image)
 	if err != nil {
 		var pgcon *pgconn.PgError
 		if errors.As(err, &pgcon) {
@@ -37,11 +38,15 @@ func (db *BrandRepo) Create(ctx context.Context, m models.Brand) error {
 }
 
 func (db *BrandRepo) GetByID(ctx context.Context, id string) (*models.Brand, error) {
-	q := `select * from brands where id = $1`
+	q := `select
+			id, name, image, created_at,
+			updated_at, deleted_at
+		from brands where id = $1`
 	var m models.Brand
 	if err := db.db.QueryRow(ctx, q, id).Scan(
 		&m.ID,
 		&m.Name,
+		&m.Image,
 		&m.CreatedAt,
 		&m.UpdatedAt,
 		&m.DeletedAt,
@@ -52,7 +57,10 @@ func (db *BrandRepo) GetByID(ctx context.Context, id string) (*models.Brand, err
 }
 
 func (db *BrandRepo) GetByName(ctx context.Context, name string) (*models.Brand, error) {
-	q := `select * from brands where name = $1 and deleted_at is null`
+	q := `select 
+			id, name, image, created_at,
+			updated_at, deleted_at 
+		from brands where name = $1 and deleted_at is null`
 	var m models.Brand
 	if err := db.db.QueryRow(ctx, q, name).Scan(
 		&m.ID,
@@ -75,7 +83,10 @@ func (db *BrandRepo) Change(ctx context.Context, m models.Brand) error {
 }
 
 func (db *BrandRepo) GetAll(ctx context.Context) ([]*models.Brand, error) {
-	q := `select * from brands where deleted_at is null`
+	q := `select 
+			id, name, image, created_at,
+			updated_at, deleted_at
+		from brands where deleted_at is null`
 	rows, _ := db.db.Query(ctx, q)
 	if rows.Err() != nil {
 		return nil, rows.Err()
@@ -88,6 +99,7 @@ func (db *BrandRepo) GetAll(ctx context.Context) ([]*models.Brand, error) {
 		if err := rows.Scan(
 			&m.ID,
 			&m.Name,
+			&m.Image,
 			&m.CreatedAt,
 			&m.UpdatedAt,
 			&m.DeletedAt,

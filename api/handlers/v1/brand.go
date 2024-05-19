@@ -7,12 +7,14 @@ import (
 	"app/pkg/helper"
 	"app/pkg/logs"
 	"app/storage"
+	"app/storage/filestore"
 	"context"
 	"errors"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v4"
-	"net/http"
 )
 
 // CreateBrand godoc
@@ -24,14 +26,15 @@ import (
 // @Security ApiKeyAuth
 // @Accept json
 // @Produce json
-// @Param create_brand body models_v1.CreateBrand true "Create brand request"
+// @Param create_brand formData models_v1.CreateBrand true "Create brand request"
+// @param image	formData file true "Brand image"
 // @Success 200 {object} models.Brand "success"
 // @Failure 400 {object} models_v1.Response "Bad request"
 // @Failure 409 {object} models_v1.Response "Already exists"
 // @Failure 500 {object} models_v1.Response "internal error"
 func (v1 *Handlers) CreateBrand(c *gin.Context) {
 	var m models_v1.CreateBrand
-	if c.BindJSON(&m) != nil {
+	if c.Bind(&m) != nil {
 		v1.error(c, status.StatusBadRequest)
 		return
 	}
@@ -39,6 +42,32 @@ func (v1 *Handlers) CreateBrand(c *gin.Context) {
 		ID:   uuid.NewString(),
 		Name: m.Name,
 	}
+
+	if m.Image != nil {
+		if m.Image.Size > v1.cfg.Media.CategoryPhotoMaxSize {
+			v1.error(c, status.StatusImageMaxSizeExceed)
+			return
+		}
+
+		if valid, err, _ := helper.IsValidImage(m.Image); !valid && err != nil {
+			if errors.Is(err, helper.ErrInvalidImageType) {
+				v1.error(c, status.StatusImageTypeUnkown)
+				return
+			}
+			v1.error(c, status.StatusInternal)
+			v1.log.Error("could not check the image type", logs.Error(err))
+			return
+		}
+
+		url, err := v1.filestore.Create(m.Image, filestore.FolderCategory, b.ID)
+		if err != nil {
+			v1.log.Error("could not create brand image file", logs.Error(err))
+			v1.error(c, status.StatusInternal)
+			return
+		}
+		b.Image = &url
+	}
+
 	if err := v1.storage.Brand().Create(context.Background(), b); err != nil {
 		if errors.Is(err, storage.ErrNotAffected) {
 			v1.error(c, status.StatusInternal)
@@ -83,6 +112,10 @@ func (v1 *Handlers) GetBrandByID(c *gin.Context) {
 		v1.error(c, status.StatusInternal)
 		v1.log.Error("could not get brand by id", logs.Error(err))
 		return
+	}
+
+	if cat.Image != nil {
+		cat.Image = models.GetStringAddress(v1.filestore.GetURL(*cat.Image))
 	}
 
 	v1.response(c, http.StatusOK, cat)
@@ -158,6 +191,12 @@ func (v1 *Handlers) GetAllBrand(c *gin.Context) {
 		v1.log.Error("could not get all brands", logs.Error(err))
 		v1.error(c, status.StatusInternal)
 		return
+	}
+
+	for i := range res {
+		if res[i].Image != nil {
+			res[i].Image = models.GetStringAddress(v1.filestore.GetURL(*res[i].Image))
+		}
 	}
 	v1.response(c, http.StatusOK, res)
 }
