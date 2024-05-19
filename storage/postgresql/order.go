@@ -7,7 +7,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"strconv"
 	"strings"
 	"time"
 
@@ -92,12 +91,11 @@ func (db *OrderRepo) GetByID(ctx context.Context, id string) (*models.OrderModel
 		from orders where id = $1`
 
 	var res models.OrderModel
-	var tmp_order_id int64
 	if err := db.db.QueryRow(ctx, q, id).Scan(
 		&res.ID, &res.UserID, &res.Status,
 		&res.TotalPrice, &res.PaymentType,
 		&res.CreatedAt, &res.UpdatedAt, &res.DeletedAt,
-		&tmp_order_id, &res.ClientFirstName,
+		&res.OrderID, &res.ClientFirstName,
 		&res.ClientLastName, &res.ClientPhone,
 		&res.ClientComment, &res.DeliveryType,
 		&res.DeliveryAddrLat, &res.DeliveryAddrLong,
@@ -108,7 +106,6 @@ func (db *OrderRepo) GetByID(ctx context.Context, id string) (*models.OrderModel
 		return nil, err
 	}
 
-	res.OrderID = strconv.FormatInt(tmp_order_id, 10)
 	return &res, nil
 }
 
