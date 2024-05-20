@@ -150,10 +150,15 @@ func (db *CategoryRepo) ChangeCategory(ctx context.Context, m models.Category) e
 				name_uz = $1,
 				name_ru = $2,
 				parent_id = $3,
-				updated_at = now(),
-				icon_id = $4
-			where id = $5`
-	ra, err := db.db.Exec(ctx, q, m.NameUz, m.NameRu, m.ParentID, m.IconID, m.ID)
+				updated_at = now()`
+
+	if m.IconID != nil {
+		q += fmt.Sprintf(", icon_id = %s", *m.IconID)
+	}
+
+	q += ` where id = $4`
+
+	ra, err := db.db.Exec(ctx, q, m.NameUz, m.NameRu, m.ParentID, m.ID)
 	if err != nil {
 		return err
 	}

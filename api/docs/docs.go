@@ -2568,6 +2568,49 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/order/courier/myorders": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get the list of orders of client (courier request)",
+                "tags": [
+                    "order"
+                ],
+                "summary": "get the list of orders of courier (courier request)",
+                "operationId": "CourierOrdersGetAll",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page value. Default 1",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Limit value. Default 10",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/api/order/delivered/{id}": {
             "get": {
                 "security": [
@@ -2595,6 +2638,12 @@ const docTemplate = `{
                         "description": "Success",
                         "schema": {
                             "$ref": "#/definitions/models.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad uuid",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
                         }
                     },
                     "500": {
@@ -5102,6 +5151,9 @@ const docTemplate = `{
                 "name_uz"
             ],
             "properties": {
+                "icon_id": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "string"
                 },
