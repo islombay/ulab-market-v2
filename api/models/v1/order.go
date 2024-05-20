@@ -1,7 +1,8 @@
 package models_v1
 
 type CreateOrder struct {
-	PaymentType string `json:"payment_type" binding:"required"`
+	PaymentType     string `json:"payment_type" binding:"required"`
+	PaymentCardType string `json:"payment_card_type" binding:"required"`
 
 	ClientFirstName string  `json:"client_first_name" binding:"required"`
 	ClientLastName  string  `json:"client_last_name" binding:"required"`

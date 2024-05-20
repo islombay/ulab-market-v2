@@ -29,20 +29,21 @@ func NewOrderRepo(db *pgxpool.Pool, log logs.LoggerInterface) *OrderRepo {
 func (db *OrderRepo) Create(ctx context.Context, m models.OrderModel) error {
 	q := `insert into orders(
 				id, payment_type, user_id,
-				order_id, client_first_name,
+				client_first_name,
 				client_last_name, client_phone_number,
 				client_comment, delivery_addr_lat,
-				delivery_addr_long, delivery_addr_name
+				delivery_addr_long, delivery_addr_name,
+				payment_card_type
 				)
 			values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`
 
 	_, err := db.db.Exec(ctx, q,
 		m.ID, m.PaymentType, m.UserID,
-		m.OrderID, m.ClientFirstName,
+		m.ClientFirstName,
 		m.ClientLastName, m.ClientPhone,
 		m.ClientComment, m.DeliveryAddrLat,
 		m.DeliveryAddrLong,
-		m.DeliveryAddrName,
+		m.DeliveryAddrName, m.PaymentCardType,
 	)
 	if err != nil {
 		var pgcon *pgconn.PgError
@@ -87,7 +88,8 @@ func (db *OrderRepo) GetByID(ctx context.Context, id string) (*models.OrderModel
 			delivery_addr_lat, delivery_addr_long,
 			picker_user_id, picked_at,
 			delivering_user_id, delivered_at,
-			delivery_addr_name, delivering_user_id
+			delivery_addr_name, delivering_user_id,
+			payment_card_type
 		from orders where id = $1`
 
 	var res models.OrderModel
@@ -102,6 +104,7 @@ func (db *OrderRepo) GetByID(ctx context.Context, id string) (*models.OrderModel
 		&res.PickerUserID, &res.PickedAt,
 		&res.DeliverUserID, &res.DeliveredAt,
 		&res.DeliveryAddrName, &res.DeliverUserID,
+		&res.PaymentCardType,
 	); err != nil {
 		return nil, err
 	}
@@ -127,6 +130,7 @@ func (db *OrderRepo) GetAll(ctx context.Context, pagination models.Pagination, s
 			delivery_addr_lat, delivery_addr_long,
 			delivering_user_id, delivered_at,
 			delivery_addr_name, delivering_user_id,
+			payment_card_type,
 			(select count(*) from orders %s) as total_count
 		from orders %s
 		order by created_at desc`, whereClause, whereClause)
@@ -154,6 +158,7 @@ func (db *OrderRepo) GetAll(ctx context.Context, pagination models.Pagination, s
 			&tmp.DeliveryAddrLat, &tmp.DeliveryAddrLong,
 			&tmp.DeliverUserID, &tmp.DeliveredAt,
 			&tmp.DeliveryAddrName, &tmp.DeliverUserID,
+			&tmp.PaymentCardType,
 			&count,
 		); err != nil {
 			return nil, err
@@ -174,7 +179,8 @@ func (db *OrderRepo) GetNew(ctx context.Context, forCourier bool) ([]models.Orde
 			client_last_name, client_phone_number,
 			client_comment, delivery_type,
 			delivery_addr_lat, delivery_addr_long,
-			delivery_addr_name, delivering_user_id
+			delivery_addr_name, delivering_user_id,
+			payment_card_type
 		from orders
 		where deleted_at is null`
 
@@ -205,6 +211,7 @@ func (db *OrderRepo) GetNew(ctx context.Context, forCourier bool) ([]models.Orde
 			&tmp.ClientComment, &tmp.DeliveryType,
 			&tmp.DeliveryAddrLat, &tmp.DeliveryAddrLong,
 			&tmp.DeliveryAddrName, &tmp.DeliverUserID,
+			&tmp.PaymentCardType,
 		); err != nil {
 			return nil, err
 		}
@@ -252,7 +259,7 @@ func (db *OrderRepo) GetAllByClient(ctx context.Context, user_id string, paginat
 			client_last_name, client_phone_number,
 			client_comment, status, total_price, payment_type,
 			delivery_type, delivery_addr_lat, delivery_addr_long,
-			delivery_addr_name, created_at,
+			delivery_addr_name, created_at, payment_card_type,
 			(	select
 					count(*)
 				from orders
@@ -280,6 +287,7 @@ func (db *OrderRepo) GetAllByClient(ctx context.Context, user_id string, paginat
 			&tmp.ClientComment, &tmp.Status, &tmp.TotalPrice,
 			&tmp.PaymentType, &tmp.DeliveryType, &tmp.DeliveryAddrLat,
 			&tmp.DeliveryAddrLong, &tmp.DeliveryAddrName, &tmp.CreatedAt,
+			&tmp.PaymentCardType,
 			&count,
 		); err != nil {
 			return nil, 0, err
@@ -304,4 +312,48 @@ func (db *OrderRepo) MarkDelivered(ctx context.Context, order_id string) error {
 	}
 
 	return nil
+}
+
+func (db *OrderRepo) GetCourierOrders(ctx context.Context, user_id string, pagination models.Pagination) ([]models.OrderModel, int, error) {
+	q := fmt.Sprintf(`select
+			id, client_first_name, order_id,
+			client_last_name, status, total_price,
+			payment_type, delivery_type, delivery_addr_name,
+			created_at, payment_card_type,
+			(	select
+					count(*)
+				from orders
+				where deleted_at is null and delivering_user_id = $1
+			) as total_count
+		from orders
+		where deleted_at is null and delivering_user_id = $1
+		order by created_at desc
+		limit %d offset %d`, pagination.Limit, pagination.Offset)
+
+	row, _ := db.db.Query(ctx, q, user_id)
+	if row.Err() != nil {
+		return nil, 0, row.Err()
+	}
+
+	var res []models.OrderModel
+
+	var count int
+
+	for row.Next() {
+		var tmp models.OrderModel
+		if err := row.Scan(
+			&tmp.ID, &tmp.ClientFirstName, &tmp.OrderID,
+			&tmp.ClientLastName, &tmp.Status, &tmp.TotalPrice,
+			&tmp.PaymentType, &tmp.DeliveryType,
+			&tmp.DeliveryAddrName, &tmp.CreatedAt,
+			&tmp.PaymentCardType,
+			&count,
+		); err != nil {
+			return nil, 0, err
+		}
+
+		res = append(res, tmp)
+	}
+
+	return res, count, nil
 }

@@ -11,7 +11,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"strconv"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -54,10 +54,12 @@ func (srv OrderService) CreateOrder(ctx context.Context, order models_v1.CreateO
 		return nil, &status.StatusBadPhone
 	}
 
+	order.PaymentCardType = strings.ToLower(order.PaymentCardType)
+
 	orderModel := models.OrderModel{
 		ID:              uuid.NewString(),
-		OrderID:         strconv.FormatInt(time.Now().Unix(), 10),
 		PaymentType:     order.PaymentType,
+		PaymentCardType: models.GetStringAddress(order.PaymentCardType),
 		UserID:          userID,
 		ClientFirstName: &order.ClientFirstName,
 		ClientLastName:  &order.ClientLastName,
@@ -410,5 +412,26 @@ func (srv OrderService) OrderDelivered(ctx context.Context, userID, orderID stri
 	return models_v1.Response{
 		Message: "Ok",
 		Code:    http.StatusOK,
+	}, nil
+}
+
+func (srv OrderService) GetCourierFinishedOrders(ctx context.Context, userID string, pagination models.Pagination) (interface{}, *status.Status) {
+	model, count, err := srv.store.Order().GetCourierOrders(ctx, userID, pagination)
+	if err != nil {
+		srv.log.Error("could not get the list of history orders of courier", logs.Error(err),
+			logs.String("courier_id", userID))
+		return nil, &status.StatusInternal
+	}
+
+	for i := range model {
+		if val, exists := models.OrderStatusIndexes[model[i].Status]; exists {
+			model[i].StatusID = val
+		}
+	}
+
+	return models.Response{
+		StatusCode: 200,
+		Data:       model,
+		Count:      count,
 	}, nil
 }

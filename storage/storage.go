@@ -60,6 +60,7 @@ type OrderI interface {
 	MarkDelivered(ctx context.Context, order_id string) error
 
 	GetAllByClient(ctx context.Context, user_id string, pagination models.Pagination) ([]models.OrderModel, int, error)
+	GetCourierOrders(ctx context.Context, user_id string, pagination models.Pagination) ([]models.OrderModel, int, error)
 }
 
 type BranchInterface interface {

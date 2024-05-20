@@ -25,7 +25,8 @@ type OrderModel struct {
 	StatusID   int     `json:"status_id"`
 	TotalPrice float64 `db:"total_price" json:"total_price"`
 
-	PaymentType string `db:"payment_type" json:"payment_type"`
+	PaymentType     string  `db:"payment_type" json:"payment_type"`
+	PaymentCardType *string `json:"payment_card_type"`
 
 	DeliveryType     string  `json:"delivery_type"`
 	DeliveryAddrLat  float64 `json:"delivery_addr_lat"`
