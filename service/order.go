@@ -381,6 +381,12 @@ func (srv OrderService) GetOrderAllByClient(ctx context.Context, userID string, 
 			return nil, &status.StatusInternal
 		}
 
+		for i := range products {
+			if products[i].ProductMainImage != nil {
+				products[i].ProductMainImage = models.GetStringAddress(srv.filestorage.GetURL(*products[i].ProductMainImage))
+			}
+		}
+
 		model[i].Products = products
 	}
 
