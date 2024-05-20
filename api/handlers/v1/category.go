@@ -318,7 +318,7 @@ func (v1 *Handlers) ChangeCategory(c *gin.Context) {
 		ParentID: pn,
 	}
 
-	if m.IconID != nil {
+	if models.GetStringValue(m.IconID) == "" {
 		if !helper.IsValidUUID(*m.IconID) {
 			v1.error(c, status.StatusBadUUID)
 			return
