@@ -238,7 +238,7 @@ func (db *CategoryRepo) GetBrands(ctx context.Context, id string) ([]models.Bran
 					or parent_id = $1)
 				and deleted_at is null
 			)
-			select p.brand_id, b.name from all_category_ids as c
+			select distinct p.brand_id, b.name from all_category_ids as c
 				join products as p on p.category_id = c.id
 				join brands as b on p.brand_id = b.id;`
 
