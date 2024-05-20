@@ -146,8 +146,14 @@ func (db *CategoryRepo) ChangeImage(ctx context.Context, cid, imageUrl, iconURL 
 }
 
 func (db *CategoryRepo) ChangeCategory(ctx context.Context, m models.Category) error {
-	q := `update category set name_uz = $1, name_ru = $2, parent_id = $3, updated_at = now() where id = $4`
-	ra, err := db.db.Exec(ctx, q, m.NameUz, m.NameRu, m.ParentID, m.ID)
+	q := `update category set
+				name_uz = $1,
+				name_ru = $2,
+				parent_id = $3,
+				updated_at = now(),
+				icon_id = $4
+			where id = $5`
+	ra, err := db.db.Exec(ctx, q, m.NameUz, m.NameRu, m.ParentID, m.IconID, m.ID)
 	if err != nil {
 		return err
 	}

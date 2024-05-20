@@ -309,6 +309,7 @@ func (v1 *Handlers) ChangeCategory(c *gin.Context) {
 			return
 		}
 	}
+
 	var pn = models.GetStringAddress(m.ParentID)
 	ct := models.Category{
 		ID:       m.ID,
@@ -316,6 +317,25 @@ func (v1 *Handlers) ChangeCategory(c *gin.Context) {
 		NameRu:   m.NameRu,
 		ParentID: pn,
 	}
+
+	if m.IconID != nil {
+		if !helper.IsValidUUID(*m.IconID) {
+			v1.error(c, status.StatusBadUUID)
+			return
+		}
+		if _, err := v1.storage.Icon().GetIconByID(context.Background(), *m.IconID); err != nil {
+			if errors.Is(err, pgx.ErrNoRows) {
+				v1.error(c, status.StatusIconNotFound)
+				return
+			}
+			v1.error(c, status.StatusInternal)
+			v1.log.Error("could not get icon by id", logs.Error(err))
+			return
+		}
+
+		ct.IconID = m.IconID
+	}
+
 	if err := v1.storage.Category().ChangeCategory(context.Background(), ct); err != nil {
 		if errors.Is(err, storage.ErrNotAffected) {
 			v1.log.Error("got not affected on changing category")
