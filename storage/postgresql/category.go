@@ -153,7 +153,7 @@ func (db *CategoryRepo) ChangeCategory(ctx context.Context, m models.Category) e
 				updated_at = now()`
 
 	if m.IconID != nil {
-		q += fmt.Sprintf(", icon_id = %s", *m.IconID)
+		q += fmt.Sprintf(", icon_id = '%s'", *m.IconID)
 	}
 
 	q += ` where id = $4`

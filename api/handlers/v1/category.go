@@ -341,6 +341,7 @@ func (v1 *Handlers) ChangeCategory(c *gin.Context) {
 			v1.log.Error("got not affected on changing category")
 		}
 		v1.error(c, status.StatusInternal)
+		v1.log.Error("could not update category", logs.Error(err), logs.String("category_id", ct.ID))
 		return
 	}
 	v1.response(c, http.StatusOK, models_v1.Response{
