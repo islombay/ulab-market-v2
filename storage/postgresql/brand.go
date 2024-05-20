@@ -76,15 +76,19 @@ func (db *BrandRepo) GetByName(ctx context.Context, name string) (*models.Brand,
 }
 
 func (db *BrandRepo) Change(ctx context.Context, m models.Brand) error {
-	q := `update brands set name = $1, updated_at = now()`
+	q := `update brands set updated_at = now()`
 
 	if m.Image != nil {
 		q += fmt.Sprintf(", image = '%s'", *m.Image)
 	}
 
-	q += ` where id = $2`
+	if m.Name != "" {
+		q += fmt.Sprintf(", name = '%s'", m.Name)
+	}
 
-	if _, err := db.db.Exec(ctx, q, m.Name, m.ID); err != nil {
+	q += ` where id = $1`
+
+	if _, err := db.db.Exec(ctx, q, m.ID); err != nil {
 		return err
 	}
 	return nil

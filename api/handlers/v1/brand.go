@@ -157,14 +157,20 @@ func (v1 *Handlers) ChangeBrand(c *gin.Context) {
 		v1.log.Error("could not get brand by id", logs.Error(err), logs.String("bid", m.ID))
 		return
 	}
-	if b.Name == m.Name {
+
+	b = &models.Brand{
+		ID:    m.ID,
+		Image: nil,
+		Name:  "",
+	}
+
+	if m.Name == nil && m.Image == nil {
 		v1.error(c, status.StatusNoUpdateProvided)
 		return
 	}
-	b = &models.Brand{
-		ID:    m.ID,
-		Name:  m.Name,
-		Image: nil,
+
+	if m.Name != nil {
+		b.Name = *m.Name
 	}
 
 	if m.Image != nil {

@@ -9,6 +9,6 @@ type CreateBrand struct {
 
 type ChangeBrand struct {
 	ID    string                `json:"id" form:"id" binding:"required"`
-	Name  string                `json:"name" form:"name" binding:"required"`
+	Name  *string               `json:"name" form:"name"`
 	Image *multipart.FileHeader `form:"image" swaggerignore:"true"`
 }

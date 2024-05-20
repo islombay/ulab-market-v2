@@ -1130,8 +1130,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "name": "name",
-                        "in": "formData",
-                        "required": true
+                        "in": "formData"
                     },
                     {
                         "type": "file",
@@ -4770,6 +4769,9 @@ const docTemplate = `{
                 "order_id": {
                     "type": "string"
                 },
+                "payment_card_type": {
+                    "type": "string"
+                },
                 "payment_type": {
                     "type": "string"
                 },
@@ -5345,6 +5347,7 @@ const docTemplate = `{
                 "delivery_addr_lat",
                 "delivery_addr_long",
                 "delivery_type",
+                "payment_card_type",
                 "payment_type"
             ],
             "properties": {
@@ -5370,6 +5373,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "delivery_type": {
+                    "type": "string"
+                },
+                "payment_card_type": {
                     "type": "string"
                 },
                 "payment_type": {
