@@ -374,6 +374,14 @@ func (srv OrderService) GetOrderAllByClient(ctx context.Context, userID string, 
 		if val, exists := models.OrderStatusIndexes[model[i].Status]; exists {
 			model[i].StatusID = val
 		}
+
+		products, err := srv.store.OrderProduct().GetOrderProducts(ctx, model[i].ID)
+		if err != nil {
+			srv.log.Error("could not get products of order", logs.Error(err), logs.String("order_id", model[i].ID))
+			return nil, &status.StatusInternal
+		}
+
+		model[i].Products = products
 	}
 
 	return models.Response{

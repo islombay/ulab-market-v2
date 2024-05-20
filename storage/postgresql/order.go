@@ -259,7 +259,7 @@ func (db *OrderRepo) GetAllByClient(ctx context.Context, user_id string, paginat
 			client_last_name, client_phone_number,
 			client_comment, status, total_price, payment_type,
 			delivery_type, delivery_addr_lat, delivery_addr_long,
-			delivery_addr_name, created_at, payment_card_type,
+			delivery_addr_name, created_at, payment_card_type, delivered_at,
 			(	select
 					count(*)
 				from orders
@@ -287,7 +287,7 @@ func (db *OrderRepo) GetAllByClient(ctx context.Context, user_id string, paginat
 			&tmp.ClientComment, &tmp.Status, &tmp.TotalPrice,
 			&tmp.PaymentType, &tmp.DeliveryType, &tmp.DeliveryAddrLat,
 			&tmp.DeliveryAddrLong, &tmp.DeliveryAddrName, &tmp.CreatedAt,
-			&tmp.PaymentCardType,
+			&tmp.PaymentCardType, &tmp.DeliveredAt,
 			&count,
 		); err != nil {
 			return nil, 0, err
