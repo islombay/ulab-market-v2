@@ -1762,6 +1762,35 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/client/getme": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get client information (self)",
+                "tags": [
+                    "client"
+                ],
+                "summary": "get client information (self)",
+                "operationId": "ClientGetMe",
+                "responses": {
+                    "200": {
+                        "description": "List of clients",
+                        "schema": {
+                            "$ref": "#/definitions/models.ClientSwagger"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/api/courier": {
             "post": {
                 "security": [
@@ -3514,7 +3543,7 @@ const docTemplate = `{
                         }
                     },
                     "413": {
-                        "description": "Image size is big / Video size is big / Image count too many / Video count too many",
+                        "description": "Image size is big / Video size is big / Image count too many / Video count too many / Articul too long",
                         "schema": {
                             "$ref": "#/definitions/models_v1.Response"
                         }
@@ -4692,6 +4721,9 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "phone_number": {
+                    "type": "string"
+                },
+                "surname": {
                     "type": "string"
                 },
                 "updated_at": {

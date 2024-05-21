@@ -37,6 +37,8 @@ create table if not exists clients (
     surname varhcar(50) default null,
     phone_number varchar(12) unique,
     email varchar(255) unique,
+    gender varchar(20) default 'male',
+    birthdate time default null,
 
     created_at timestamp default now() not null,
     updated_at timestamp default now() not null,

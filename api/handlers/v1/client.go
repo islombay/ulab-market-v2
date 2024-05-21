@@ -30,6 +30,15 @@ func (v1 *Handlers) GetClientList(c *gin.Context) {
 	v1.response(c, http.StatusOK, res)
 }
 
+// ClientGetMe
+// @id			ClientGetMe
+// @router		/api/client/getme [get]
+// @security	ApiKeyAuth
+// @tags 		client
+// @summary		get client information (self)
+// @description	get client information (self)
+// @success 	200	{object}	models.ClientSwagger	"List of clients"
+// @failure		500 {object}	models_v1.Response		"Internal server error"
 func (v1 *Handlers) ClientGetMe(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()

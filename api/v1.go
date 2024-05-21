@@ -60,6 +60,11 @@ func NewV1(
 			handler.MiddlewareIsClient(),
 			handler.ClientGetMe,
 		)
+
+		// client.PUT("/me",
+		// 	handler.MiddlewareIsClient(),
+		// 	handler.ClientUpdate,
+		// )
 	}
 
 	income := v1.Group("/income")
