@@ -10,7 +10,6 @@ import (
 	"app/storage/filestore"
 	"context"
 	"errors"
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -45,8 +44,9 @@ func (v1 *Handlers) CreateBrand(c *gin.Context) {
 		Name: m.Name,
 	}
 
-	fmt.Println(m.Image.Filename)
-	fmt.Println(m.Image)
+	if m.Image.Size == 0 {
+		m.Image = nil
+	}
 
 	if m.Image != nil {
 		if m.Image.Size > v1.cfg.Media.CategoryPhotoMaxSize {
