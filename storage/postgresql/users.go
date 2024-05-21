@@ -94,7 +94,7 @@ func (db *UserRepo) GetClientByEmail(ctx context.Context, e string) (*models.Cli
 	q := `select 
 			id, name, surname, phone_number,
 			email, created_at, updated_at,
-			deleted_at
+			deleted_at, gender, birthdate
 		from clients where email = $1 limit 1;`
 	var m models.Client
 
@@ -102,6 +102,7 @@ func (db *UserRepo) GetClientByEmail(ctx context.Context, e string) (*models.Cli
 		&m.ID, &m.Name, &m.Surname,
 		&m.PhoneNumber, &m.Email,
 		&m.CreatedAt, &m.UpdatedAt, &m.DeletedAt,
+		&m.Gender, &m.BirthDate,
 	); err != nil {
 		return nil, err
 	}
@@ -112,7 +113,7 @@ func (db *UserRepo) GetClientByPhone(ctx context.Context, p string) (*models.Cli
 	q := `select 
 				id, name, surname, phone_number,
 				email, created_at, updated_at,
-				deleted_at
+				deleted_at, gender, birthdate
 			from clients where phone_number = $1 limit 1;`
 	var m models.Client
 
@@ -120,6 +121,7 @@ func (db *UserRepo) GetClientByPhone(ctx context.Context, p string) (*models.Cli
 		&m.ID, &m.Name, &m.Surname,
 		&m.PhoneNumber, &m.Email,
 		&m.CreatedAt, &m.UpdatedAt, &m.DeletedAt,
+		&m.Gender, &m.BirthDate,
 	); err != nil {
 		return nil, err
 	}
@@ -130,7 +132,7 @@ func (db *UserRepo) GetClientByLogin(ctx context.Context, l string) (*models.Cli
 	q := `select
 				id, name, surname, phone_number,
 				email, created_at, updated_at,
-				deleted_at
+				deleted_at, gender, birthdate
 			from clients where phone_number = $1 or email = $1 limit 1;`
 	var m models.Client
 
@@ -138,6 +140,7 @@ func (db *UserRepo) GetClientByLogin(ctx context.Context, l string) (*models.Cli
 		&m.ID, &m.Name, &m.Surname,
 		&m.PhoneNumber, &m.Email,
 		&m.CreatedAt, &m.UpdatedAt, &m.DeletedAt,
+		&m.Gender, &m.BirthDate,
 	); err != nil {
 		return nil, err
 	}
@@ -308,7 +311,8 @@ func (db *UserRepo) ChangeStaff(ctx context.Context, m models.Staff) error {
 func (db *UserRepo) GetClientList(ctx context.Context) ([]models.Client, error) {
 	q := `select
 			id, name, surname, phone_number,
-			email, created_at, updated_at
+			email, created_at, updated_at,
+			gender, birthdate
 		from clients
 		where deleted_at is null
 		order by created_at desc`
@@ -327,6 +331,7 @@ func (db *UserRepo) GetClientList(ctx context.Context) ([]models.Client, error) 
 			&tmp.ID, &tmp.Name, &tmp.Surname,
 			&tmp.PhoneNumber, &tmp.Email,
 			&tmp.CreatedAt, &tmp.UpdatedAt,
+			&tmp.Gender, &tmp.BirthDate,
 		); err != nil {
 			return nil, err
 		}
