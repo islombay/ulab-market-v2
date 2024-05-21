@@ -10,6 +10,7 @@ import (
 	"app/storage/filestore"
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -34,14 +35,18 @@ import (
 // @Failure 500 {object} models_v1.Response "internal error"
 func (v1 *Handlers) CreateBrand(c *gin.Context) {
 	var m models_v1.CreateBrand
-	if c.Bind(&m) != nil {
+	if err := c.Bind(&m); err != nil {
 		v1.error(c, status.StatusBadRequest)
+		v1.log.Error("bad request", logs.Error(err))
 		return
 	}
 	b := models.Brand{
 		ID:   uuid.NewString(),
 		Name: m.Name,
 	}
+
+	fmt.Println(m)
+	fmt.Println(m.Image == nil)
 
 	if m.Image != nil {
 		if m.Image.Size > v1.cfg.Media.CategoryPhotoMaxSize {
