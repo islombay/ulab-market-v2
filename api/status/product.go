@@ -3,6 +3,10 @@ package status
 import "net/http"
 
 var (
+	StatusProductArticulTooLong = Status{
+		Message: "Articul too long",
+		Code:    http.StatusRequestEntityTooLarge,
+	}
 	StatusProductMainImageMaxSizeExceed = Status{
 		Message:     "Main image size exceeds the limit",
 		Description: "main image size is big",

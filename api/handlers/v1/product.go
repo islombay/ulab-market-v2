@@ -39,7 +39,7 @@ import (
 // @Failure 400 {object} models_v1.Response "Bad request / bad uuid / status invalid"
 // @Failure 404 {object} models_v1.Response "Category not found / Brand not found"
 // @failure 409 {object} models_v1.Response "Articul already found"
-// @Failure 413 {object} models_v1.Response "Image size is big / Video size is big / Image count too many / Video count too many"
+// @Failure 413 {object} models_v1.Response "Image size is big / Video size is big / Image count too many / Video count too many / Articul too long"
 // @Failure 415 {object} models_v1.Response "Image type is not supported / Video type is not supported"
 // @Failure 500 {object} models_v1.Response "Internal error"
 func (v1 *Handlers) CreateProduct(c *gin.Context) {
@@ -68,6 +68,11 @@ func (v1 *Handlers) CreateProduct(c *gin.Context) {
 		v1.error(c, status.StatusInternal)
 		v1.log.Error("could not get branch by id", logs.Error(err),
 			logs.String("bid", m.BranchID))
+		return
+	}
+
+	if len(m.Articul) > 250 {
+		v1.error(c, status.StatusProductArticulTooLong)
 		return
 	}
 
