@@ -160,8 +160,9 @@ func (db *UserRepo) GetStaffByID(ctx context.Context, id string) (*models.Staff,
 
 func (db *UserRepo) GetClientByID(ctx context.Context, id string) (*models.Client, error) {
 	q := `select 
-			id, name, surname, phone_number, email
-			created_at, updated_at, deleted_at
+			id, name, surname, phone_number, email,
+			created_at, updated_at, deleted_at,
+			gender, birthdate
 		from clients where id = $1 and deleted_at is null;`
 	var m models.Client
 
@@ -169,6 +170,7 @@ func (db *UserRepo) GetClientByID(ctx context.Context, id string) (*models.Clien
 		&m.ID,
 		&m.Name, &m.Surname, &m.PhoneNumber, &m.Email,
 		&m.CreatedAt, &m.UpdatedAt, &m.DeletedAt,
+		&m.Gender, &m.BirthDate,
 	); err != nil {
 		return nil, err
 	}

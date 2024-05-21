@@ -11,6 +11,9 @@ type Client struct {
 	PhoneNumber *string `json:"phone_number" obj:"phone_number"`
 	Email       *string `json:"email" obj:"email"`
 
+	Gender    string     `json:"gender", obj:"gender"`
+	BirthDate *time.Time `json:"birth_date,omitempty" obj:"gender"`
+
 	CreatedAt time.Time  `json:"created_at" obj:"created_at"`
 	UpdatedAt time.Time  `json:"updated_at" obj:"updated_at"`
 	DeletedAt *time.Time `json:"deleted_at,omitempty" obj:"deleted_at"`
@@ -23,6 +26,9 @@ type ClientSwagger struct {
 	PhoneNumber string `json:"phone_number" obj:"phone_number"`
 	Email       string `json:"email" obj:"email"`
 	OrderCount  int    `json:"order_count" obj:"order_count"`
+
+	Gender    string     `json:"gender", obj:"gender"`
+	BirthDate *time.Time `json:"birth_date,omitempty" obj:"gender"`
 
 	CreatedAt time.Time `json:"created_at" obj:"created_at"`
 	UpdatedAt time.Time `json:"updated_at" obj:"updated_at"`
