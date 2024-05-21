@@ -91,12 +91,16 @@ func (db *UserRepo) CreateStaff(ctx context.Context, m models.Staff) error {
 }
 
 func (db *UserRepo) GetClientByEmail(ctx context.Context, e string) (*models.Client, error) {
-	q := `select * from clients where email = $1 limit 1;`
+	q := `select 
+			id, name, surname, phone_number,
+			email, created_at, updated_at,
+			deleted_at
+		from clients where email = $1 limit 1;`
 	var m models.Client
 
 	if err := db.db.QueryRow(ctx, q, e).Scan(
-		&m.ID,
-		&m.Name, &m.PhoneNumber, &m.Email,
+		&m.ID, &m.Name, &m.Surname,
+		&m.PhoneNumber, &m.Email,
 		&m.CreatedAt, &m.UpdatedAt, &m.DeletedAt,
 	); err != nil {
 		return nil, err
@@ -105,12 +109,16 @@ func (db *UserRepo) GetClientByEmail(ctx context.Context, e string) (*models.Cli
 }
 
 func (db *UserRepo) GetClientByPhone(ctx context.Context, p string) (*models.Client, error) {
-	q := `select * from clients where phone_number = $1 limit 1;`
+	q := `select 
+				id, name, surname, phone_number,
+				email, created_at, updated_at,
+				deleted_at
+			from clients where phone_number = $1 limit 1;`
 	var m models.Client
 
 	if err := db.db.QueryRow(ctx, q, p).Scan(
-		&m.ID,
-		&m.Name, &m.PhoneNumber, &m.Email,
+		&m.ID, &m.Name, &m.Surname,
+		&m.PhoneNumber, &m.Email,
 		&m.CreatedAt, &m.UpdatedAt, &m.DeletedAt,
 	); err != nil {
 		return nil, err
@@ -119,12 +127,16 @@ func (db *UserRepo) GetClientByPhone(ctx context.Context, p string) (*models.Cli
 }
 
 func (db *UserRepo) GetClientByLogin(ctx context.Context, l string) (*models.Client, error) {
-	q := `select * from clients where phone_number = $1 or email = $1 limit 1;`
+	q := `select
+				id, name, surname, phone_number,
+				email, created_at, updated_at,
+				deleted_at
+			from clients where phone_number = $1 or email = $1 limit 1;`
 	var m models.Client
 
 	if err := db.db.QueryRow(ctx, q, l).Scan(
-		&m.ID,
-		&m.Name, &m.PhoneNumber, &m.Email,
+		&m.ID, &m.Name, &m.Surname,
+		&m.PhoneNumber, &m.Email,
 		&m.CreatedAt, &m.UpdatedAt, &m.DeletedAt,
 	); err != nil {
 		return nil, err
@@ -147,12 +159,15 @@ func (db *UserRepo) GetStaffByID(ctx context.Context, id string) (*models.Staff,
 }
 
 func (db *UserRepo) GetClientByID(ctx context.Context, id string) (*models.Client, error) {
-	q := `select * from clients where id = $1 and deleted_at is null;`
+	q := `select 
+			id, name, surname, phone_number, email
+			created_at, updated_at, deleted_at
+		from clients where id = $1 and deleted_at is null;`
 	var m models.Client
 
 	if err := db.db.QueryRow(ctx, q, id).Scan(
 		&m.ID,
-		&m.Name, &m.PhoneNumber, &m.Email,
+		&m.Name, &m.Surname, &m.PhoneNumber, &m.Email,
 		&m.CreatedAt, &m.UpdatedAt, &m.DeletedAt,
 	); err != nil {
 		return nil, err
@@ -173,7 +188,11 @@ func (db *UserRepo) ChangeStaffPassword(ctx context.Context, id, pwd string) err
 }
 
 func (db *UserRepo) GetStaffByLogin(ctx context.Context, l string) (*models.Staff, error) {
-	q := `select * from staff where (phone_number = $1 or email = $1) and deleted_at is null limit 1;`
+	q := `select 
+			id, name, phone_number, email,
+			password, role_id, created_at,
+			updated_at, deleted_at
+		from staff where (phone_number = $1 or email = $1) and deleted_at is null limit 1;`
 	var m models.Staff
 
 	if err := db.db.QueryRow(ctx, q, l).Scan(
@@ -187,7 +206,11 @@ func (db *UserRepo) GetStaffByLogin(ctx context.Context, l string) (*models.Staf
 }
 
 func (db *UserRepo) GetStaffByRole(ctx context.Context, roleID string) ([]models.Staff, error) {
-	q := `select * from staff where role_id = $1 and deleted_at is null`
+	q := `select
+				id, name, phone_number, email,
+				password, role_id, created_at,
+				updated_at, deleted_at
+			from staff where role_id = $1 and deleted_at is null`
 	m := []models.Staff{}
 
 	rows, _ := db.db.Query(ctx, q, roleID)
@@ -282,7 +305,7 @@ func (db *UserRepo) ChangeStaff(ctx context.Context, m models.Staff) error {
 
 func (db *UserRepo) GetClientList(ctx context.Context) ([]models.Client, error) {
 	q := `select
-			id, name, phone_number,
+			id, name, surname, phone_number,
 			email, created_at, updated_at
 		from clients
 		where deleted_at is null
@@ -299,7 +322,7 @@ func (db *UserRepo) GetClientList(ctx context.Context) ([]models.Client, error) 
 		var tmp models.Client
 
 		if err := rows.Scan(
-			&tmp.ID, &tmp.Name,
+			&tmp.ID, &tmp.Name, &tmp.Surname,
 			&tmp.PhoneNumber, &tmp.Email,
 			&tmp.CreatedAt, &tmp.UpdatedAt,
 		); err != nil {

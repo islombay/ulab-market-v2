@@ -7,6 +7,7 @@ import (
 type Client struct {
 	ID          string  `json:"id" obj:"id"`
 	Name        string  `json:"name" obj:"name"`
+	Surname     string  `json:"surname" obj:"surname"`
 	PhoneNumber *string `json:"phone_number" obj:"phone_number"`
 	Email       *string `json:"email" obj:"email"`
 
@@ -18,6 +19,7 @@ type Client struct {
 type ClientSwagger struct {
 	ID          string `json:"id" obj:"id"`
 	Name        string `json:"name" obj:"name"`
+	Surname     string `json:"surname" obj:"surname"`
 	PhoneNumber string `json:"phone_number" obj:"phone_number"`
 	Email       string `json:"email" obj:"email"`
 	OrderCount  int    `json:"order_count" obj:"order_count"`

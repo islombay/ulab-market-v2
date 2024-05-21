@@ -34,6 +34,7 @@ create table if not exists permission_to_role (
 create table if not exists clients (
     id uuid primary key,
     name varchar(30) default null,
+    surname varhcar(50) default null,
     phone_number varchar(12) unique,
     email varchar(255) unique,
 

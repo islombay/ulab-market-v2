@@ -55,6 +55,11 @@ func NewV1(
 			handler.MiddlewareStaffPermissionCheck(auth_lib.PermissionCanSeeClients),
 			handler.GetClientList,
 		)
+
+		client.GET("/getme",
+			handler.MiddlewareIsClient(),
+			handler.ClientGetMe,
+		)
 	}
 
 	income := v1.Group("/income")

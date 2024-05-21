@@ -68,3 +68,21 @@ func (srv *clientService) getOrdersCount(ctx context.Context, user_id string) (i
 
 	return count, nil
 }
+
+func (srv *clientService) GetMe(ctx context.Context, user_id string) (interface{}, *status.Status) {
+	model, err := srv.store.User().GetClientByID(ctx, user_id)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, &status.StatusUserNotFound
+		}
+
+		srv.log.Error("could not find client by id", logs.Error(err), logs.String("uid", user_id))
+		return nil, &status.StatusInternal
+	}
+
+	if model.DeletedAt != nil {
+		return nil, &status.StatusUserNotFound
+	}
+
+	return model, nil
+}

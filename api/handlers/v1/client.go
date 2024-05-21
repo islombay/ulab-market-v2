@@ -1,6 +1,7 @@
 package handlersv1
 
 import (
+	"app/api/status"
 	"context"
 	"net/http"
 	"time"
@@ -27,4 +28,23 @@ func (v1 *Handlers) GetClientList(c *gin.Context) {
 		return
 	}
 	v1.response(c, http.StatusOK, res)
+}
+
+func (v1 *Handlers) ClientGetMe(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+
+	userID, err := v1.getUserID(c)
+	if err != nil {
+		v1.error(c, err.(status.Status))
+		return
+	}
+
+	resp, errStatus := v1.service.Client().GetMe(ctx, userID)
+	if errStatus != nil {
+		v1.error(c, *errStatus)
+		return
+	}
+
+	v1.response(c, http.StatusOK, resp)
 }
