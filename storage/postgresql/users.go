@@ -308,6 +308,51 @@ func (db *UserRepo) ChangeStaff(ctx context.Context, m models.Staff) error {
 	return nil
 }
 
+func (db *UserRepo) UpdateClient(ctx context.Context, model models.ClientUpdate) error {
+	updateFields := make(map[string]interface{})
+	if model.Name != nil {
+		updateFields["name"] = *model.Name
+	}
+	if model.Surname != nil {
+		updateFields["surname"] = *model.Surname
+	}
+	if model.Gender != nil {
+		updateFields["gender"] = *model.Gender
+	}
+	if model.BirthDate != nil {
+		updateFields["birthdate"] = *model.BirthDate
+	}
+	if model.Email != nil {
+		updateFields["email"] = *model.Email
+	}
+	updateFields["updated_at"] = time.Now()
+
+	if len(updateFields) == 0 {
+		return storage.ErrNoUpdate
+	}
+	setParts := []string{}
+	args := []interface{}{}
+	iv := 1
+	for k, v := range updateFields {
+		setParts = append(setParts, fmt.Sprintf("%s = $%d", k, iv))
+		args = append(args, v)
+		iv++
+	}
+	q := fmt.Sprintf("update clients set %s where id = $%d", strings.Join(setParts, ", "), iv)
+	args = append(args, model.ID)
+
+	if _, err := db.db.Exec(ctx, q, args...); err != nil {
+		var pgerr *pgconn.PgError
+		if errors.As(err, &pgerr) {
+			if pgerr.Code == DuplicateKeyError {
+				return storage.ErrAlreadyExists
+			}
+		}
+		return err
+	}
+	return nil
+}
+
 func (db *UserRepo) GetClientList(ctx context.Context) ([]models.Client, error) {
 	q := `select
 			id, name, surname, phone_number,

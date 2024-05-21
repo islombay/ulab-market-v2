@@ -21,6 +21,14 @@ var (
 		Description: "Provided invalid email",
 		Code:        http.StatusBadRequest,
 	}
+	StatusBadGender = Status{
+		Message: "Invalid gender",
+		Code:    http.StatusBadRequest,
+	}
+	StatusBadDate = Status{
+		Message: "Invalid date",
+		Code:    http.StatusBadRequest,
+	}
 	StatusBadPhone = Status{
 		Message:     "Invalid phone number",
 		Description: "Provided invalid phone number",
@@ -189,5 +197,16 @@ var (
 		Message:     "Order not yet picked",
 		Code:        http.StatusNotAcceptable,
 		Description: "Order must be picked by picker, and after that courier can mark it as delivering or finished",
+	}
+)
+
+var (
+	StatusNameInvalid = Status{
+		Message: "Name invalid",
+		Code:    http.StatusBadRequest,
+	}
+	StatusSurnameInvalid = Status{
+		Message: "Surname invalid",
+		Code:    http.StatusBadRequest,
 	}
 )
