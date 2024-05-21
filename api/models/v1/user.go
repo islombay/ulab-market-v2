@@ -13,3 +13,13 @@ type ClientOutput struct {
 
 	CreatedAt time.Time `json:"created_at" obj:"created_at"`
 }
+
+type ClientUpdate struct {
+	ID          string     `json:"id" binding:"required"`
+	Name        *string    `json:"name"`
+	Surname     *string    `json:"surname"`
+	PhoneNumber *string    `json:"phone_number"`
+	Email       *string    `json:"email"`
+	Gender      *string    `json:"gender"`
+	BirthDate   *time.Time `json:"birth_date"`
+}

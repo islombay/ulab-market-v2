@@ -4702,6 +4702,9 @@ const docTemplate = `{
         "models.ClientSwagger": {
             "type": "object",
             "properties": {
+                "birth_date": {
+                    "type": "string"
+                },
                 "created_at": {
                     "type": "string"
                 },
@@ -4709,6 +4712,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "email": {
+                    "type": "string"
+                },
+                "gender": {
                     "type": "string"
                 },
                 "id": {

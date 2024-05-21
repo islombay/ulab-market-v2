@@ -184,4 +184,10 @@ var (
 		Code:        http.StatusMethodNotAllowed,
 		Description: "cannot changes",
 	}
+
+	OrderNotYetPicked = Status{
+		Message:     "Order not yet picked",
+		Code:        http.StatusNotAcceptable,
+		Description: "Order must be picked by picker, and after that courier can mark it as delivering or finished",
+	}
 )

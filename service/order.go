@@ -418,6 +418,10 @@ func (srv OrderService) OrderDelivered(ctx context.Context, userID, orderID stri
 		return nil, &status.StatusNotChangable
 	}
 
+	if order.Status != OrderStatusPicked {
+		return nil, &status.OrderNotYetPicked
+	}
+
 	if err := srv.store.Order().MarkDelivered(ctx, orderID); err != nil {
 		srv.log.Error("could not mark the order as delivered", logs.Error(err), logs.String("order_id", orderID))
 		return nil, &status.StatusInternal

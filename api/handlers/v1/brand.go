@@ -173,6 +173,8 @@ func (v1 *Handlers) ChangeBrand(c *gin.Context) {
 		b.Name = *m.Name
 	}
 
+	// fmt.Println(m)
+
 	if m.Image != nil {
 		if m.Image.Size > v1.cfg.Media.CategoryPhotoMaxSize {
 			v1.error(c, status.StatusImageMaxSizeExceed)

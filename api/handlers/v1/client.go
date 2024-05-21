@@ -57,3 +57,7 @@ func (v1 *Handlers) ClientGetMe(c *gin.Context) {
 
 	v1.response(c, http.StatusOK, resp)
 }
+
+func (v1 *Handlers) ClientUpdate(c *gin.Context) {
+
+}
