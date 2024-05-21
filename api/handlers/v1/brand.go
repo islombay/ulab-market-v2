@@ -45,8 +45,8 @@ func (v1 *Handlers) CreateBrand(c *gin.Context) {
 		Name: m.Name,
 	}
 
-	fmt.Println(m)
-	fmt.Println(m.Image == nil)
+	fmt.Println(m.Image.Filename)
+	fmt.Println(m.Image)
 
 	if m.Image != nil {
 		if m.Image.Size > v1.cfg.Media.CategoryPhotoMaxSize {
