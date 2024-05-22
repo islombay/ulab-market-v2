@@ -310,6 +310,20 @@ func (v1 *Handlers) ChangeCategory(c *gin.Context) {
 		}
 	}
 
+	if m.NameRu != "" {
+		if len(m.NameRu) > 250 {
+			v1.error(c, status.StatusTextTooLong)
+			return
+		}
+	}
+
+	if m.NameUz != "" {
+		if len(m.NameUz) > 250 {
+			v1.error(c, status.StatusTextTooLong)
+			return
+		}
+	}
+
 	var pn = models.GetStringAddress(m.ParentID)
 	ct := models.Category{
 		ID:       m.ID,
@@ -318,7 +332,7 @@ func (v1 *Handlers) ChangeCategory(c *gin.Context) {
 		ParentID: pn,
 	}
 
-	if models.GetStringValue(m.IconID) == "" {
+	if models.GetStringValue(m.IconID) != "" {
 		if !helper.IsValidUUID(*m.IconID) {
 			v1.error(c, status.StatusBadUUID)
 			return

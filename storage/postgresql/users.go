@@ -327,7 +327,7 @@ func (db *UserRepo) UpdateClient(ctx context.Context, model models.ClientUpdate)
 	}
 	updateFields["updated_at"] = time.Now()
 
-	if len(updateFields) == 0 {
+	if len(updateFields) == 1 {
 		return storage.ErrNoUpdate
 	}
 	setParts := []string{}

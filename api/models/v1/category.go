@@ -18,8 +18,8 @@ type ChangeCategoryImage struct {
 
 type ChangeCategory struct {
 	ID       string  `json:"id" binding:"required"`
-	NameUz   string  `json:"name_uz" binding:"required"`
-	NameRu   string  `json:"name_ru" binding:"required"`
+	NameUz   string  `json:"name_uz"`
+	NameRu   string  `json:"name_ru"`
 	ParentID string  `json:"parent_id"`
 	IconID   *string `json:"icon_id"`
 }

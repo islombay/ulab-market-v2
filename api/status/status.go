@@ -209,4 +209,8 @@ var (
 		Message: "Surname invalid",
 		Code:    http.StatusBadRequest,
 	}
+	StatusTextTooLong = Status{
+		Message: "Text too long",
+		Code:    http.StatusBadRequest,
+	}
 )

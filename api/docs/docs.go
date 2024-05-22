@@ -5272,9 +5272,7 @@ const docTemplate = `{
         "models_v1.ChangeCategory": {
             "type": "object",
             "required": [
-                "id",
-                "name_ru",
-                "name_uz"
+                "id"
             ],
             "properties": {
                 "icon_id": {

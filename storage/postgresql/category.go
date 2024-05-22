@@ -146,20 +146,45 @@ func (db *CategoryRepo) ChangeImage(ctx context.Context, cid, imageUrl, iconURL 
 }
 
 func (db *CategoryRepo) ChangeCategory(ctx context.Context, m models.Category) error {
-	q := `update category set
-				name_uz = $1,
-				name_ru = $2,
-				parent_id = $3,
-				updated_at = now()`
-
+	updateFields := make(map[string]interface{})
+	if m.NameRu != "" {
+		updateFields["name_ru"] = m.NameRu
+	}
+	if m.NameUz != "" {
+		updateFields["name_uz"] = m.NameUz
+	}
 	if m.IconID != nil {
-		q += fmt.Sprintf(", icon_id = '%s'", *m.IconID)
+		updateFields["icon_id"] = m.IconID
 	}
 
-	q += ` where id = $4`
+	updateFields["updated_at"] = time.Now()
 
-	ra, err := db.db.Exec(ctx, q, m.NameUz, m.NameRu, m.ParentID, m.ID)
+	if len(updateFields) == 1 {
+		return storage.ErrNoUpdate
+	}
+
+	setParts := []string{}
+	args := []interface{}{}
+	iv := 1
+	for k, v := range updateFields {
+		setParts = append(setParts, fmt.Sprintf("%s = $%d", k, iv))
+		args = append(args, v)
+		iv++
+	}
+
+	q := fmt.Sprintf("update category set %s where id = $%d",
+		strings.Join(setParts, ", "), iv)
+
+	args = append(args, m.ID)
+
+	ra, err := db.db.Exec(ctx, q, args...)
 	if err != nil {
+		var pgerr *pgconn.PgError
+		if errors.As(err, &pgerr) {
+			if pgerr.Code == DuplicateKeyError {
+				return storage.ErrAlreadyExists
+			}
+		}
 		return err
 	}
 
