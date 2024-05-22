@@ -59,3 +59,13 @@ type ClientAddress struct {
 	UpdatedAt time.Time  `db:"updated_at" json:"updated_at"`
 	DeletedAt *time.Time `db:"deleted_at" json:"deleted_at"`
 }
+
+type ClientUpdate struct {
+	ID      string  `json:"-"`
+	Name    *string `json:"name"`
+	Surname *string `json:"surname"`
+	Email   *string `json:"email"`
+
+	Gender    *string    `json:"gender"`
+	BirthDate *time.Time `json:"birth_date,omitempty"`
+}

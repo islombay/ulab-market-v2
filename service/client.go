@@ -2,12 +2,15 @@ package service
 
 import (
 	"app/api/models"
+	models_v1 "app/api/models/v1"
 	"app/api/status"
 	"app/pkg/helper"
 	"app/pkg/logs"
 	"app/storage"
 	"context"
 	"errors"
+	"net/http"
+	"time"
 
 	"github.com/jackc/pgx/v5"
 )
@@ -85,4 +88,46 @@ func (srv *clientService) GetMe(ctx context.Context, user_id string) (interface{
 	}
 
 	return model, nil
+}
+
+func (srv *clientService) Update(ctx context.Context, model models.ClientUpdate) (interface{}, *status.Status) {
+	if model.Email != nil {
+		if !helper.IsValidEmail(*model.Email) {
+			return nil, &status.StatusBadEmail
+		}
+	}
+
+	if model.Gender != nil {
+		if !(*model.Gender == "male" || *model.Gender == "female") {
+			return nil, &status.StatusBadGender
+		}
+	}
+
+	if model.BirthDate != nil {
+		if model.BirthDate.After(time.Now()) {
+			return nil, &status.StatusBadDate
+		}
+	}
+
+	if model.Name != nil {
+		if len(*model.Name) < 3 || len(*model.Name) > 20 {
+			return nil, &status.StatusNameInvalid
+		}
+	}
+
+	if model.Surname != nil {
+		if len(*model.Surname) < 3 || len(*model.Surname) > 20 {
+			return nil, &status.StatusSurnameInvalid
+		}
+	}
+
+	if err := srv.store.User().UpdateClient(ctx, model); err != nil {
+		if errors.Is(err, storage.ErrAlreadyExists) {
+			return nil, &status.StatusAlreadyExists
+		}
+		srv.log.Error("could not update client", logs.Error(err), logs.String("uid", model.ID))
+		return nil, &status.StatusInternal
+	}
+
+	return models_v1.Response{Message: "Ok", Code: http.StatusOK}, nil
 }

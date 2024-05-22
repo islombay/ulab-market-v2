@@ -148,6 +148,8 @@ type UserInterface interface {
 	GetClientByLogin(ctx context.Context, l string) (*models.Client, error)
 	GetClientByID(ctx context.Context, id string) (*models.Client, error)
 	GetClientList(ctx context.Context) ([]models.Client, error)
+
+	UpdateClient(ctx context.Context, model models.ClientUpdate) error
 }
 
 type CategoryInterface interface {
