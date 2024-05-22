@@ -225,13 +225,14 @@ func (srv OrderService) GetAll(ctx context.Context, orderStatus string, paginati
 	var model []models.OrderModel
 
 	var err error
+	var count int
 	if orderStatus == "archive" {
-		model, err = srv.store.Order().GetAll(ctx, pagination, []string{"finished", "canceled"})
+		model, count, err = srv.store.Order().GetAll(ctx, pagination, []string{"finished", "canceled"})
 	} else if orderStatus == "active" {
 		// model, err = srv.store.Order().GetActive(ctx)
-		model, err = srv.store.Order().GetAll(ctx, pagination, []string{"in_process", "picked", "delivering"})
+		model, count, err = srv.store.Order().GetAll(ctx, pagination, []string{"in_process", "picked", "delivering"})
 	} else {
-		model, err = srv.store.Order().GetAll(ctx, pagination, []string{})
+		model, count, err = srv.store.Order().GetAll(ctx, pagination, []string{})
 	}
 	if err != nil {
 		srv.log.Error("could not get order all archived", logs.Error(err))
@@ -244,7 +245,11 @@ func (srv OrderService) GetAll(ctx context.Context, orderStatus string, paginati
 		}
 	}
 
-	return model, nil
+	return models.Response{
+		StatusCode: http.StatusOK,
+		Count:      count,
+		Data:       model,
+	}, nil
 }
 
 func (srv OrderService) GetOrderProducts(ctx context.Context, order_id string) (interface{}, *status.Status) {

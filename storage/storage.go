@@ -49,7 +49,7 @@ type OrderI interface {
 	Delete(ctx context.Context, id string) error
 	ChangeStatus(ctx context.Context, id, status string) error
 
-	GetAll(ctx context.Context, pagination models.Pagination, statuses []string) ([]models.OrderModel, error)
+	GetAll(ctx context.Context, pagination models.Pagination, statuses []string) ([]models.OrderModel, int, error)
 	GetByID(ctx context.Context, id string) (*models.OrderModel, error)
 	GetNew(ctx context.Context, forCourier bool) ([]models.OrderModel, error)
 

@@ -15,7 +15,7 @@ type Pagination struct {
 
 func (p *Pagination) Fix() {
 	if p.Limit <= 0 {
-		p.Limit = 500
+		p.Limit = 10
 	}
 
 	if p.Page <= 0 {

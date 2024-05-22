@@ -112,7 +112,7 @@ func (db *OrderRepo) GetByID(ctx context.Context, id string) (*models.OrderModel
 	return &res, nil
 }
 
-func (db *OrderRepo) GetAll(ctx context.Context, pagination models.Pagination, statuses []string) ([]models.OrderModel, error) {
+func (db *OrderRepo) GetAll(ctx context.Context, pagination models.Pagination, statuses []string) ([]models.OrderModel, int, error) {
 	whereClause := "where deleted_at is null"
 
 	if len(statuses) > 0 {
@@ -139,7 +139,7 @@ func (db *OrderRepo) GetAll(ctx context.Context, pagination models.Pagination, s
 
 	rows, _ := db.db.Query(ctx, q)
 	if rows.Err() != nil {
-		return nil, rows.Err()
+		return nil, 0, rows.Err()
 	}
 
 	var count int
@@ -161,13 +161,12 @@ func (db *OrderRepo) GetAll(ctx context.Context, pagination models.Pagination, s
 			&tmp.PaymentCardType,
 			&count,
 		); err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 		res = append(res, tmp)
 	}
 
-	fmt.Println(count)
-	return res, nil
+	return res, count, nil
 }
 
 func (db *OrderRepo) GetNew(ctx context.Context, forCourier bool) ([]models.OrderModel, error) {
