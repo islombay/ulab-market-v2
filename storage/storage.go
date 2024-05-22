@@ -51,7 +51,7 @@ type OrderI interface {
 
 	GetAll(ctx context.Context, pagination models.Pagination, statuses []string) ([]models.OrderModel, int, error)
 	GetByID(ctx context.Context, id string) (*models.OrderModel, error)
-	GetNew(ctx context.Context, forCourier bool) ([]models.OrderModel, error)
+	GetNew(ctx context.Context, pagination models.Pagination, forCourier bool) ([]models.OrderModel, int, error)
 
 	OrdersCount(ctx context.Context, user_id string) (int, error)
 

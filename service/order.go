@@ -286,8 +286,8 @@ func (srv OrderService) GetProductAll(ctx context.Context) (interface{}, *status
 	return model, nil
 }
 
-func (srv OrderService) GetNewList(ctx context.Context, forCourier bool) (interface{}, *status.Status) {
-	model, err := srv.store.Order().GetNew(ctx, forCourier)
+func (srv OrderService) GetNewList(ctx context.Context, pagination models.Pagination, forCourier bool) (interface{}, *status.Status) {
+	model, count, err := srv.store.Order().GetNew(ctx, pagination, forCourier)
 	if err != nil {
 		srv.log.Error("could not get new orders list", logs.Error(err))
 		return nil, &status.StatusInternal
@@ -312,6 +312,14 @@ func (srv OrderService) GetNewList(ctx context.Context, forCourier bool) (interf
 
 			model[i].Products = products
 		}
+	}
+
+	if !forCourier {
+		return models.Response{
+			StatusCode: http.StatusOK,
+			Count:      count,
+			Data:       model,
+		}, nil
 	}
 
 	return model, nil

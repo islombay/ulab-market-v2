@@ -2865,6 +2865,20 @@ const docTemplate = `{
                 ],
                 "summary": "Get all new orders list",
                 "operationId": "GetNewOrdersList",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page value. Default 1",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Limit value. Default 10",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Success",

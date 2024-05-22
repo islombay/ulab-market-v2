@@ -169,8 +169,17 @@ func (db *OrderRepo) GetAll(ctx context.Context, pagination models.Pagination, s
 	return res, count, nil
 }
 
-func (db *OrderRepo) GetNew(ctx context.Context, forCourier bool) ([]models.OrderModel, error) {
-	q := `select
+func (db *OrderRepo) GetNew(ctx context.Context, pagination models.Pagination, forCourier bool) ([]models.OrderModel, int, error) {
+	whereClause := "deleted_at is null"
+
+	if forCourier {
+		whereClause += ` and status in ('in_process', 'picked')`
+		whereClause += ` and delivering_user_id is null`
+	} else {
+		whereClause += ` and status in ('in_process')`
+	}
+
+	q := fmt.Sprintf(`select
 			id, user_id, status,
 			total_price,payment_type,
 			created_at, updated_at, deleted_at,
@@ -179,25 +188,25 @@ func (db *OrderRepo) GetNew(ctx context.Context, forCourier bool) ([]models.Orde
 			client_comment, delivery_type,
 			delivery_addr_lat, delivery_addr_long,
 			delivery_addr_name, delivering_user_id,
-			payment_card_type
+			payment_card_type,
+			(
+				select count(*) from orders where %s
+			)
 		from orders
-		where deleted_at is null`
+		where %s order by created_at desc`, whereClause, whereClause)
 
-	if forCourier {
-		q += ` and status in ('in_process', 'picked')`
-		q += ` and delivering_user_id is null`
-	} else {
-		q += ` and status in ('in_process')`
+	if !forCourier {
+		q += fmt.Sprintf(" limit %d offset %d", pagination.Limit, pagination.Offset)
 	}
-
-	q += ` order by created_at desc`
 
 	rows, _ := db.db.Query(ctx, q)
 	if rows.Err() != nil {
-		return nil, rows.Err()
+		return nil, 0, rows.Err()
 	}
 
 	res := []models.OrderModel{}
+
+	var count int
 
 	for rows.Next() {
 		var tmp models.OrderModel
@@ -210,13 +219,13 @@ func (db *OrderRepo) GetNew(ctx context.Context, forCourier bool) ([]models.Orde
 			&tmp.ClientComment, &tmp.DeliveryType,
 			&tmp.DeliveryAddrLat, &tmp.DeliveryAddrLong,
 			&tmp.DeliveryAddrName, &tmp.DeliverUserID,
-			&tmp.PaymentCardType,
+			&tmp.PaymentCardType, &count,
 		); err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 		res = append(res, tmp)
 	}
-	return res, nil
+	return res, count, nil
 }
 
 func (db *OrderRepo) OrdersCount(ctx context.Context, user_id string) (int, error) {

@@ -275,13 +275,20 @@ func (v1 *Handlers) getUserID(c *gin.Context) (string, interface{}) {
 // @security	ApiKeyAuth
 // @accept		json
 // @produce		json
+// @param 		page  query int false "Page value. Default 1"
+// @param 		limit query int false "Limit value. Default 10"
 // @success		200	{object}	[]models.OrderModel "Success"
 // @failure		500	{object}	models_v1.Response	"Internal server error"
 func (v1 *Handlers) GetNewOrdersList(c *gin.Context) {
+
+	var m models.Pagination
+	c.ShouldBind(&m)
+	m.Fix()
+
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 
-	res, errStatus := v1.service.Order().GetNewList(ctx, false)
+	res, errStatus := v1.service.Order().GetNewList(ctx, m, false)
 	if errStatus != nil {
 		v1.error(c, *errStatus)
 		return
@@ -304,7 +311,11 @@ func (v1 *Handlers) GetAvailableOrdersCourier(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 
-	res, errStatus := v1.service.Order().GetNewList(ctx, true)
+	var m models.Pagination
+	c.ShouldBind(&m)
+	m.Fix()
+
+	res, errStatus := v1.service.Order().GetNewList(ctx, m, true)
 	if errStatus != nil {
 		v1.error(c, *errStatus)
 		return
