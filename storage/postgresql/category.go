@@ -67,24 +67,33 @@ func (db *CategoryRepo) GetByID(ctx context.Context, id string) (*models.Categor
 	return &m, nil
 }
 
-func (db *CategoryRepo) GetAll(ctx context.Context, onlySub bool) ([]*models.Category, error) {
-	q := `select
-    	id, name_uz, name_ru,
-    	image, icon_id, parent_id,
-    	created_at, updated_at, deleted_at
-    	from category where deleted_at is null`
+func (db *CategoryRepo) GetAll(ctx context.Context, pagination models.Pagination, onlySub bool) ([]*models.Category, int, error) {
+	whereClause := "deleted_at is null"
 	if onlySub {
-		q += ` and parent_id is not null`
+		whereClause += ` and parent_id is not null`
 	} else {
-		q += ` and parent_id is null`
+		whereClause += ` and parent_id is null`
 	}
 
-	q += " order by created_at desc"
+	q := fmt.Sprintf(`select
+    	id, name_uz, name_ru,
+    	image, icon_id, parent_id,
+    	created_at, updated_at, deleted_at,
+		(
+			select count(*) from category where %s
+		)
+    	from category
+		where %s
+		order by created_at desc
+		limit %d offset %d`, whereClause, whereClause, pagination.Limit, pagination.Offset)
+
 	m := []*models.Category{}
 	rows, _ := db.db.Query(ctx, q)
 	if rows.Err() != nil {
-		return nil, rows.Err()
+		return nil, 0, rows.Err()
 	}
+
+	var count int
 
 	for rows.Next() {
 		var tmp models.Category
@@ -98,12 +107,13 @@ func (db *CategoryRepo) GetAll(ctx context.Context, onlySub bool) ([]*models.Cat
 			&tmp.CreatedAt,
 			&tmp.UpdatedAt,
 			&tmp.DeletedAt,
+			&count,
 		); err != nil {
 			db.log.Error("could not scan category", logs.Error(err))
 		}
 		m = append(m, &tmp)
 	}
-	return m, nil
+	return m, count, nil
 }
 
 func (db *CategoryRepo) ChangeImage(ctx context.Context, cid, imageUrl, iconURL *string) error {

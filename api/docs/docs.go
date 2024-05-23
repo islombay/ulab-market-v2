@@ -1352,6 +1352,18 @@ const docTemplate = `{
                         "description": "Only subcategory",
                         "name": "only_sub",
                         "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Limit default 10",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page, default 1",
+                        "name": "page",
+                        "in": "query"
                     }
                 ],
                 "responses": {

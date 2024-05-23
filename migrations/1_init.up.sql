@@ -99,3 +99,6 @@ create table if not exists category (
 
     foreign key (icon_id) references icons_list(id) on delete set null
 );
+
+CREATE UNIQUE INDEX unique_name_uz_active ON category (name_uz) WHERE deleted_at IS NULL;
+CREATE UNIQUE INDEX unique_name_ru_active ON category (name_ru) WHERE deleted_at IS NULL;

@@ -432,23 +432,29 @@ func (v1 *Handlers) GetCategoryByID(c *gin.Context) {
 }
 
 // GetAllCategory
-// @id getAllCategory
-// @router /api/category [get]
-// @tags category
-// @accept json
-// @produce json
-// @summary get category all
-// @param only_sub query bool false "Only subcategory"
+// @id 			getAllCategory
+// @router 		/api/category [get]
+// @tags 		category
+// @accept 		json
+// @produce 	json
+// @summary 	get category all
+// @param 		only_sub 	query bool	false "Only subcategory"
+// @param 		limit 	query int 	false "Limit default 10"
+// @param		page	query int	false "Page, default 1"
 // @description get category, returns translations, and subcategories for all category
-// @success 200 {object} []models.CategorySwagger "category returned"
-// @failure 500 {object} models_v1.Response "Internal error"
+// @success 	200 {object} []models.CategorySwagger 	"category returned"
+// @failure 	500 {object} models_v1.Response 		"Internal error"
 func (v1 *Handlers) GetAllCategory(c *gin.Context) {
 	var params models_v1.GetAllCategory
 	if err := c.ShouldBind(&params); err != nil {
 		v1.log.Error("bad request", logs.Error(err))
 	}
 
-	res, err := v1.storage.Category().GetAll(context.Background(), params.OnlySub)
+	var m models.Pagination
+	c.ShouldBind(&m)
+	m.Fix()
+
+	res, count, err := v1.storage.Category().GetAll(context.Background(), m, params.OnlySub)
 	if err != nil {
 		v1.log.Error("could not get all categories", logs.Error(err))
 		v1.error(c, status.StatusInternal)
@@ -489,7 +495,11 @@ func (v1 *Handlers) GetAllCategory(c *gin.Context) {
 
 		e.Sub = subs
 	}
-	v1.response(c, http.StatusOK, res)
+	v1.response(c, http.StatusOK, models.Response{
+		StatusCode: http.StatusOK,
+		Count:      count,
+		Data:       res,
+	})
 }
 
 // DeleteCategory
