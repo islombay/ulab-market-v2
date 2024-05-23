@@ -147,7 +147,8 @@ type UserInterface interface {
 	GetClientByPhone(ctx context.Context, p string) (*models.Client, error)
 	GetClientByLogin(ctx context.Context, l string) (*models.Client, error)
 	GetClientByID(ctx context.Context, id string) (*models.Client, error)
-	GetClientList(ctx context.Context) ([]models.Client, error)
+
+	GetClientList(ctx context.Context, pagination models.Pagination) ([]models.Client, int, error)
 
 	UpdateClient(ctx context.Context, model models.ClientUpdate) error
 }

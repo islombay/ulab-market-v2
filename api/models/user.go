@@ -19,7 +19,8 @@ type Client struct {
 	DeletedAt *time.Time `json:"deleted_at,omitempty" obj:"deleted_at"`
 }
 
-type ClientSwagger struct {
+// ClientListAdminPanel has orderCount
+type ClientListAdminPanel struct {
 	ID          string `json:"id" obj:"id"`
 	Name        string `json:"name" obj:"name"`
 	Surname     string `json:"surname" obj:"surname"`

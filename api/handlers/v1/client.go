@@ -17,13 +17,19 @@ import (
 // @tags 		client
 // @summary		Get list of clients ( only staff )
 // @description	Get list of clients ( all information )
-// @success 	200	{object}	[]models.ClientSwagger	"List of clients"
+// @param		limit		query	int		false "Limit, default 10"
+// @param		page		query	int		false "Page, default 1"
+// @success 	200	{object}	[]models.ClientListAdminPanel	"List of clients"
 // @failure		500 {object}	models_v1.Response		"Internal server error"
 func (v1 *Handlers) GetClientList(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 
-	res, errStatus := v1.service.Client().GetList(ctx)
+	var m models.Pagination
+	c.ShouldBind(&m)
+	m.Fix()
+
+	res, errStatus := v1.service.Client().GetList(ctx, m)
 	if errStatus != nil {
 		v1.error(c, *errStatus)
 		return
@@ -38,7 +44,7 @@ func (v1 *Handlers) GetClientList(c *gin.Context) {
 // @tags 		client
 // @summary		get client information (self)
 // @description	get client information (self)
-// @success 	200	{object}	models.ClientSwagger	"List of clients"
+// @success 	200	{object}	models.ClientListAdminPanel	"List of clients"
 // @failure		500 {object}	models_v1.Response		"Internal server error"
 func (v1 *Handlers) ClientGetMe(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)

@@ -1781,13 +1781,27 @@ const docTemplate = `{
                 ],
                 "summary": "Get list of clients ( only staff )",
                 "operationId": "GetClientList",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Limit, default 10",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page, default 1",
+                        "name": "page",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "List of clients",
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.ClientSwagger"
+                                "$ref": "#/definitions/models.ClientListAdminPanel"
                             }
                         }
                     },
@@ -1817,7 +1831,7 @@ const docTemplate = `{
                     "200": {
                         "description": "List of clients",
                         "schema": {
-                            "$ref": "#/definitions/models.ClientSwagger"
+                            "$ref": "#/definitions/models.ClientListAdminPanel"
                         }
                     },
                     "500": {
@@ -4803,7 +4817,7 @@ const docTemplate = `{
                 }
             }
         },
-        "models.ClientSwagger": {
+        "models.ClientListAdminPanel": {
             "type": "object",
             "properties": {
                 "birth_date": {

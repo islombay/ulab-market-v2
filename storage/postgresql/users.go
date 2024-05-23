@@ -353,22 +353,32 @@ func (db *UserRepo) UpdateClient(ctx context.Context, model models.ClientUpdate)
 	return nil
 }
 
-func (db *UserRepo) GetClientList(ctx context.Context) ([]models.Client, error) {
-	q := `select
+func (db *UserRepo) GetClientList(ctx context.Context, pagination models.Pagination) ([]models.Client, int, error) {
+	whereClause := "deleted_at is null"
+	if pagination.Query != "" {
+		pagination.Query = "'%" + pagination.Query + "%'"
+		whereClause += fmt.Sprintf(" and (name ilike %s or surname ilike %s or phone_number ilike %s or email ilike %s)", pagination.Query, pagination.Query, pagination.Query, pagination.Query)
+	}
+	q := fmt.Sprintf(`select
 			id, name, surname, phone_number,
 			email, created_at, updated_at,
-			gender, birthdate
+			gender, birthdate,
+			(
+				select count(*) from clients where %s
+			)
 		from clients
-		where deleted_at is null
-		order by created_at desc`
+		where %s
+		order by created_at desc
+		limit %d offset %d`, whereClause, whereClause, pagination.Limit, pagination.Offset)
 
 	var res []models.Client
 
 	rows, _ := db.db.Query(ctx, q)
 	if rows.Err() != nil {
-		return nil, rows.Err()
+		return nil, 0, rows.Err()
 	}
 
+	var count int
 	for rows.Next() {
 		var tmp models.Client
 
@@ -377,12 +387,13 @@ func (db *UserRepo) GetClientList(ctx context.Context) ([]models.Client, error) 
 			&tmp.PhoneNumber, &tmp.Email,
 			&tmp.CreatedAt, &tmp.UpdatedAt,
 			&tmp.Gender, &tmp.BirthDate,
+			&count,
 		); err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 
 		res = append(res, tmp)
 	}
 
-	return res, nil
+	return res, count, nil
 }

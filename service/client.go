@@ -30,23 +30,23 @@ func NewClientService(
 	}
 }
 
-func (srv *clientService) GetList(ctx context.Context) (interface{}, *status.Status) {
-	model, err := srv.store.User().GetClientList(ctx)
+func (srv *clientService) GetList(ctx context.Context, pagination models.Pagination) (interface{}, *status.Status) {
+	model, count, err := srv.store.User().GetClientList(ctx, pagination)
 	if err != nil {
 		srv.log.Error("could not get list of clients", logs.Error(err))
 		return nil, &status.StatusInternal
 	}
 
-	var resp_model []models.ClientSwagger
+	var resp_model []models.ClientListAdminPanel
 
 	for _, usr := range model {
 		count, err := srv.getOrdersCount(ctx, usr.ID)
 		if err != nil {
 			return nil, err
 		}
-		tmp := models.ClientSwagger{}
+		tmp := models.ClientListAdminPanel{}
 		if err := helper.Reobject(usr, &tmp, "obj"); err != nil {
-			srv.log.Error("could not reobject models.Client to models.ClientSwagger",
+			srv.log.Error("could not reobject models.Client to models.ClientListAdminPanel",
 				logs.Error(err))
 			return nil, &status.StatusInternal
 		}
@@ -55,7 +55,11 @@ func (srv *clientService) GetList(ctx context.Context) (interface{}, *status.Sta
 		resp_model = append(resp_model, tmp)
 	}
 
-	return resp_model, nil
+	return models.Response{
+		StatusCode: http.StatusOK,
+		Count:      count,
+		Data:       resp_model,
+	}, nil
 }
 
 func (srv *clientService) getOrdersCount(ctx context.Context, user_id string) (int, *status.Status) {
