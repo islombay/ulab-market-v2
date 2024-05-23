@@ -20,7 +20,7 @@ type Search struct {
 
 func (p *Pagination) Fix() {
 	if p.Limit <= 0 {
-		p.Limit = 10
+		p.Limit = 1000
 	}
 
 	if p.Page <= 0 {
