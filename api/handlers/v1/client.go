@@ -19,6 +19,7 @@ import (
 // @description	Get list of clients ( all information )
 // @param		limit		query	int		false "Limit, default 10"
 // @param		page		query	int		false "Page, default 1"
+// @param		q			query	string	false "Query to search"
 // @success 	200	{object}	[]models.ClientListAdminPanel	"List of clients"
 // @failure		500 {object}	models_v1.Response		"Internal server error"
 func (v1 *Handlers) GetClientList(c *gin.Context) {
