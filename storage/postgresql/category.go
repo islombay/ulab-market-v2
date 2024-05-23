@@ -75,6 +75,14 @@ func (db *CategoryRepo) GetAll(ctx context.Context, pagination models.Pagination
 		whereClause += ` and parent_id is null`
 	}
 
+	if pagination.Search.Query != "" {
+		pagination.Query = `'%` + pagination.Query + `%'`
+		whereClause += `
+			and (name_uz ilike ` + pagination.Query + ` or
+			name_ru ilike ` + pagination.Query + `)
+		`
+	}
+
 	q := fmt.Sprintf(`select
     	id, name_uz, name_ru,
     	image, icon_id, parent_id,

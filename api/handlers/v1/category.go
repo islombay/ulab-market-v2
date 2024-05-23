@@ -441,6 +441,7 @@ func (v1 *Handlers) GetCategoryByID(c *gin.Context) {
 // @param 		only_sub 	query bool	false "Only subcategory"
 // @param 		limit 	query int 	false "Limit default 10"
 // @param		page	query int	false "Page, default 1"
+// @param		q		query string false "Query to search"
 // @description get category, returns translations, and subcategories for all category
 // @success 	200 {object} []models.CategorySwagger 	"category returned"
 // @failure 	500 {object} models_v1.Response 		"Internal error"

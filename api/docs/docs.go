@@ -1364,6 +1364,12 @@ const docTemplate = `{
                         "description": "Page, default 1",
                         "name": "page",
                         "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Query to search",
+                        "name": "q",
+                        "in": "query"
                     }
                 ],
                 "responses": {

@@ -8,9 +8,14 @@ type Response struct {
 }
 
 type Pagination struct {
+	Search
 	Limit  int `form:"limit"`
 	Page   int `form:"page"`
 	Offset int `form:"-" json:"-"`
+}
+
+type Search struct {
+	Query string `form:"q"`
 }
 
 func (p *Pagination) Fix() {
