@@ -1084,6 +1084,26 @@ const docTemplate = `{
                 ],
                 "summary": "get brand all",
                 "operationId": "getAllBrand",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Limit default 10",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page default 1",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Query to search",
+                        "name": "q",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "brand returned",

@@ -110,7 +110,8 @@ func (db *BrandRepo) GetAll(ctx context.Context, pagination models.Pagination) (
 				where %s
 			)
 		from brands where %s
-		order by created_at desc`, whereClause, whereClause)
+		order by created_at desc
+		limit %d offset %d`, whereClause, whereClause, pagination.Limit, pagination.Offset)
 	rows, _ := db.db.Query(ctx, q)
 	if rows.Err() != nil {
 		return nil, 0, rows.Err()

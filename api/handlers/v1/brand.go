@@ -228,6 +228,7 @@ func (v1 *Handlers) ChangeBrand(c *gin.Context) {
 // @description get brand
 // @param		limit	query	int		false "Limit default 10"
 // @param		page	query	int		false "Page default 1"
+// @param		q		query 	string	false "Query to search"
 // @success 200 {object} []models.Brand "brand returned"
 // @failure 500 {object} models_v1.Response "Internal error"
 func (v1 *Handlers) GetAllBrand(c *gin.Context) {
