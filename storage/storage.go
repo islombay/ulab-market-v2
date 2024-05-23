@@ -172,7 +172,7 @@ type BrandInterface interface {
 	Create(ctx context.Context, m models.Brand) error
 	GetByID(ctx context.Context, id string) (*models.Brand, error)
 	GetByName(ctx context.Context, name string) (*models.Brand, error)
-	GetAll(ctx context.Context) ([]*models.Brand, error)
+	GetAll(ctx context.Context, pagination models.Pagination) ([]*models.Brand, int, error)
 
 	Change(ctx context.Context, m models.Brand) error
 	Delete(ctx context.Context, id string) error

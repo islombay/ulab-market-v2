@@ -94,18 +94,31 @@ func (db *BrandRepo) Change(ctx context.Context, m models.Brand) error {
 	return nil
 }
 
-func (db *BrandRepo) GetAll(ctx context.Context) ([]*models.Brand, error) {
-	q := `select 
+func (db *BrandRepo) GetAll(ctx context.Context, pagination models.Pagination) ([]*models.Brand, int, error) {
+	whereClause := `deleted_at is null`
+
+	if pagination.Query != "" {
+		pagination.Query = "'%" + pagination.Query + "%'"
+		whereClause += " and name ilike " + pagination.Query
+	}
+
+	q := fmt.Sprintf(`select 
 			id, name, image, created_at,
-			updated_at, deleted_at
-		from brands where deleted_at is null
-		order by created_at desc`
+			updated_at, deleted_at,
+			(
+				select count(*) from brands
+				where %s
+			)
+		from brands where %s
+		order by created_at desc`, whereClause, whereClause)
 	rows, _ := db.db.Query(ctx, q)
 	if rows.Err() != nil {
-		return nil, rows.Err()
+		return nil, 0, rows.Err()
 	}
 
 	res := []*models.Brand{}
+
+	var count int
 
 	for rows.Next() {
 		var m models.Brand
@@ -116,12 +129,13 @@ func (db *BrandRepo) GetAll(ctx context.Context) ([]*models.Brand, error) {
 			&m.CreatedAt,
 			&m.UpdatedAt,
 			&m.DeletedAt,
+			&count,
 		); err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 		res = append(res, &m)
 	}
-	return res, nil
+	return res, count, nil
 }
 
 func (db *BrandRepo) Delete(ctx context.Context, id string) error {

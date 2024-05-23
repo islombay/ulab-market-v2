@@ -226,10 +226,17 @@ func (v1 *Handlers) ChangeBrand(c *gin.Context) {
 // @produce json
 // @summary get brand all
 // @description get brand
+// @param		limit	query	int		false "Limit default 10"
+// @param		page	query	int		false "Page default 1"
 // @success 200 {object} []models.Brand "brand returned"
 // @failure 500 {object} models_v1.Response "Internal error"
 func (v1 *Handlers) GetAllBrand(c *gin.Context) {
-	res, err := v1.storage.Brand().GetAll(context.Background())
+
+	var m models.Pagination
+	c.ShouldBind(&m)
+	m.Fix()
+
+	res, count, err := v1.storage.Brand().GetAll(context.Background(), m)
 	if err != nil {
 		v1.log.Error("could not get all brands", logs.Error(err))
 		v1.error(c, status.StatusInternal)
@@ -241,7 +248,12 @@ func (v1 *Handlers) GetAllBrand(c *gin.Context) {
 			res[i].Image = models.GetStringAddress(v1.filestore.GetURL(*res[i].Image))
 		}
 	}
-	v1.response(c, http.StatusOK, res)
+
+	v1.response(c, http.StatusOK, models.Response{
+		StatusCode: http.StatusOK,
+		Count:      count,
+		Data:       res,
+	})
 }
 
 // DeleteBrand
