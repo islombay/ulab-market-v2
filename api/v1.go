@@ -243,6 +243,7 @@ func NewV1(
 		)
 
 		product.GET("", handler.GetAllProducts)
+		product.GET("_pagin", handler.GetAllProductsPagination)
 		product.GET("/:id", handler.GetProductByID)
 		product.GET("/admin/:id", handler.MiddlewareIsStaff(), handler.GetProductByIDAdmin)
 	}

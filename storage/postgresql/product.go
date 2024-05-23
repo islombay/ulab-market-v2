@@ -2,6 +2,7 @@ package postgresql
 
 import (
 	"app/api/models"
+	models_v1 "app/api/models/v1"
 	"app/pkg/logs"
 	"app/storage"
 	"context"
@@ -302,6 +303,82 @@ func (db *ProductRepo) GetAll(ctx context.Context, query, catid, bid *string, re
 		products = append(products, &m)
 	}
 	return products, nil
+}
+
+func (db *ProductRepo) GetAllPagination(ctx context.Context, pagination models_v1.ProductPagination) ([]*models.Product, int, error) {
+	whereClause := "deleted_at is null"
+	withClause := ""
+
+	if pagination.CategoryID != nil {
+		withClause = fmt.Sprintf(`with subcategory_ids as (
+			select id from category
+			where (parent_id = '%s' or id = '%s')
+			and deleted_at is null
+		)`, *pagination.CategoryID, *pagination.CategoryID)
+
+		whereClause += " and category_id in (select id from subcategory_ids)"
+	}
+
+	if pagination.BrandID != nil {
+		whereClause += fmt.Sprintf(" and brand_id = '%s'", *pagination.BrandID)
+	}
+
+	if pagination.Query != "" {
+		pagination.Query = "'%" + pagination.Query + "%'"
+		whereClause += fmt.Sprintf(
+			` and (
+				name_uz ilike %s or name_ru ilike %s or
+				description_uz ilike %s or description_ru ilike %s
+			)`, pagination.Query, pagination.Query, pagination.Query, pagination.Query,
+		)
+	}
+
+	q := fmt.Sprintf(`%s select
+			id, articul, name_uz, name_ru,
+			description_uz, description_ru,
+			outcome_price, (
+				select coalesce(sum(s.quantity), 0) from storage as s
+				where s.product_id = p.id
+			) as quantity, category_id, brand_id,
+			rating, status, main_image,
+			created_at, updated_at, deleted_at,
+			view_count, (
+				select count(*) from products where %s
+			)
+		from products as p
+		where %s
+		order by p.created_at desc
+		limit %d offset %d`,
+		withClause, whereClause, whereClause, pagination.Limit, pagination.Offset)
+
+	products := []*models.Product{}
+	rows, _ := db.db.Query(ctx, q)
+	if rows.Err() != nil {
+		return nil, 0, rows.Err()
+	}
+	defer rows.Close()
+
+	var count int
+
+	for rows.Next() {
+		var m models.Product
+		if err := rows.Scan(
+			&m.ID, &m.Articul,
+			&m.NameUz, &m.NameRu,
+			&m.DescriptionUz, &m.DescriptionRu,
+			&m.OutcomePrice,
+			&m.Quantity,
+			&m.CategoryID, &m.BrandID,
+			&m.Rating, &m.Status, &m.MainImage,
+			&m.CreatedAt, &m.UpdatedAt, &m.DeletedAt,
+			&m.ViewCount, &count,
+		); err != nil {
+			return nil, 0, err
+		}
+
+		products = append(products, &m)
+	}
+	return products, count, nil
 }
 
 func (db *ProductRepo) GetProductImageFilesByID(ctx context.Context, id string) ([]models.ProductMediaFiles, error) {

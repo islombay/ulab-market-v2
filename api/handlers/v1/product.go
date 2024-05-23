@@ -343,7 +343,7 @@ func (v1 *Handlers) CreateProduct(c *gin.Context) {
 // @param cid query string false "Category ID to search in"
 // @param q query string false "Query to search product"
 // @param bid query string false "Brand ID to search in"
-// @param offset query int false "Offset value. Default 0"
+// @param page query int false "Page value. Default 0"
 // @param limit query int false "Limit value. Default 10"
 // @produce json
 // @Success 200 {object} []models.Product "Success"
@@ -375,7 +375,7 @@ func (v1 *Handlers) GetAllProducts(c *gin.Context) {
 		m.BrandID,
 		models.GetProductAllLimits{
 			Limit:  m.Limit,
-			Offset: m.Offset,
+			Offset: (m.Page - 1) * m.Limit,
 		})
 	if err != nil {
 		v1.error(c, status.StatusInternal)
@@ -419,6 +419,89 @@ func (v1 *Handlers) GetAllProducts(c *gin.Context) {
 	}
 
 	v1.response(c, http.StatusOK, res)
+}
+
+// GetAllProductsPagination
+// @id GetAllProductsPagination
+// @router /api/product/_pagin [get]
+// @summary get all products
+// @description get all products
+// @tags product
+// @param cid query string false "Category ID to search in"
+// @param q query string false "Query to search product"
+// @param bid query string false "Brand ID to search in"
+// @param page query int false "page value. Default 1"
+// @param limit query int false "Limit value. Default 10"
+// @produce json
+// @Success 200 {object} []models.Product "Success"
+// @Failure 400 {object} models_v1.Response "Bad request / bad uuid / status invalid"
+// @Failure 404 {object} models_v1.Response "Category not found / Brand not found"
+// @Failure 500 {object} models_v1.Response "Internal error"
+func (v1 *Handlers) GetAllProductsPagination(c *gin.Context) {
+	var m models_v1.ProductPagination
+	c.ShouldBind(&m)
+
+	m.Fix()
+
+	if m.CategoryID != nil {
+		if !helper.IsValidUUID(*m.CategoryID) {
+			v1.error(c, status.StatusBadUUID)
+			return
+		}
+	}
+	if m.BrandID != nil {
+		if !helper.IsValidUUID(*m.BrandID) {
+			v1.error(c, status.StatusBadUUID)
+			return
+		}
+	}
+	products, count, err := v1.storage.Product().GetAllPagination(context.Background(), m)
+	if err != nil {
+		v1.error(c, status.StatusInternal)
+		v1.log.Error("could not get all products", logs.Error(err))
+		return
+	}
+
+	res := make([]models_v1.Product, len(products))
+
+	for i, p := range products {
+		if p.MainImage != nil {
+			p.MainImage = models.GetStringAddress(v1.filestore.GetURL(*p.MainImage))
+		}
+		tmp := models_v1.Product{}
+		if err := helper.Reobject(*p, &tmp, "obj"); err != nil {
+			v1.error(c, status.StatusInternal)
+			v1.log.Error("could not reobject", logs.Error(err))
+			return
+		}
+
+		if p.CategoryID != nil {
+			tmpCat, err := v1.storage.Category().GetByID(context.Background(), *p.CategoryID)
+			if err != nil {
+				if errors.Is(err, pgx.ErrNoRows) {
+					v1.log.Error("could not find category by id from product", logs.String("pid", p.ID),
+						logs.String("cid", *p.CategoryID))
+				} else {
+					v1.log.Error("could not get category information from product", logs.String("pid", p.ID),
+						logs.String("cid", *p.CategoryID), logs.Error(err))
+				}
+			} else {
+				tmp.CategoryInformation = *tmpCat
+				if tmp.CategoryInformation.Image != nil {
+					tmp.CategoryInformation.Image = models.GetStringAddress(v1.filestore.GetURL(*tmp.CategoryInformation.Image))
+				}
+			}
+		}
+		tmp.Articul = p.Articul
+
+		res[i] = tmp
+	}
+
+	v1.response(c, http.StatusOK, models.Response{
+		StatusCode: http.StatusOK,
+		Count:      count,
+		Data:       res,
+	})
 }
 
 // GetProductByID

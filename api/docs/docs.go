@@ -1793,6 +1793,12 @@ const docTemplate = `{
                         "description": "Page, default 1",
                         "name": "page",
                         "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Query to search",
+                        "name": "q",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -3422,8 +3428,8 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "Offset value. Default 0",
-                        "name": "offset",
+                        "description": "Page value. Default 0",
+                        "name": "page",
                         "in": "query"
                     },
                     {
@@ -3668,6 +3674,80 @@ const docTemplate = `{
                     },
                     "415": {
                         "description": "Image type is not supported / Video type is not supported",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal error",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/product/_pagin": {
+            "get": {
+                "description": "get all products",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "product"
+                ],
+                "summary": "get all products",
+                "operationId": "GetAllProductsPagination",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Category ID to search in",
+                        "name": "cid",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Query to search product",
+                        "name": "q",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Brand ID to search in",
+                        "name": "bid",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page value. Default 1",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Limit value. Default 10",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Product"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request / bad uuid / status invalid",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Category not found / Brand not found",
                         "schema": {
                             "$ref": "#/definitions/models_v1.Response"
                         }

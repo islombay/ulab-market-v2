@@ -96,6 +96,7 @@ type ProductInterface interface {
 	CreateProduct(ctx context.Context, m models.Product) error
 
 	GetAll(ctx context.Context, query, catid, bid *string, req models.GetProductAllLimits) ([]*models.Product, error)
+	GetAllPagination(ctx context.Context, pagination models_v1.ProductPagination) ([]*models.Product, int, error)
 	GetByID(ctx context.Context, id string) (*models.Product, error)
 
 	DeleteProductByID(ctx context.Context, id string) error

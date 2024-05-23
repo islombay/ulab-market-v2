@@ -36,8 +36,14 @@ type GetAllProductsQueryParams struct {
 	CategoryID *string `form:"cid"`
 	Query      *string `form:"q"`
 	BrandID    *string `form:"bid"`
-	Offset     int     `form:"offset"`
+	Page       int     `form:"page"`
 	Limit      int     `form:"limit"`
+}
+
+type ProductPagination struct {
+	CategoryID *string `form:"cid"`
+	BrandID    *string `form:"bid"`
+	models.Pagination
 }
 
 type ChangeProductMainImage struct {
