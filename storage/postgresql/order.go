@@ -54,7 +54,14 @@ func (db *OrderRepo) Create(ctx context.Context, m models.OrderModel) error {
 		}
 		return err
 	}
-	return err
+
+	q = `update clients set name = $1, surname = $2 where id = $3`
+	_, err = db.db.Exec(ctx, q, m.ClientFirstName, m.ClientLastName, m.UserID)
+	if err != nil {
+		db.log.Error("could not change the name of client in order", logs.Error(err), logs.String("uid", m.UserID),
+			logs.String("name", *m.ClientFirstName), logs.String("surname", *m.ClientLastName))
+	}
+	return nil
 }
 
 func (db *OrderRepo) Delete(ctx context.Context, id string) error {

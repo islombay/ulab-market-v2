@@ -43,6 +43,10 @@ const (
 	OrderStatusPicked     = "picked"
 )
 
+var (
+	PaymentTypes = []string{"card", "cash"}
+)
+
 func (srv OrderService) CreateOrder(ctx context.Context, order models_v1.CreateOrder) (interface{}, *status.Status) {
 	userID, ok := ctx.Value(ContextUserID).(string)
 	if !ok {
@@ -52,6 +56,10 @@ func (srv OrderService) CreateOrder(ctx context.Context, order models_v1.CreateO
 
 	if !helper.IsValidPhone(order.ClientPhone) {
 		return nil, &status.StatusBadPhone
+	}
+
+	if order.PaymentType != PaymentTypes[0] || order.PaymentType != PaymentTypes[1] {
+		return nil, &status.StatusPaymentTypeInvalid
 	}
 
 	order.PaymentCardType = strings.ToLower(order.PaymentCardType)
