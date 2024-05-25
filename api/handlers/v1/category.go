@@ -31,6 +31,7 @@ import (
 // @param image formData file false "Image file"
 // @Success 200 {object} models_v1.ResponseID "success"
 // @Failure 400 {object} models_v1.Response "Bad request"
+// @failure 404 {object} models_v1.Response "Icon ID not found / Parent category not found"
 // @Failure 409 {object} models_v1.Response "Already exists"
 // @Failure 500 {object} models_v1.Response "internal error"
 func (v1 *Handlers) CreateCategory(c *gin.Context) {
@@ -164,8 +165,8 @@ func (v1 *Handlers) CreateCategory(c *gin.Context) {
 // @Param changeCategoryImage formData models_v1.ChangeCategoryImage true "change category image"
 // @param image formData file false "picture file"
 // @Success 200 {object} models_v1.Response "Success"
-// @Failure 400 {object} models_v1.Response "Bad request / bad uuid"
-// @Failure 404 {object} models_v1.Response "Category not found"
+// @Failure 400 {object} models_v1.Response "Bad Request / Bad UUID / No update"
+// @Failure 404 {object} models_v1.Response "Category not found / Icon not found"
 // @Failure 413 {object} models_v1.Response "Image size is big"
 // @Failure 415 {object} models_v1.Response "Image type is not supported"
 // @Failure 500 {object} models_v1.Response "Internal error"
@@ -269,8 +270,8 @@ func (v1 *Handlers) ChangeCategoryImage(c *gin.Context) {
 // @produce json
 // @param changeCategory body models_v1.ChangeCategory true "change category. all old values must be also given"
 // @Success 200 {object} models_v1.Response "Success"
-// @Failure 400 {object} models_v1.Response "Bad request / bad uuid"
-// @Failure 404 {object} models_v1.Response "Category not found/ parent category not found"
+// @Failure 400 {object} models_v1.Response "Bad Request / Bad UUID / Text too long"
+// @Failure 404 {object} models_v1.Response "Category not found / Parent category not found / Icon not found"
 // @Failure 500 {object} models_v1.Response "Internal error"
 func (v1 *Handlers) ChangeCategory(c *gin.Context) {
 	var m models_v1.ChangeCategory
@@ -514,8 +515,8 @@ func (v1 *Handlers) GetAllCategory(c *gin.Context) {
 // @param id path string true "category id"
 // @description delete category & delete category translations
 // @success 200 {object} models_v1.Response "deleted successfully"
-// @failure 400 {object} models_v1.Response "bad uuid"
-// @failure 404 {object} models_v1.Response "category not found"
+// @failure 400 {object} models_v1.Response "Bad UUID"
+// @failure 404 {object} models_v1.Response "Category not found"
 // @failure 500 {object} models_v1.Response "Internal error"
 func (v1 *Handlers) DeleteCategory(c *gin.Context) {
 	id := c.Param("id")
@@ -552,7 +553,7 @@ func (v1 *Handlers) DeleteCategory(c *gin.Context) {
 // @produce json
 // @param 	id 	path string true 		"Category id"
 // @success 200 {object} models.Brand 		"Success"
-// @failure 400 {object} models_v1.Response "Bad id"
+// @failure 400 {object} models_v1.Response "Bad UUID"
 // @failure 500 {object} models_v1.Response "Internal server error"
 func (v1 *Handlers) GetCategoryBrands(c *gin.Context) {
 	id := c.Param("id")
