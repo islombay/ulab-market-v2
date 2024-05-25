@@ -59,6 +59,7 @@ func (srv OrderService) CreateOrder(ctx context.Context, order models_v1.CreateO
 	}
 
 	if order.PaymentType != PaymentTypes[0] || order.PaymentType != PaymentTypes[1] {
+		srv.log.Error("bad payment type", logs.String("user_provided", order.PaymentType))
 		return nil, &status.StatusPaymentTypeInvalid
 	}
 
