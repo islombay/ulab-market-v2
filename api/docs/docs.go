@@ -1447,13 +1447,13 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad request / bad uuid",
+                        "description": "Bad Request / Bad UUID / Text too long",
                         "schema": {
                             "$ref": "#/definitions/models_v1.Response"
                         }
                     },
                     "404": {
-                        "description": "Category not found/ parent category not found",
+                        "description": "Category not found / Parent category not found / Icon not found",
                         "schema": {
                             "$ref": "#/definitions/models_v1.Response"
                         }
@@ -1527,6 +1527,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/models_v1.Response"
                         }
                     },
+                    "404": {
+                        "description": "Icon ID not found / Parent category not found",
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.Response"
+                        }
+                    },
                     "409": {
                         "description": "Already exists",
                         "schema": {
@@ -1588,13 +1594,13 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad request / bad uuid",
+                        "description": "Bad Request / Bad UUID / No update",
                         "schema": {
                             "$ref": "#/definitions/models_v1.Response"
                         }
                     },
                     "404": {
-                        "description": "Category not found",
+                        "description": "Category not found / Icon not found",
                         "schema": {
                             "$ref": "#/definitions/models_v1.Response"
                         }
@@ -1705,13 +1711,13 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "bad uuid",
+                        "description": "Bad UUID",
                         "schema": {
                             "$ref": "#/definitions/models_v1.Response"
                         }
                     },
                     "404": {
-                        "description": "category not found",
+                        "description": "Category not found",
                         "schema": {
                             "$ref": "#/definitions/models_v1.Response"
                         }
@@ -1754,7 +1760,7 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad id",
+                        "description": "Bad UUID",
                         "schema": {
                             "$ref": "#/definitions/models_v1.Response"
                         }
@@ -4826,6 +4832,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "icon_id": {
+                    "type": "string"
+                },
+                "icon_id1": {
                     "type": "string"
                 },
                 "id": {

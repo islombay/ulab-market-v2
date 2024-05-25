@@ -8,3 +8,6 @@ mocks/
 app
 api/docs/swagger.json
 api/docs/swagger.yaml
+source_dbname.dump
+*.sh
+db_backup

@@ -70,6 +70,7 @@ func (srv OrderService) CreateOrder(ctx context.Context, order models_v1.CreateO
 		PaymentType:     order.PaymentType,
 		PaymentCardType: models.GetStringAddress(order.PaymentCardType),
 		UserID:          userID,
+
 		ClientFirstName: &order.ClientFirstName,
 		ClientLastName:  &order.ClientLastName,
 		ClientPhone:     &order.ClientPhone,
