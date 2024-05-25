@@ -3,13 +3,14 @@ package models
 import "time"
 
 type Category struct {
-	ID       string      `json:"id,omitempty" db:"id"`
-	NameUz   string      `json:"name_uz,omitempty" db:"name_uz"`
-	NameRu   string      `json:"name_ru,omitempty" db:"name_ru"`
-	Image    *string     `json:"image,omitempty" db:"image"`
-	IconID   *string     `json:"icon_id,omitempty" db:"icon_id"`
-	ParentID *string     `json:"parent_id,omitempty" db:"parent_id"`
-	Sub      []*Category `json:"subcategories,omitempty"`
+	ID        string      `json:"id,omitempty" db:"id"`
+	NameUz    string      `json:"name_uz,omitempty" db:"name_uz"`
+	NameRu    string      `json:"name_ru,omitempty" db:"name_ru"`
+	Image     *string     `json:"image,omitempty" db:"image"`
+	IconID    *string     `json:"icon_id,omitempty" db:"icon_id"`
+	IconIDFix string      `json:"icon_id1,omitempty"`
+	ParentID  *string     `json:"parent_id,omitempty" db:"parent_id"`
+	Sub       []*Category `json:"subcategories,omitempty"`
 
 	CreatedAt time.Time  `db:"created_at" json:"created_at"`
 	UpdatedAt time.Time  `db:"updated_at" json:"updated_at"`

@@ -416,7 +416,9 @@ func (v1 *Handlers) GetCategoryByID(c *gin.Context) {
 		}
 	}
 	cat.Sub = subs
+
 	if cat.IconID != nil && *cat.IconID != "" {
+		cat.IconIDFix = *cat.IconID
 		i, err := v1.storage.Icon().GetIconByID(context.Background(), *cat.IconID)
 		if err != nil {
 			v1.log.Error("could not get icon by id", logs.Error(err))
