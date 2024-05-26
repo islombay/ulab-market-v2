@@ -354,6 +354,9 @@ func (v1 *Handlers) ChangeCategory(c *gin.Context) {
 	if err := v1.storage.Category().ChangeCategory(context.Background(), ct); err != nil {
 		if errors.Is(err, storage.ErrNotAffected) {
 			v1.log.Error("got not affected on changing category")
+		} else if errors.Is(err, storage.ErrAlreadyExists) {
+			v1.error(c, status.StatusAlreadyExists)
+			return
 		}
 		v1.error(c, status.StatusInternal)
 		v1.log.Error("could not update category", logs.Error(err), logs.String("category_id", ct.ID))
