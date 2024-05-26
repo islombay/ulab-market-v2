@@ -7,6 +7,7 @@ import (
 	"app/pkg/logs"
 	"context"
 	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -79,9 +80,11 @@ func (v1 *Handlers) MiddlewareIsCourier() gin.HandlerFunc {
 			return
 		}
 		if usr.RoleID != auth_lib.RoleCourier.ID {
+			fmt.Println("here")
 			v1.error(c, status.StatusForbidden)
 			return
 		}
+
 		c.Set(UserIDContext, token.UID)
 		c.Set(UserRoleContext, token.Type)
 		c.Next()

@@ -48,6 +48,11 @@ func (v1 *Handlers) CreateBrand(c *gin.Context) {
 		m.Image = nil
 	}
 
+	if m.Image == nil {
+		v1.error(c, status.StatusBadRequest)
+		return
+	}
+
 	if m.Image != nil {
 		if m.Image.Size > v1.cfg.Media.CategoryPhotoMaxSize {
 			v1.error(c, status.StatusImageMaxSizeExceed)

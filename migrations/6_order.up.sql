@@ -44,12 +44,13 @@ BEGIN
     unix_time := unix_time % 1000000000;
     
     -- Generate random letters
-    random_letters := CHR(ASCII('a') + floor(random() * 26)) || CHR(ASCII('a') + floor(random() * 26));
+    random_letters := CHR(ASCII('a') + floor(random() * 26)::INT) || CHR(ASCII('a') + floor(random() * 26)::INT);
 
     -- Concatenate letters and modified Unix time
     RETURN random_letters || unix_time;
 END;
 $$ LANGUAGE plpgsql;
+
 
 create table if not exists orders (
     id uuid primary key default uuid_generate_v4(),
@@ -65,6 +66,7 @@ create table if not exists orders (
     status status_order_enum default 'in_process',
     total_price numeric,
     payment_type payment_order_enum,
+    payment_card_type varchar(250),
     
     delivery_type delivery_order_enum not null default 'deliver',
     delivery_addr_lat float not null,
