@@ -13,6 +13,7 @@ type IServiceManager interface {
 	Income() *IncomeService
 	Courier() *courierService
 	Client() *clientService
+	Notify() *notificationService
 }
 
 type Service struct {
@@ -20,15 +21,17 @@ type Service struct {
 	favourite    *FavouriteService
 	storeService *storeService
 
-	income  *IncomeService
-	courier *courierService
-	client  *clientService
+	income       *IncomeService
+	courier      *courierService
+	client       *clientService
+	notification *notificationService
 }
 
 func New(str storage.StoreInterface, log logs.LoggerInterface, filestorage storage.FileStorageInterface, cache storage.CacheInterface, stmp smtp.SMTPInterface) IServiceManager {
 	srv := Service{}
 
-	srv.order = NewOrderService(str, log, filestorage)
+	srv.notification = NewNotificationService(log)
+	srv.order = NewOrderService(str, log, filestorage, srv.notification)
 	srv.storeService = NewStoreService(str, log)
 	srv.favourite = NewFavouriteService(str, log)
 	srv.income = NewIncomeService(str, log)
@@ -60,6 +63,10 @@ func (s *Service) Income() *IncomeService {
 
 func (s *Service) Courier() *courierService {
 	return s.courier
+}
+
+func (s *Service) Notify() *notificationService {
+	return s.notification
 }
 
 var (

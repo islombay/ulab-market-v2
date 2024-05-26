@@ -31,11 +31,11 @@ import (
 // @Failure 409 {object} models_v1.Response "Already exists"
 // @Failure 500 {object} models_v1.Response "internal error"
 func (v1 *Handlers) AddBranch(c *gin.Context) {
-	v1.error(c, status.Status{
-		Message: "Not found",
-		Code:    http.StatusNotFound,
-	})
-	return
+	// v1.error(c, status.Status{
+	// 	Message: "Not found",
+	// 	Code:    http.StatusNotFound,
+	// })
+	// return
 	var m models_v1.CreateBranch
 	if err := c.BindJSON(&m); err != nil {
 		v1.log.Debug("got bad request for create branch", logs.Error(err))

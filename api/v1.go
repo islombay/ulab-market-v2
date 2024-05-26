@@ -29,6 +29,8 @@ func NewV1(
 
 	v1 := r.Group("/")
 
+	go service.Notify().Courier.HandleNotifications()
+
 	super := v1.Group("/super")
 	{
 		super.GET("migrate-down",
@@ -128,6 +130,11 @@ func NewV1(
 		courier.DELETE("/:id",
 			handler.MiddlewareStaffPermissionCheck(auth_lib.PermissionDeleteCourier),
 			handler.DeleteCourier,
+		)
+
+		courier.GET("/order/ws",
+			handler.MiddlewareIsCourier(),
+			handler.CourierOrdersRealTimeConnection,
 		)
 	}
 

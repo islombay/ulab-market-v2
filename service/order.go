@@ -22,16 +22,20 @@ type OrderService struct {
 	store       storage.StoreInterface
 	log         logs.LoggerInterface
 	filestorage storage.FileStorageInterface
+
+	notification *notificationService
 }
 
 func NewOrderService(store storage.StoreInterface,
 	log logs.LoggerInterface,
 	filestorage storage.FileStorageInterface,
+	notify *notificationService,
 ) OrderService {
 	return OrderService{
-		log:         log,
-		store:       store,
-		filestorage: filestorage,
+		log:          log,
+		store:        store,
+		filestorage:  filestorage,
+		notification: notify,
 	}
 }
 
@@ -160,6 +164,19 @@ func (srv OrderService) CreateOrder(ctx context.Context, order models_v1.CreateO
 		srv.store.Basket().Delete(ctx, userID, product_basket.ProductID)
 	}
 
+	go func() {
+		ctx, cancel := context.WithTimeout(
+			context.Background(),
+			time.Second*5,
+		)
+		defer cancel()
+		order, errStatus := srv.GetByID(ctx, orderModel.ID)
+		if errStatus != nil {
+			srv.log.Error("could not get the order by id after it was created and send to websocket")
+		} else {
+			srv.notification.Courier.WriteToQueue(*order.(*models.OrderModel))
+		}
+	}()
 	return models_v1.Response{
 		Code:    200,
 		Message: "Ok",

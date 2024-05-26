@@ -4,6 +4,7 @@ import (
 	models_v1 "app/api/models/v1"
 	"app/api/status"
 	"app/pkg/helper"
+	"app/pkg/logs"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -67,4 +68,21 @@ func (v1 *Handlers) DeleteCourier(c *gin.Context) {
 		return
 	}
 	v1.response(c, http.StatusOK, resp)
+}
+
+func (v1 *Handlers) CourierOrdersRealTimeConnection(c *gin.Context) {
+	ws, err := v1.service.Notify().Courier.GetUpgrader(c.Writer, c.Request)
+	if err != nil {
+		v1.error(c, status.StatusInternal)
+		return
+	}
+
+	defer ws.Close()
+
+	for {
+		if _, _, err := ws.ReadMessage(); err != nil {
+			v1.log.Debug("lost connection with client", logs.Error(err))
+			return
+		}
+	}
 }
