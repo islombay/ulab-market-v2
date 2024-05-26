@@ -213,6 +213,10 @@ func (v1 *Handlers) ChangeBrand(c *gin.Context) {
 	}
 
 	if err := v1.storage.Brand().Change(context.Background(), *b); err != nil {
+		if errors.Is(err, storage.ErrAlreadyExists) {
+			v1.error(c, status.StatusAlreadyExists)
+			return
+		}
 		v1.error(c, status.StatusInternal)
 		v1.log.Error("could not update brand", logs.Error(err), logs.String("bid", m.ID))
 		return

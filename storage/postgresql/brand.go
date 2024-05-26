@@ -89,6 +89,12 @@ func (db *BrandRepo) Change(ctx context.Context, m models.Brand) error {
 	q += ` where id = $1`
 
 	if _, err := db.db.Exec(ctx, q, m.ID); err != nil {
+		var pgcon *pgconn.PgError
+		if errors.As(err, &pgcon) {
+			if pgcon.Code == DuplicateKeyError {
+				return storage.ErrAlreadyExists
+			}
+		}
 		return err
 	}
 	return nil

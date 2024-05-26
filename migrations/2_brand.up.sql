@@ -7,3 +7,4 @@ create table if not exists brands (
     updated_at timestamp default now() not null,
     deleted_at timestamp default null
 );
+CREATE UNIQUE INDEX unique_name_brand_active ON brands (name) WHERE deleted_at IS NULL;
