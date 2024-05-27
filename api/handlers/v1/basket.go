@@ -59,21 +59,6 @@ func (v1 *Handlers) AddToBasket(c *gin.Context) {
 		return
 	}
 
-	if _, err := v1.storage.Basket().Get(context.Background(),
-		str,
-		m.ProductID,
-	); err == nil {
-		v1.error(c, status.StatusAlreadyExists)
-		return
-	} else if err != nil {
-		if !errors.Is(err, pgx.ErrNoRows) {
-			v1.error(c, status.StatusInternal)
-			v1.log.Error("could not get basket product", logs.Error(err),
-				logs.String("uid", str), logs.String("pid", m.ProductID))
-			return
-		}
-	}
-
 	product, err := v1.storage.Product().GetByID(context.Background(), m.ProductID)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
@@ -82,6 +67,46 @@ func (v1 *Handlers) AddToBasket(c *gin.Context) {
 		}
 		v1.error(c, status.StatusInternal)
 		return
+	}
+
+	if _, err := v1.storage.Basket().Get(context.Background(),
+		str,
+		m.ProductID,
+	); err == nil {
+		// --------------------------------------------------------------------------
+		if int(m.Quantity) > product.Quantity {
+			v1.error(c, status.StatusProductQuantityTooMany)
+			return
+		}
+
+		if err := v1.storage.Basket().ChangeQuantity(
+			context.Background(),
+			m.ProductID,
+			str,
+			int(m.Quantity),
+		); err != nil {
+			v1.error(c, status.StatusInternal)
+			v1.log.Error("could not update quantity of product in basket",
+				logs.Error(err), logs.String("uid", str),
+				logs.String("pid", m.ProductID), logs.Int("q", int(m.Quantity)),
+			)
+			return
+		}
+
+		v1.response(c, http.StatusOK, models_v1.Response{
+			Code:    200,
+			Message: "Ok",
+		})
+
+		return
+
+	} else if err != nil {
+		if !errors.Is(err, pgx.ErrNoRows) {
+			v1.error(c, status.StatusInternal)
+			v1.log.Error("could not get basket product", logs.Error(err),
+				logs.String("uid", str), logs.String("pid", m.ProductID))
+			return
+		}
 	}
 
 	if int(m.Quantity) > product.Quantity {
