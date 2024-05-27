@@ -136,7 +136,7 @@ func (db *CategoryRepo) ChangeImage(ctx context.Context, cid, imageUrl, iconURL 
 
 	updateFields["updated_at"] = time.Now()
 
-	if len(updateFields) == 0 {
+	if len(updateFields) == 1 {
 		return storage.ErrNoUpdate
 	}
 

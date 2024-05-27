@@ -30,8 +30,8 @@ type Product struct {
 
 	ViewCount int `json:"view_count,omitempty" obj:"view_count"`
 
-	CreatedAt time.Time  `db:"created_at" json:"created_at" obj:"created_at"`
-	UpdatedAt time.Time  `db:"updated_at" json:"updated_at" obj:"updated_at"`
+	CreatedAt time.Time  `db:"created_at" json:"created_at,omitempty" obj:"created_at"`
+	UpdatedAt time.Time  `db:"updated_at" json:"updated_at,omitempty" obj:"updated_at"`
 	DeletedAt *time.Time `db:"deleted_at" json:"deleted_at,omitempty"`
 }
 

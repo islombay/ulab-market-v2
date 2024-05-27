@@ -6,10 +6,12 @@ import (
 	"app/pkg/logs"
 	"app/storage"
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
 
+	"github.com/jackc/pgconn"
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
@@ -451,32 +453,75 @@ func (db *ProductRepo) IncrementViewCount(ctx context.Context, id string) error 
 }
 
 func (db *ProductRepo) Change(ctx context.Context, m *models.Product) error {
-	q := `update products set
-			articul = $1,
-			name_uz = $2,
-			name_ru = $3,
-			description_ru = $4,
-			description_uz = $5,
-			outcome_price = $6,
-			category_id = $7,
-			brand_id = $8,
-			updated_at = now()
-		where id = $9 and deleted_at is null
+
+	updateFields := make(map[string]interface{})
+
+	if m.Articul != "" {
+		updateFields["articul"] = m.Articul
+	}
+
+	if m.NameRu != "" {
+		updateFields["name_ru"] = m.NameRu
+	}
+
+	if m.NameUz != "" {
+		updateFields["name_uz"] = m.NameUz
+	}
+
+	if m.DescriptionRu != "" {
+		updateFields["description_ru"] = m.DescriptionRu
+	}
+
+	if m.DescriptionUz != "" {
+		updateFields["description_uz"] = m.DescriptionUz
+	}
+
+	if m.OutcomePrice != 0 {
+		updateFields["outcome_price"] = m.OutcomePrice
+	}
+
+	if m.CategoryID != nil && *m.CategoryID != "" {
+		updateFields["category_id"] = m.CategoryID
+	}
+
+	if m.BrandID != nil && *m.BrandID != "" {
+		updateFields["brand_id"] = m.BrandID
+	}
+
+	updateFields["updated_at"] = time.Now()
+
+	if len(updateFields) <= 1 {
+		return storage.ErrNoUpdate
+	}
+
+	setParts := []string{}
+	args := []interface{}{}
+	iv := 1
+	for k, v := range updateFields {
+		setParts = append(setParts, fmt.Sprintf("%s = $%d", k, iv))
+		args = append(args, v)
+		iv++
+	}
+
+	q := fmt.Sprintf(`
+		update products set %s
+		where id = $%d and deleted_at is null
 		returning
 			id, articul, name_uz, name_ru,
 			description_uz, description_ru,
 			outcome_price, (
 				select coalesce(sum(s.quantity), 0) from storage as s
-				where s.product_id = $9
+				where s.product_id = $%d
 			) as quantity, category_id, brand_id,
 			status, rating, main_image, view_count,
-			created_at, updated_at, deleted_at`
+			created_at, updated_at, deleted_at`,
+		strings.Join(setParts, ", "), iv, iv)
 
-	err := db.db.QueryRow(ctx, q,
-		m.Articul, m.NameUz, m.NameRu,
-		m.DescriptionRu, m.DescriptionUz,
-		m.OutcomePrice, m.CategoryID,
-		m.BrandID, m.ID,
+	args = append(args, m.ID)
+
+	// fmt.Println(q)
+
+	err := db.db.QueryRow(ctx, q, args...,
 	).Scan(
 		&m.ID, &m.Articul, &m.NameUz, &m.NameRu,
 		&m.DescriptionUz, &m.DescriptionRu,
@@ -486,5 +531,14 @@ func (db *ProductRepo) Change(ctx context.Context, m *models.Product) error {
 		&m.ViewCount, &m.CreatedAt,
 		&m.UpdatedAt, &m.DeletedAt,
 	)
-	return err
+	if err != nil {
+		var pgerr *pgconn.PgError
+		if errors.As(err, &pgerr) {
+			if pgerr.Code == DuplicateKeyError {
+				return storage.ErrAlreadyExists
+			}
+		}
+		return err
+	}
+	return nil
 }

@@ -5482,14 +5482,7 @@ const docTemplate = `{
         "models_v1.ChangeProductRequest": {
             "type": "object",
             "required": [
-                "articul",
-                "description_ru",
-                "description_uz",
-                "id",
-                "name_ru",
-                "name_uz",
-                "outcome_price",
-                "status"
+                "id"
             ],
             "properties": {
                 "articul": {

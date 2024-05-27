@@ -98,19 +98,19 @@ type AddProductVideoFiles struct {
 
 type ChangeProductRequest struct {
 	ID      string `json:"id" binding:"required"`
-	Articul string `json:"articul" binding:"required"`
-	NameUz  string `json:"name_uz" binding:"required"`
-	NameRu  string `json:"name_ru" binding:"required"`
+	Articul string `json:"articul"`
+	NameUz  string `json:"name_uz"`
+	NameRu  string `json:"name_ru"`
 
-	DescriptionUz string `json:"description_uz" binding:"required"`
-	DescriptionRu string `json:"description_ru" binding:"required"`
+	DescriptionUz string `json:"description_uz"`
+	DescriptionRu string `json:"description_ru"`
 
-	OutcomePrice float64 `json:"outcome_price" binding:"required"`
+	OutcomePrice float64 `json:"outcome_price"`
 
 	CategoryID string `json:"category_id"`
 	BrandID    string `json:"brand_id"`
 
-	Status string `json:"status" binding:"required"`
+	Status string `json:"status"`
 }
 
 type ChangeProductPrice struct {

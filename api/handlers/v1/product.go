@@ -1136,13 +1136,13 @@ func (v1 *Handlers) EditProduct(c *gin.Context) {
 		return
 	}
 
-	if m.OutcomePrice <= 0 {
+	if m.OutcomePrice != 0 && m.OutcomePrice < 0 {
 		v1.error(c, status.StatusProductPriceInvalid)
 		return
 	}
 
 	m.Status = strings.ToLower(m.Status)
-	if !(m.Status == helper.ProductStatusActive || m.Status == helper.ProductStatusInactive) {
+	if m.Status != "" && !(m.Status == helper.ProductStatusActive || m.Status == helper.ProductStatusInactive) {
 		v1.error(c, status.StatusProductStatusInvalid)
 		return
 	}
@@ -1183,6 +1183,20 @@ func (v1 *Handlers) EditProduct(c *gin.Context) {
 		}
 	}
 
+	if m.NameRu != "" {
+		if len(m.NameRu) > 250 {
+			v1.error(c, status.StatusTextTooLong)
+			return
+		}
+	}
+
+	if m.NameUz != "" {
+		if len(m.NameUz) > 250 {
+			v1.error(c, status.StatusTextTooLong)
+			return
+		}
+	}
+
 	productModel := models.Product{
 		ID:      m.ID,
 		Articul: m.Articul,
@@ -1200,7 +1214,16 @@ func (v1 *Handlers) EditProduct(c *gin.Context) {
 		Status: m.Status,
 	}
 
-	v1.storage.Product().Change(context.Background(), &productModel)
+	if err := v1.storage.Product().Change(context.Background(), &productModel); err != nil {
+		if errors.Is(err, storage.ErrAlreadyExists) {
+			v1.error(c, status.StatusAlreadyExists)
+			return
+		}
+		v1.error(c, status.StatusInternal)
+		v1.log.Error("could not update product", logs.Error(err), logs.String("pid", productModel.ID))
+		return
+	}
+
 	if productModel.MainImage != nil {
 		productModel.MainImage = models.GetStringAddress(v1.filestore.GetURL(*productModel.MainImage))
 	}
