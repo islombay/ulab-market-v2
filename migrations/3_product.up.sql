@@ -37,7 +37,7 @@ create table if not exists products (
 );
 
 create table if not exists product_image_files (
-    id uuid primary key ,
+    id uuid primary key,
     product_id uuid not null,
     media_file varchar(255) not null,
 

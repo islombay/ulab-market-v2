@@ -157,7 +157,7 @@ func (v1 *Handlers) ChangeBrand(c *gin.Context) {
 		v1.error(c, status.StatusBadUUID)
 		return
 	}
-	b, err := v1.storage.Brand().GetByID(context.Background(), m.ID)
+	brandPrevious, err := v1.storage.Brand().GetByID(context.Background(), m.ID)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			v1.error(c, status.StatusBrandNotFound)
@@ -168,7 +168,7 @@ func (v1 *Handlers) ChangeBrand(c *gin.Context) {
 		return
 	}
 
-	b = &models.Brand{
+	b := &models.Brand{
 		ID:    m.ID,
 		Image: nil,
 		Name:  "",
@@ -209,6 +209,7 @@ func (v1 *Handlers) ChangeBrand(c *gin.Context) {
 			v1.error(c, status.StatusInternal)
 			return
 		}
+
 		b.Image = &url
 	}
 
@@ -221,6 +222,11 @@ func (v1 *Handlers) ChangeBrand(c *gin.Context) {
 		v1.log.Error("could not update brand", logs.Error(err), logs.String("bid", m.ID))
 		return
 	}
+
+	if brandPrevious.Image != nil && b.Image != nil {
+		v1.filestore.DeleteFile(*brandPrevious.Image)
+	}
+
 	v1.response(c, http.StatusOK, models_v1.Response{
 		Code:    200,
 		Message: "Ok",
