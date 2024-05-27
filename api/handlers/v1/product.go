@@ -673,6 +673,25 @@ func (v1 *Handlers) GetProductByIDAdmin(c *gin.Context) {
 	if product.MainImage != nil {
 		tmp.MainImage = *product.MainImage
 	}
+
+	fmt.Println(tmp.CategoryID)
+	if tmp.CategoryID != "" {
+		tmpCat, err := v1.storage.Category().GetByID(context.Background(), tmp.CategoryID)
+		if err != nil {
+			if errors.Is(err, pgx.ErrNoRows) {
+				v1.log.Error("could not find category by id from product", logs.String("pid", tmp.ID),
+					logs.String("cid", tmp.CategoryID))
+			} else {
+				v1.log.Error("could not get category information from product", logs.String("pid", tmp.ID),
+					logs.String("cid", tmp.CategoryID), logs.Error(err))
+			}
+		} else {
+			tmp.CategoryInformation = *tmpCat
+			if tmp.CategoryInformation.Image != nil {
+				tmp.CategoryInformation.Image = models.GetStringAddress(v1.filestore.GetURL(*tmp.CategoryInformation.Image))
+			}
+		}
+	}
 	v1.response(c, http.StatusOK, tmp)
 }
 
