@@ -276,6 +276,11 @@ func NewV1(
 			handler.MiddlewareIsClient(),
 			handler.DeleteFromBasket,
 		)
+
+		basket.DELETE("/all",
+			handler.MiddlewareIsClient(),
+			handler.DeleteAllBasket,
+		)
 	}
 
 	iconsList := v1.Group("/icon")

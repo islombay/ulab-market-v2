@@ -270,6 +270,41 @@ func (v1 *Handlers) DeleteFromBasket(c *gin.Context) {
 	})
 }
 
+// DeleteFromBasket
+// @id DeleteAllFromBasket
+// @router /api/basket/all [delete]
+// @summary delete all products from basket
+// @description delete all productsfrom basket
+// @tags basket
+// @accept json
+// @produce json
+// @security ApiKeyAuth
+// @success 200 {object} models_v1.Response "Success"
+// @failure 400 {object} models_v1.Response "Bad request / invalid product id"
+// @failure 500 {object} models_v1.Response "Internal error"
+func (v1 *Handlers) DeleteAllBasket(c *gin.Context) {
+	userID, err := v1.getUserID(c)
+	if err != nil {
+		v1.error(c, err.(status.Status))
+		return
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+
+	if err := v1.storage.Basket().DeleteAll(ctx, userID); err != nil {
+		v1.log.Error("could not delete all from basket for user", logs.Error(err),
+			logs.String("user_id", userID))
+		v1.error(c, status.StatusInternal)
+		return
+	}
+
+	v1.response(c, http.StatusOK, models_v1.Response{
+		Message: "Ok",
+		Code:    http.StatusOK,
+	})
+}
+
 // ChangeBasket
 // @id ChangeBasket
 // @router /api/basket [put]

@@ -87,6 +87,7 @@ type BasketInterface interface {
 	Get(ctx context.Context, user_id, product_id string) (*models.BasketModel, error)
 	GetAll(ctx context.Context, user_id string) ([]models.BasketModel, error)
 	Delete(ctx context.Context, user_id, product_id string) error
+	DeleteAll(ctx context.Context, user_id string) error
 
 	ChangeQuantity(ctx context.Context, pid, uid string, quantity int) error
 }

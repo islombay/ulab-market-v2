@@ -11,3 +11,4 @@ api/docs/swagger.yaml
 source_dbname.dump
 *.sh
 db_backup
+courier.txt
