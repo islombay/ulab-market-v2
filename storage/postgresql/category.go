@@ -86,14 +86,11 @@ func (db *CategoryRepo) GetAll(ctx context.Context, pagination models.Pagination
 	q := fmt.Sprintf(`select
     	id, name_uz, name_ru,
     	image, icon_id, parent_id,
-    	created_at, updated_at, deleted_at,
-		(
-			select count(*) from category where %s
-		)
+    	created_at, updated_at, deleted_at
     	from category
 		where %s
 		order by created_at desc
-		limit %d offset %d`, whereClause, whereClause, pagination.Limit, pagination.Offset)
+		limit %d offset %d`, whereClause, pagination.Limit, pagination.Offset)
 
 	m := []*models.Category{}
 	rows, _ := db.db.Query(ctx, q)
@@ -102,6 +99,10 @@ func (db *CategoryRepo) GetAll(ctx context.Context, pagination models.Pagination
 	}
 
 	var count int
+
+	if err := db.db.QueryRow(ctx, fmt.Sprintf("select count(*) from category where %s", whereClause)).Scan(&count); err != nil {
+		return nil, 0, err
+	}
 
 	for rows.Next() {
 		var tmp models.Category
@@ -115,7 +116,6 @@ func (db *CategoryRepo) GetAll(ctx context.Context, pagination models.Pagination
 			&tmp.CreatedAt,
 			&tmp.UpdatedAt,
 			&tmp.DeletedAt,
-			&count,
 		); err != nil {
 			db.log.Error("could not scan category", logs.Error(err))
 		}
