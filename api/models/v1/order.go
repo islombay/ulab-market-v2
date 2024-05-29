@@ -14,7 +14,7 @@ type CreateOrder struct {
 	DeliveryAddrLong float64 `json:"delivery_addr_long" binding:"required"`
 	DeliverAddrName  *string `json:"delivery_name"`
 
-	Products []BasketProduct `json:"products" binding:"required"`
+	// Products []BasketProduct `json:"products" binding:"required"`
 }
 
 type BasketProduct struct {
