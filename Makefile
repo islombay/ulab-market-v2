@@ -12,7 +12,7 @@ swag-install:
 binary-start:
 	./app
 
-build: swag-install
+build: swag-install swag
 	go mod tidy
 	go build -o app cmd/main.go
 
@@ -20,5 +20,5 @@ db:
 	psql -U postgres -W -h localhost -p 5432 -d ulab-market-v2
 
 run: swag run-server
-run-prod: swag binary-start
+run-prod: binary-start
 install: swag-install swag build
