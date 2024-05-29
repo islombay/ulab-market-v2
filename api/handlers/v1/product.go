@@ -722,6 +722,11 @@ func (v1 *Handlers) ChangeProductMainImage(c *gin.Context) {
 		return
 	}
 
+	if m.Image.Size == 0 {
+		v1.error(c, status.StatusBadRequest)
+		return
+	}
+
 	product, err := v1.storage.Product().GetByID(context.Background(), m.ProductID)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {

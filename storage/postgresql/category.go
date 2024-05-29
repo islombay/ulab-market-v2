@@ -86,7 +86,7 @@ func (db *CategoryRepo) GetAll(ctx context.Context, pagination models.Pagination
 	q := fmt.Sprintf(`select
     	id, name_uz, name_ru,
     	image, icon_id, parent_id,
-    	created_at, updated_at, deleted_at
+    	created_at, updated_at
     	from category
 		where %s
 		order by created_at desc
@@ -115,7 +115,6 @@ func (db *CategoryRepo) GetAll(ctx context.Context, pagination models.Pagination
 			&tmp.ParentID,
 			&tmp.CreatedAt,
 			&tmp.UpdatedAt,
-			&tmp.DeletedAt,
 		); err != nil {
 			db.log.Error("could not scan category", logs.Error(err))
 		}

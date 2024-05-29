@@ -102,3 +102,4 @@ create table if not exists category (
 
 CREATE UNIQUE INDEX unique_name_uz_active ON category (name_uz) WHERE deleted_at IS NULL;
 CREATE UNIQUE INDEX unique_name_ru_active ON category (name_ru) WHERE deleted_at IS NULL;
+CREATE INDEX idx_category_parent_id ON category (parent_id);
