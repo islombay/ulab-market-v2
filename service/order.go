@@ -425,7 +425,7 @@ func (srv OrderService) MakePicked(ctx context.Context, order_id, userID, user_t
 		}
 	} else if user_type == "courier" {
 
-		if model.DeliverUserID != nil || *model.DeliverUserID != "" {
+		if model.DeliverUserID != nil {
 			srv.log.Debug("delivering_user_id already set")
 			return nil, &status.StatusNotChangable
 		}
