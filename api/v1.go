@@ -326,16 +326,6 @@ func NewV1(
 			handler.GetOrderAll,
 		)
 
-		// order.GET("/archived",
-		// 	handler.MiddlewareIsStaff(),
-		// 	handler.GetArchivedOrder,
-		// )
-
-		// order.GET("/active",
-		// 	handler.MiddlewareIsStaff(),
-		// 	handler.GetActiveOrder,
-		// )
-
 		order.GET("/product/:id", handler.GetOrderProduct)
 		order.GET("/product", handler.GetOrderProductAll)
 
@@ -372,6 +362,11 @@ func NewV1(
 		order.GET("/courier/myorders",
 			handler.MiddlewareIsCourier(),
 			handler.CourierOrdersGetAll,
+		)
+
+		order.POST("/courier/start",
+			handler.MiddlewareIsCourier(),
+			handler.CourierStartDeliver,
 		)
 	}
 

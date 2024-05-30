@@ -409,6 +409,7 @@ func (srv OrderService) MakePicked(ctx context.Context, order_id, userID, user_t
 	if model.Status == OrderStatusDelivering ||
 		model.Status == OrderStatusFinished ||
 		model.Status == OrderStatusCanceled {
+		srv.log.Debug("finish, cancel, delivering statuses")
 		return nil, &status.StatusNotChangable
 	}
 
@@ -423,6 +424,20 @@ func (srv OrderService) MakePicked(ctx context.Context, order_id, userID, user_t
 			return nil, &status.StatusInternal
 		}
 	} else if user_type == "courier" {
+
+		if model.DeliverUserID != nil || *model.DeliverUserID != "" {
+			srv.log.Debug("delivering_user_id already set")
+			return nil, &status.StatusNotChangable
+		}
+
+		if count, errStatus := srv.getCourierActiveCount(ctx, userID); errStatus != nil {
+			return nil, errStatus
+		} else {
+			if count != 0 {
+				return nil, &status.OrderNotFinished
+			}
+		}
+
 		if err := srv.store.Order().MarkPickedByCourier(ctx, order_id, userID, time.Now()); err != nil {
 			srv.log.Error("could not mark order as picked by courier", logs.Error(err),
 				logs.String("order_id", order_id))
@@ -434,6 +449,16 @@ func (srv OrderService) MakePicked(ctx context.Context, order_id, userID, user_t
 		Message: "OK",
 		Code:    http.StatusOK,
 	}, nil
+}
+
+func (srv OrderService) getCourierActiveCount(ctx context.Context, courier_id string) (int, *status.Status) {
+	if count, err := srv.store.Order().GetCourierActiveListCount(ctx, courier_id); err != nil {
+		srv.log.Error("could not get count of courier active orders", logs.Error(err),
+			logs.String("courier_id", courier_id))
+		return 0, &status.StatusInternal
+	} else {
+		return count, nil
+	}
 }
 
 func (srv OrderService) GetOrderAllByClient(ctx context.Context, userID string, pagination models.Pagination) (interface{}, *status.Status) {
@@ -492,8 +517,8 @@ func (srv OrderService) OrderDelivered(ctx context.Context, userID, orderID stri
 		return nil, &status.StatusNotChangable
 	}
 
-	if order.Status != OrderStatusPicked {
-		return nil, &status.OrderNotYetPicked
+	if order.Status != OrderStatusDelivering {
+		return nil, &status.OrderNotYetDelivering
 	}
 
 	if err := srv.store.Order().MarkDelivered(ctx, orderID); err != nil {
@@ -525,5 +550,41 @@ func (srv OrderService) GetCourierFinishedOrders(ctx context.Context, userID str
 		StatusCode: 200,
 		Data:       model,
 		Count:      count,
+	}, nil
+}
+
+func (srv OrderService) CourierStartDelivering(ctx context.Context, model models_v1.CourierStartDeliverRequest) (interface{}, *status.Status) {
+	order, err := srv.store.Order().GetByID(ctx, model.OrderID)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			srv.log.Error("could not find the the order by id in", logs.String("order_id", model.OrderID))
+			return nil, &status.StatusNotFound
+		}
+
+		srv.log.Error("could not get by id order", logs.Error(err), logs.String("order_id", model.OrderID))
+		return nil, &status.StatusInternal
+	}
+
+	if order.DeletedAt != nil {
+		return nil, &status.StatusNotFound
+	}
+
+	if order.Status == OrderStatusCanceled ||
+		order.Status == OrderStatusFinished {
+		return nil, &status.StatusNotChangable
+	}
+
+	if order.Status != OrderStatusPicked {
+		return nil, &status.OrderNotYetPicked
+	}
+
+	if err := srv.store.Order().MarkDelivering(ctx, model.OrderID, model.CourierID); err != nil {
+		srv.log.Error("could not mark the order as delivering", logs.Error(err), logs.String("order_id", order.ID))
+		return nil, &status.StatusInternal
+	}
+
+	return models_v1.Response{
+		Message: "Ok",
+		Code:    http.StatusOK,
 	}, nil
 }

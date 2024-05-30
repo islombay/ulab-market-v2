@@ -503,3 +503,42 @@ func (v1 *Handlers) CourierOrdersGetAll(c *gin.Context) {
 	}
 	v1.response(c, http.StatusOK, res)
 }
+
+// CourierStartDeliver
+// @id			CourierStartDeliver
+// @router		/api/order/courier/start [post]
+// @summary		Start the delivering
+// @description	Start the delivering
+// @tags		order
+// @security	ApiKeyAuth
+// @param 		start_order body models_v1.CourierStartDeliverRequest true "Start order body"
+// @success		200 {object}	models.Response		"Success"
+// @failure		400 {object}	models.Response		"Bad Request"
+// @failure		404 {object}	models.Response		"Not found"
+// @failure		405 {object}	models.Response		"Cannot change"
+// @failure		406	{object}	models.Response		"Order not yet picked \ Order not yet delivering"
+// @failure		500 {object}	models.Response		"Internal server error"
+func (v1 *Handlers) CourierStartDeliver(c *gin.Context) {
+	var m models_v1.CourierStartDeliverRequest
+	if c.BindJSON(&m) != nil {
+		v1.error(c, status.StatusBadRequest)
+		return
+	}
+	userID, err := v1.getUserID(c)
+	if err != nil {
+		v1.error(c, err.(status.Status))
+		return
+	}
+
+	m.CourierID = userID
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+
+	res, errStatus := v1.service.Order().CourierStartDelivering(ctx, m)
+	if errStatus != nil {
+		v1.error(c, *errStatus)
+		return
+	}
+	v1.response(c, http.StatusOK, res)
+}

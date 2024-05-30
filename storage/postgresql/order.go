@@ -235,6 +235,22 @@ func (db *OrderRepo) GetNew(ctx context.Context, pagination models.Pagination, f
 	return res, count, nil
 }
 
+func (db *OrderRepo) GetCourierActiveListCount(ctx context.Context, courier_id string) (int, error) {
+	q := fmt.Sprintf(
+		`select count(*) from orders
+		where deleted_at is null and delivering_user_id = '%s' and
+		status in ('in_process', 'picked', 'delivering')`,
+		courier_id,
+	)
+
+	var count int
+	if err := db.db.QueryRow(ctx, q).Scan(&count); err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}
+
 func (db *OrderRepo) GetCourierActiveList(ctx context.Context, pagination models.Pagination, courier_id string) ([]models.OrderModel, int, error) {
 	whereClause := fmt.Sprintf(
 		`deleted_at is null and delivering_user_id = '%s' and
@@ -311,6 +327,25 @@ func (db *OrderRepo) MarkPicked(ctx context.Context, order_id, picker_id string,
 	_, err := db.db.Exec(ctx, q, picked_at, picker_id, order_id)
 
 	return err
+}
+
+func (db *OrderRepo) MarkDelivering(ctx context.Context, order_id, courier_id string) error {
+	q := `update orders set
+			updated_at = now(),
+			status = 'delivering'
+		where id = $1 and deleted_at is null and delivering_user_id = $2`
+
+	cmdTag, err := db.db.Exec(ctx, q, order_id, courier_id)
+
+	if err != nil {
+		return err
+	}
+
+	if cmdTag.RowsAffected() == 0 {
+		return storage.ErrNotAffected
+	}
+
+	return nil
 }
 
 func (db *OrderRepo) MarkPickedByCourier(ctx context.Context, order_id, courier_id string, picked_at time.Time) error {

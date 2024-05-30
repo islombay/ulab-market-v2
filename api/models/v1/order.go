@@ -21,3 +21,8 @@ type BasketProduct struct {
 	ProductID string `json:"product_id" binding:"required"`
 	Quantity  uint   `json:"quantity" binding:"required"`
 }
+
+type CourierStartDeliverRequest struct {
+	OrderID   string `json:"order_id" binding:"required"`
+	CourierID string `json:"-"`
+}

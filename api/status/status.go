@@ -198,6 +198,18 @@ var (
 		Code:        http.StatusNotAcceptable,
 		Description: "Order must be picked by picker, and after that courier can mark it as delivering or finished",
 	}
+
+	OrderNotYetDelivering = Status{
+		Message:     "Order not yet delivering",
+		Code:        http.StatusNotAcceptable,
+		Description: "Order must be in status delivering, and after that courier can mark it as delivered or finished",
+	}
+
+	OrderNotFinished = Status{
+		Message:     "Order not finished yet",
+		Code:        http.StatusLocked,
+		Description: "Previous order is not finished for courier",
+	}
 )
 
 var (

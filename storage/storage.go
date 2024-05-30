@@ -54,12 +54,14 @@ type OrderI interface {
 	GetNew(ctx context.Context, pagination models.Pagination, forCourier bool) ([]models.OrderModel, int, error)
 
 	GetCourierActiveList(ctx context.Context, pagination models.Pagination, courier_id string) ([]models.OrderModel, int, error)
+	GetCourierActiveListCount(ctx context.Context, courier_id string) (int, error)
 
 	OrdersCount(ctx context.Context, user_id string) (int, error)
 
 	MarkPicked(ctx context.Context, order_id, picker_id string, picked_at time.Time) error
 	MarkPickedByCourier(ctx context.Context, order_id, courier_id string, picked_at time.Time) error
 	MarkDelivered(ctx context.Context, order_id string) error
+	MarkDelivering(ctx context.Context, order_id, courier_id string) error
 
 	GetAllByClient(ctx context.Context, user_id string, pagination models.Pagination) ([]models.OrderModel, int, error)
 	GetCourierOrders(ctx context.Context, user_id string, pagination models.Pagination) ([]models.OrderModel, int, error)

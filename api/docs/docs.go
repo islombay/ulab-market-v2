@@ -2796,6 +2796,70 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/order/courier/start": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Start the delivering",
+                "tags": [
+                    "order"
+                ],
+                "summary": "Start the delivering",
+                "operationId": "CourierStartDeliver",
+                "parameters": [
+                    {
+                        "description": "Start order body",
+                        "name": "start_order",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models_v1.CourierStartDeliverRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    },
+                    "405": {
+                        "description": "Cannot change",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    },
+                    "406": {
+                        "description": "Order not yet picked",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/api/order/delivered/{id}": {
             "get": {
                 "security": [
@@ -5557,6 +5621,17 @@ const docTemplate = `{
                     "type": "number"
                 },
                 "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "models_v1.CourierStartDeliverRequest": {
+            "type": "object",
+            "required": [
+                "order_id"
+            ],
+            "properties": {
+                "order_id": {
                     "type": "string"
                 }
             }
