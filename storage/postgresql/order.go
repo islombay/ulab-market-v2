@@ -433,7 +433,7 @@ func (db *OrderRepo) GetCourierOrders(ctx context.Context, user_id string, pagin
 			) as total_count
 		from orders
 		where deleted_at is null and delivering_user_id = $1
-		order by created_at desc
+		order by delivered_at desc
 		limit %d offset %d`, pagination.Limit, pagination.Offset)
 
 	row, _ := db.db.Query(ctx, q, user_id)
