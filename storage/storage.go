@@ -53,6 +53,8 @@ type OrderI interface {
 	GetByID(ctx context.Context, id string) (*models.OrderModel, error)
 	GetNew(ctx context.Context, pagination models.Pagination, forCourier bool) ([]models.OrderModel, int, error)
 
+	GetCourierActiveList(ctx context.Context, pagination models.Pagination, courier_id string) ([]models.OrderModel, int, error)
+
 	OrdersCount(ctx context.Context, user_id string) (int, error)
 
 	MarkPicked(ctx context.Context, order_id, picker_id string, picked_at time.Time) error

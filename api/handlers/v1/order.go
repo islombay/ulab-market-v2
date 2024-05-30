@@ -308,14 +308,20 @@ func (v1 *Handlers) GetNewOrdersList(c *gin.Context) {
 // @success		200	{object}	[]models.OrderModel "Success"
 // @failure		500	{object}	models_v1.Response	"Internal server error"
 func (v1 *Handlers) GetAvailableOrdersCourier(c *gin.Context) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*15)
 	defer cancel()
 
 	var m models.Pagination
 	c.ShouldBind(&m)
 	m.Fix()
 
-	res, errStatus := v1.service.Order().GetNewList(ctx, m, true)
+	userID, err := v1.getUserID(c)
+	if err != nil {
+		v1.error(c, err.(status.Status))
+		return
+	}
+
+	res, errStatus := v1.service.Order().GetNewListCourier(ctx, m, userID)
 	if errStatus != nil {
 		v1.error(c, *errStatus)
 		return

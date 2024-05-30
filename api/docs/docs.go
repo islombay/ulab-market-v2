@@ -5072,6 +5072,9 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
+                "is_delivering": {
+                    "type": "boolean"
+                },
                 "order_id": {
                     "type": "string"
                 },

@@ -235,6 +235,62 @@ func (db *OrderRepo) GetNew(ctx context.Context, pagination models.Pagination, f
 	return res, count, nil
 }
 
+func (db *OrderRepo) GetCourierActiveList(ctx context.Context, pagination models.Pagination, courier_id string) ([]models.OrderModel, int, error) {
+	whereClause := fmt.Sprintf(
+		`deleted_at is null and delivering_user_id = '%s' and
+		status in ('in_process', 'picked', 'delivering')`,
+		courier_id,
+	)
+	q := fmt.Sprintf(`select
+			id, user_id, status,
+			total_price,payment_type,
+			created_at, updated_at, deleted_at,
+			order_id, client_first_name,
+			client_last_name, client_phone_number,
+			client_comment, delivery_type,
+			delivery_addr_lat, delivery_addr_long,
+			delivery_addr_name,
+			payment_card_type,
+			(
+				select count(*) from orders where %s
+			)
+		from orders
+		where %s
+		order by created_at desc
+		limit %d offset %d
+		`, whereClause, whereClause, pagination.Limit, pagination.Offset,
+	)
+
+	rows, _ := db.db.Query(ctx, q)
+	if rows.Err() != nil {
+		return nil, 0, rows.Err()
+	}
+
+	res := []models.OrderModel{}
+
+	var count int
+
+	for rows.Next() {
+		var tmp models.OrderModel
+		if err := rows.Scan(
+			&tmp.ID, &tmp.UserID, &tmp.Status,
+			&tmp.TotalPrice, &tmp.PaymentType,
+			&tmp.CreatedAt, &tmp.UpdatedAt, &tmp.DeletedAt,
+			&tmp.OrderID, &tmp.ClientFirstName,
+			&tmp.ClientLastName, &tmp.ClientPhone,
+			&tmp.ClientComment, &tmp.DeliveryType,
+			&tmp.DeliveryAddrLat, &tmp.DeliveryAddrLong,
+			&tmp.DeliveryAddrName,
+			&tmp.PaymentCardType, &count,
+		); err != nil {
+			return nil, 0, err
+		}
+		tmp.IsDeliveringByCourier = true
+		res = append(res, tmp)
+	}
+	return res, count, nil
+}
+
 func (db *OrderRepo) OrdersCount(ctx context.Context, user_id string) (int, error) {
 	q := `select count(*) from orders where user_id = $1 and deleted_at is null`
 

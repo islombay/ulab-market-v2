@@ -352,6 +352,40 @@ func (srv OrderService) GetNewList(ctx context.Context, pagination models.Pagina
 	return model, nil
 }
 
+func (srv OrderService) GetNewListCourier(ctx context.Context, pagination models.Pagination, courier_id string) (interface{}, *status.Status) {
+	active_orders, count, err := srv.store.Order().GetCourierActiveList(ctx, pagination, courier_id)
+	if err != nil {
+		srv.log.Error("could not get active orders list of courier", logs.Error(err),
+			logs.String("courier_id", courier_id))
+		return nil, &status.StatusInternal
+	}
+
+	srv.log.Debug("active orders count", logs.Int("count", count))
+
+	if count != 0 {
+		for i := range active_orders {
+			if orderStatusID, exists := models.OrderStatusIndexes[active_orders[i].Status]; exists {
+				active_orders[i].StatusID = orderStatusID
+			}
+
+			products, err := srv.store.OrderProduct().GetOrderProducts(ctx, active_orders[i].ID)
+			if err != nil {
+				srv.log.Error("could not get products of order", logs.Error(err), logs.String("order_id", active_orders[i].ID))
+				return nil, &status.StatusInternal
+			}
+
+			for i := range products {
+				products[i].ProductMainImage = models.GetStringAddress(srv.filestorage.GetURL(*products[i].ProductMainImage))
+			}
+
+			active_orders[i].Products = products
+		}
+		return active_orders, nil
+	}
+
+	return srv.GetNewList(ctx, pagination, true)
+}
+
 func (srv OrderService) MakePicked(ctx context.Context, order_id, userID, user_type string) (interface{}, *status.Status) {
 	// check the status
 	// if order.status in (delivering, picked, finished, canceled)
