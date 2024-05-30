@@ -46,9 +46,9 @@ func (db *CategoryRepo) Create(ctx context.Context, m models.Category) error {
 }
 
 func (db *CategoryRepo) GetByID(ctx context.Context, id string) (*models.Category, error) {
-	q := `select id, name_uz, name_ru,
-       image, icon_id, parent_id,
-       created_at, updated_at, deleted_at
+	q := `select
+				id, name_uz, name_ru, image, icon_id, parent_id,
+       			created_at, updated_at, deleted_at
 		from category where id = $1`
 	var m models.Category
 	if err := db.db.QueryRow(ctx, q, id).Scan(
@@ -68,39 +68,45 @@ func (db *CategoryRepo) GetByID(ctx context.Context, id string) (*models.Categor
 }
 
 func (db *CategoryRepo) GetAll(ctx context.Context, pagination models.Pagination, onlySub bool) ([]*models.Category, int, error) {
-	whereClause := "deleted_at is null"
+	var whereClause strings.Builder
+
+	whereClause.WriteString("c.deleted_at is null")
 	if onlySub {
-		whereClause += ` and parent_id is not null`
+		whereClause.WriteString(" and c.parent_id is not null")
 	} else {
-		whereClause += ` and parent_id is null`
+		whereClause.WriteString(" and c.parent_id is null")
 	}
 
 	if pagination.Search.Query != "" {
 		pagination.Query = `'%` + pagination.Query + `%'`
-		whereClause += `
-			and (name_uz ilike ` + pagination.Query + ` or
-			name_ru ilike ` + pagination.Query + `)
-		`
+		whereClause.WriteString(`
+			and (c.name_uz ilike ` + pagination.Query + ` or
+			c.name_ru ilike ` + pagination.Query + `)
+		`)
 	}
 
-	q := fmt.Sprintf(`select
-    	id, name_uz, name_ru,
-    	image, icon_id, parent_id,
-    	created_at, updated_at
-    	from category
-		where %s
-		order by created_at desc
-		limit %d offset %d`, whereClause, pagination.Limit, pagination.Offset)
+	q := fmt.Sprintf(`
+		SELECT
+    		c.id, c.name_uz, c.name_ru,
+    		c.image, icon.url, c.parent_id,
+    		c.created_at, c.updated_at
+    	FROM category AS c
+		LEFT JOIN icons_list AS icon ON icon.id = c.icon_id
+		WHERE %s
+		ORDER BY c.created_at DESC
+		LIMIT %d OFFSET %d`, whereClause.String(), pagination.Limit, pagination.Offset)
+
+	fmt.Println(q)
 
 	m := []*models.Category{}
-	rows, _ := db.db.Query(ctx, q)
-	if rows.Err() != nil {
-		return nil, 0, rows.Err()
+	rows, err := db.db.Query(ctx, q)
+	if err != nil {
+		return nil, 0, err
 	}
 
 	var count int
 
-	if err := db.db.QueryRow(ctx, fmt.Sprintf("select count(*) from category where %s", whereClause)).Scan(&count); err != nil {
+	if err := db.db.QueryRow(ctx, fmt.Sprintf("SELECT count(*) FROM category AS c WHERE %s", whereClause.String())).Scan(&count); err != nil {
 		return nil, 0, err
 	}
 
@@ -122,6 +128,64 @@ func (db *CategoryRepo) GetAll(ctx context.Context, pagination models.Pagination
 	}
 	return m, count, nil
 }
+
+// func (db *CategoryRepo) GetAll(ctx context.Context, pagination models.Pagination, onlySub bool) ([]*models.Category, int, error) {
+// 	whereClause := "c.deleted_at is null"
+// 	if onlySub {
+// 		whereClause += ` and c.parent_id is not null`
+// 	} else {
+// 		whereClause += ` and c.parent_id is null`
+// 	}
+
+// 	if pagination.Search.Query != "" {
+// 		pagination.Query = `'%` + pagination.Query + `%'`
+// 		whereClause += `
+// 			and (c.name_uz ilike ` + pagination.Query + ` or
+// 			c.name_ru ilike ` + pagination.Query + `)
+// 		`
+// 	}
+
+// 	q := fmt.Sprintf(`select
+//     		c.id, c.name_uz, c.name_ru,
+//     		c.image, icon.url, c.parent_id,
+//     		c.created_at, c.updated_at
+//     	from category as c
+// 		left join icons_list as icon on icon.id = c.icon_id
+// 		where %s
+// 		order by c.created_at desc
+// 		limit %d offset %d`, whereClause, pagination.Limit, pagination.Offset)
+
+// 	fmt.Println(q)
+// 	m := []*models.Category{}
+// 	rows, _ := db.db.Query(ctx, q)
+// 	if rows.Err() != nil {
+// 		return nil, 0, rows.Err()
+// 	}
+
+// 	var count int
+
+// 	if err := db.db.QueryRow(ctx, fmt.Sprintf("select count(*) from category where %s", whereClause)).Scan(&count); err != nil {
+// 		return nil, 0, err
+// 	}
+
+// 	for rows.Next() {
+// 		var tmp models.Category
+// 		if err := rows.Scan(
+// 			&tmp.ID,
+// 			&tmp.NameUz,
+// 			&tmp.NameRu,
+// 			&tmp.Image,
+// 			&tmp.IconID,
+// 			&tmp.ParentID,
+// 			&tmp.CreatedAt,
+// 			&tmp.UpdatedAt,
+// 		); err != nil {
+// 			db.log.Error("could not scan category", logs.Error(err))
+// 		}
+// 		m = append(m, &tmp)
+// 	}
+// 	return m, count, nil
+// }
 
 func (db *CategoryRepo) ChangeImage(ctx context.Context, cid, imageUrl, iconURL *string) error {
 	updateFields := make(map[string]interface{})
@@ -212,11 +276,14 @@ func (db *CategoryRepo) ChangeCategory(ctx context.Context, m models.Category) e
 }
 
 func (db *CategoryRepo) GetSubcategories(ctx context.Context, id string) ([]*models.Category, error) {
-	q := `select id, name_uz, name_ru,
-       image, icon_id, parent_id, created_at,
-       updated_at, deleted_at
-       from category where parent_id = $1 and deleted_at is null
-	   order by created_at desc`
+	q := `select
+			c.id, c.name_uz, c.name_ru,
+       		c.image, icon.url, c.parent_id, c.created_at,
+       		c.updated_at, c.deleted_at
+       	from category as c
+		left join icons_list as icon on icon.id = c.icon_id
+		where c.parent_id = $1 and c.deleted_at is null
+	   	order by c.created_at desc`
 	var m []*models.Category
 	row, _ := db.db.Query(ctx, q, id)
 	if row.Err() != nil {

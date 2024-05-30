@@ -409,13 +409,14 @@ func (v1 *Handlers) GetCategoryByID(c *gin.Context) {
 			subs[i].Image = models.GetStringAddress(v1.filestore.GetURL(*subs[i].Image))
 		}
 
+		// FIXME: change getIconByID logic - > from storage IconID will be a url to icon
 		if subs[i].IconID != nil && *subs[i].IconID != "" {
-			ic, err := v1.storage.Icon().GetIconByID(context.Background(), *subs[i].IconID)
-			if err != nil {
-				v1.log.Error("could not get icon by id", logs.Error(err))
-			} else {
-				subs[i].IconID = models.GetStringAddress(v1.filestore.GetURL(ic.URL))
-			}
+			// ic, err := v1.storage.Icon().GetIconByID(context.Background(), *subs[i].IconID)
+			// if err != nil {
+			// 	v1.log.Error("could not get icon by id", logs.Error(err))
+			// } else {
+			subs[i].IconID = models.GetStringAddress(v1.filestore.GetURL(*subs[i].IconID))
+			// }
 		}
 	}
 	cat.Sub = subs
@@ -481,23 +482,25 @@ func (v1 *Handlers) GetAllCategory(c *gin.Context) {
 				subs[i].Image = models.GetStringAddress(v1.filestore.GetURL(*subs[i].Image))
 			}
 
+			// FIXME: change getIconByID logic - > from storage IconID will be a url to icon
 			if subs[i].IconID != nil && *subs[i].IconID != "" {
-				ic, err := v1.storage.Icon().GetIconByID(context.Background(), *subs[i].IconID)
-				if err != nil {
-					v1.log.Error("could not get icon by id", logs.Error(err))
-				} else {
-					subs[i].IconID = models.GetStringAddress(v1.filestore.GetURL(ic.URL))
-				}
+				// ic, err := v1.storage.Icon().GetIconByID(context.Background(), *subs[i].IconID)
+				// if err != nil {
+				// 	v1.log.Error("could not get icon by id", logs.Error(err))
+				// } else {
+				subs[i].IconID = models.GetStringAddress(v1.filestore.GetURL(*subs[i].IconID))
+				// }
 			}
 		}
+		// FIXME: change getIconByID logic - > from storage IconID will be a url to icon
 		if e.IconID != nil && *e.IconID != "" {
-			i, err := v1.storage.Icon().GetIconByID(context.Background(), *e.IconID)
-			if err != nil {
-				v1.log.Error("could not get icon by id", logs.Error(err),
-					logs.String("icon_id", *e.IconID))
-			} else {
-				e.IconID = models.GetStringAddress(v1.filestore.GetURL(i.URL))
-			}
+			// i, err := v1.storage.Icon().GetIconByID(context.Background(), *e.IconID)
+			// if err != nil {
+			// 	v1.log.Error("could not get icon by id", logs.Error(err),
+			// 		logs.String("icon_id", *e.IconID))
+			// } else {
+			e.IconID = models.GetStringAddress(v1.filestore.GetURL(*e.IconID))
+			// }
 		}
 
 		e.Sub = subs

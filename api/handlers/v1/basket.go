@@ -353,8 +353,8 @@ func (v1 *Handlers) ChangeBasket(c *gin.Context) {
 		return
 	}
 
-	// TODO: check whether the quantity exists
-	userBasket, err := v1.storage.Basket().Get(context.Background(),
+	// check whether the quantity exists
+	_, err := v1.storage.Basket().Get(context.Background(),
 		str,
 		m.ProductID,
 	)
@@ -379,7 +379,7 @@ func (v1 *Handlers) ChangeBasket(c *gin.Context) {
 		v1.error(c, status.StatusInternal)
 		return
 	}
-	if userBasket.Quantity+int(m.Quantity) > product.Quantity {
+	if int(m.Quantity) > product.Quantity {
 		v1.error(c, status.StatusProductQuantityTooMany)
 		return
 	}
