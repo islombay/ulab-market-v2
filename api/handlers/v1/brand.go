@@ -232,7 +232,7 @@ func (v1 *Handlers) ChangeBrand(c *gin.Context) {
 	}
 
 	if brandPrevious.Image != nil && b.Image != nil {
-		v1.filestore.DeleteFile(*brandPrevious.Image)
+		// v1.filestore.DeleteFile(*brandPrevious.Image)
 	}
 
 	v1.response(c, http.StatusOK, models_v1.Response{
