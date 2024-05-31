@@ -10,6 +10,7 @@ import (
 	"app/storage/filestore"
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -174,17 +175,23 @@ func (v1 *Handlers) ChangeBrand(c *gin.Context) {
 		Name:  "",
 	}
 
+	if m.Name != nil {
+		if *m.Name == "" {
+			m.Name = nil
+		} else {
+			b.Name = *m.Name
+		}
+	}
+
+	if m.Image != nil {
+		if m.Image.Size == 0 {
+			m.Image = nil
+		}
+	}
+
 	if m.Name == nil && m.Image == nil {
 		v1.error(c, status.StatusNoUpdateProvided)
 		return
-	}
-
-	if m.Name != nil {
-		b.Name = *m.Name
-	}
-
-	if m.Image.Size == 0 {
-		m.Image = nil
 	}
 
 	if m.Image != nil {
@@ -213,6 +220,7 @@ func (v1 *Handlers) ChangeBrand(c *gin.Context) {
 		b.Image = &url
 	}
 
+	fmt.Println(b)
 	if err := v1.storage.Brand().Change(context.Background(), *b); err != nil {
 		if errors.Is(err, storage.ErrAlreadyExists) {
 			v1.error(c, status.StatusAlreadyExists)

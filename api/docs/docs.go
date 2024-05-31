@@ -2846,7 +2846,7 @@ const docTemplate = `{
                         }
                     },
                     "406": {
-                        "description": "Order not yet picked",
+                        "description": "Order not yet picked \\ Order not yet delivering",
                         "schema": {
                             "$ref": "#/definitions/models.Response"
                         }
