@@ -96,8 +96,12 @@ func (srv *clientService) GetMe(ctx context.Context, user_id string) (interface{
 
 func (srv *clientService) Update(ctx context.Context, model models.ClientUpdate) (interface{}, *status.Status) {
 	if model.Email != nil {
-		if !helper.IsValidEmail(*model.Email) {
-			return nil, &status.StatusBadEmail
+		if *model.Email == "" {
+			model.Email = nil
+		} else {
+			if !helper.IsValidEmail(*model.Email) {
+				return nil, &status.StatusBadEmail
+			}
 		}
 	}
 
