@@ -107,7 +107,7 @@ type ChangeProductRequest struct {
 
 	OutcomePrice float64 `json:"outcome_price"`
 
-	CategoryID string `json:"category_id"`
+	CategoryID string `json:"subcategory_id"`
 	BrandID    string `json:"brand_id"`
 
 	Status string `json:"status"`
