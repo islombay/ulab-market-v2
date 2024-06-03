@@ -1152,6 +1152,10 @@ func (v1 *Handlers) EditProduct(c *gin.Context) {
 		return
 	}
 
+	if m.SubcategoryID != "" {
+		m.CategoryID = m.SubcategoryID
+	}
+
 	if m.CategoryID != "" {
 		if !helper.IsValidUUID(m.CategoryID) {
 			v1.error(c, status.StatusBadUUID)
