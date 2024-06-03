@@ -180,7 +180,7 @@ func (db *OrderRepo) GetNew(ctx context.Context, pagination models.Pagination, f
 	whereClause := "deleted_at is null"
 
 	if forCourier {
-		whereClause += ` and status in ('in_process', 'picked')`
+		whereClause += ` and status in ('picked')`
 		whereClause += ` and delivering_user_id is null`
 	} else {
 		whereClause += ` and status in ('in_process')`
