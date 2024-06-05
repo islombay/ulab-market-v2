@@ -157,6 +157,14 @@ func (v1 *Handlers) CreateProduct(c *gin.Context) {
 	}
 
 	if m.MainImage != nil {
+		if m.MainImage.Size == 0 {
+			m.MainImage = nil
+			v1.error(c, status.StatusBadRequest)
+			return
+		}
+	}
+
+	if m.MainImage != nil {
 		if _, err, msg := helper.IsValidImage(m.MainImage); err != nil {
 			if errors.Is(err, helper.ErrInvalidImageType) {
 				v1.error(c, status.StatusImageTypeUnkown)
