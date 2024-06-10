@@ -153,6 +153,9 @@ func (v1 *Handlers) GetOrderByID(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 
+	ctx = context.WithValue(ctx, UserIDContext, c.GetString(UserIDContext))
+	ctx = context.WithValue(ctx, UserRoleContext, c.GetString(UserRoleContext))
+
 	res, errStatus := v1.service.Order().GetByID(ctx, id)
 	if errStatus != nil {
 		v1.error(c, *errStatus)
@@ -217,9 +220,6 @@ func (v1 *Handlers) GetOrderProduct(c *gin.Context) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
-
-	ctx = context.WithValue(ctx, UserIDContext, c.GetString(UserIDContext))
-	ctx = context.WithValue(ctx, UserRoleContext, c.GetString(UserRoleContext))
 
 	res, errStatus := v1.service.Order().GetProductByID(ctx, productID)
 	if errStatus != nil {

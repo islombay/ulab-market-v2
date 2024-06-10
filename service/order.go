@@ -245,6 +245,7 @@ func (srv OrderService) GetByID(ctx context.Context, id string) (interface{}, *s
 	}
 
 	role_type, exists := ctx.Value("role").(string)
+	fmt.Println(role_type, exists)
 	if exists {
 		srv.log.Debug("role context exists", logs.String("role", role_type))
 		if role_type == auth_lib.RoleCourier.Name {

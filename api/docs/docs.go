@@ -5622,6 +5622,9 @@ const docTemplate = `{
                 },
                 "status": {
                     "type": "string"
+                },
+                "subcategory_id": {
+                    "type": "string"
                 }
             }
         },
