@@ -1,7 +1,6 @@
 package service
 
 import (
-	handlersv1 "app/api/handlers/v1"
 	"app/api/models"
 	models_v1 "app/api/models/v1"
 	"app/api/status"
@@ -245,7 +244,7 @@ func (srv OrderService) GetByID(ctx context.Context, id string) (interface{}, *s
 	}
 
 	if model.DeliverUserID != nil {
-		deliver_user_id, exists := ctx.Value(handlersv1.UserIDContext).(string)
+		deliver_user_id, exists := ctx.Value("uid").(string)
 		if exists {
 			if *model.DeliverUserID == deliver_user_id {
 				model.IsDeliveringByCourier = true
