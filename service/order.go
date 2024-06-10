@@ -4,6 +4,7 @@ import (
 	"app/api/models"
 	models_v1 "app/api/models/v1"
 	"app/api/status"
+	auth_lib "app/pkg/auth"
 	"app/pkg/helper"
 	"app/pkg/logs"
 	"app/storage"
@@ -243,11 +244,18 @@ func (srv OrderService) GetByID(ctx context.Context, id string) (interface{}, *s
 		return nil, errStatus
 	}
 
-	if model.DeliverUserID != nil {
-		deliver_user_id, exists := ctx.Value("uid").(string)
-		if exists {
-			if *model.DeliverUserID == deliver_user_id {
-				model.IsDeliveringByCourier = true
+	role_type, exists := ctx.Value("role").(string)
+	if exists {
+		srv.log.Debug("role context exists", logs.String("role", role_type))
+		if role_type == auth_lib.RoleCourier.Name {
+			if model.DeliverUserID != nil {
+				deliver_user_id, exists := ctx.Value("uid").(string)
+				if exists {
+					srv.log.Debug("deliver_user_id context exists", logs.String("did", deliver_user_id))
+					if *model.DeliverUserID == deliver_user_id {
+						model.IsDeliveringByCourier = true
+					}
+				}
 			}
 		}
 	}
