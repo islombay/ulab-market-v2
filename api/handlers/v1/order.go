@@ -215,7 +215,14 @@ func (v1 *Handlers) GetOrderProduct(c *gin.Context) {
 		return
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	ctx, cancel := context.WithTimeout(context.WithValue(
+		context.WithValue(
+			context.Background(),
+			UserRoleContext,
+			c.GetString(UserRoleContext),
+		),
+		UserIDContext,
+		c.GetString(service.ContextUserID)), time.Second*5)
 	defer cancel()
 
 	res, errStatus := v1.service.Order().GetProductByID(ctx, productID)

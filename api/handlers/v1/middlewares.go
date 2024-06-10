@@ -222,6 +222,23 @@ func (v1 *Handlers) MiddlewareStaffPermissionCheck(permission models.PermissionM
 			return
 		}
 		c.Set(UserIDContext, userID)
+		c.Set(UserRoleContext, token.Type)
 		c.Next()
 	}
+}
+
+func GetContextValue[T any](c *gin.Context, key string) (T, bool) {
+	value, exists := c.Get(key)
+	if !exists {
+		var zero T
+		return zero, false
+	}
+
+	// Perform type assertion
+	result, ok := value.(T)
+	if !ok {
+		var zero T
+		return zero, false
+	}
+	return result, true
 }
