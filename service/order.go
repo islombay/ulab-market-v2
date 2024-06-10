@@ -244,6 +244,11 @@ func (srv OrderService) GetByID(ctx context.Context, id string) (interface{}, *s
 	}
 
 	model.Products = orderProducts.([]models.OrderProductModel)
+	for i := range model.Products {
+		if model.Products[i].ProductMainImage != nil {
+			model.Products[i].ProductMainImage = models.GetStringAddress(srv.filestorage.GetURL(*model.Products[i].ProductMainImage))
+		}
+	}
 
 	return model, nil
 }
