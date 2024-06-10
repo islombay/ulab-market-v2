@@ -29,12 +29,6 @@ func main() {
 	cfg := config.Load()
 	var loggerLevel string
 
-	if _, err := os.Stat("api/docs"); os.IsNotExist(err) {
-		if err := os.Mkdir("api/docs", 0777); err != nil {
-			panic(err)
-		}
-	}
-
 	switch cfg.Env {
 	case config.LocalMode:
 		loggerLevel = logs.LevelDebug

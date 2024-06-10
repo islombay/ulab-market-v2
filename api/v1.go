@@ -317,7 +317,7 @@ func NewV1(
 		)
 
 		order.GET("/:id",
-			handler.MiddlewareIsStaff(),
+			handler.MiddlewareStaffPermissionCheck(auth_lib.PermissionCanSeeOrderByID),
 			handler.GetOrderByID,
 		)
 

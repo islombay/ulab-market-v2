@@ -17,7 +17,9 @@ var (
 		ID:          uuid.New().String(),
 		Name:        "courier",
 		Description: models.GetStringAddress("courier model. delivery"),
-		Permissions: nil,
+		Permissions: []models.PermissionModel{
+			PermissionCanSeeOrderByID,
+		},
 	}
 	RoleOwner = models.RoleModel{
 		ID:          uuid.New().String(),
@@ -34,6 +36,7 @@ var (
 			PermissionCanDeleteProduct,
 
 			PermissionBrandAdd,
+			PermissionCanSeeOrderByID,
 			PermissionBrandEdit,
 			PermissionBrandDelete,
 
@@ -104,6 +107,8 @@ var (
 			PermissionGetStoreList,
 			PermissionUpdateStore,
 			PermissionDeleteStore,
+
+			PermissionCanSeeOrderByID,
 		},
 	}
 	RoleSuper = models.RoleModel{
@@ -133,6 +138,8 @@ var (
 	PermissionCanMakeOrderPicked = models.PermissionModel{ID: uuid.NewString(), Name: "can_make_order_picked"}
 	PermissionCanFinishOrder     = models.PermissionModel{ID: uuid.NewString(), Name: "finish_order"}
 	PermissionCanCancelOrder     = models.PermissionModel{ID: uuid.NewString(), Name: "cancel_order"}
+
+	PermissionCanSeeOrderByID = models.PermissionModel{ID: uuid.NewString(), Name: "can_see_order_by_id"}
 )
 
 var (
@@ -256,6 +263,7 @@ var PermissionsList = []*models.PermissionModel{
 	&PermissionCanFinishOrder,
 	&PermissionCanCancelOrder,
 	&PermissionCanMakeOrderPicked,
+	&PermissionCanSeeOrderByID,
 
 	&PermissionCreateStore,
 	&PermissionGetStoreByID,
