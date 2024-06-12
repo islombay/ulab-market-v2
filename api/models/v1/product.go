@@ -7,9 +7,9 @@ import (
 )
 
 type CreateProduct struct {
-	Articul string `json:"articul" form:"articul" binding:"required"`
-	NameUz  string `json:"name_uz" form:"name_uz" binding:"required"`
-	NameRu  string `json:"name_ru" form:"name_ru" binding:"required"`
+	Articul string `json:"articul" form:"articul" binding:"required,max=250"`
+	NameUz  string `json:"name_uz" form:"name_uz" binding:"required,max=250"`
+	NameRu  string `json:"name_ru" form:"name_ru" binding:"required,max=250"`
 
 	DescriptionUz string `json:"description_uz" form:"description_uz" binding:"required"`
 	DescriptionRu string `json:"description_ru" form:"description_ru" binding:"required"`
