@@ -105,7 +105,7 @@ type ChangeProductRequest struct {
 	DescriptionUz string `json:"description_uz"`
 	DescriptionRu string `json:"description_ru"`
 
-	OutcomePrice float64 `json:"outcome_price"`
+	OutcomePrice float64 `json:"price"`
 
 	CategoryID    string `json:"category_id"`
 	SubcategoryID string `json:"subcategory_id"`
