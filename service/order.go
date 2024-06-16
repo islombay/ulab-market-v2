@@ -468,9 +468,16 @@ func (srv OrderService) MakePicked(ctx context.Context, order_id, userID, user_t
 		}
 	}
 
-	return models_v1.Response{
-		Message: "OK",
-		Code:    http.StatusOK,
+	if v, e := models.OrderStatusIndexes[model.Status]; e {
+		model.StatusID = v
+	}
+
+	return &models.Response{
+		StatusCode: 200,
+		Data: map[string]interface{}{
+			"status":    model.Status,
+			"status_id": model.StatusID,
+		},
 	}, nil
 }
 
@@ -606,8 +613,15 @@ func (srv OrderService) CourierStartDelivering(ctx context.Context, model models
 		return nil, &status.StatusInternal
 	}
 
-	return models_v1.Response{
-		Message: "Ok",
-		Code:    http.StatusOK,
+	if v, e := models.OrderStatusIndexes[order.Status]; e {
+		order.StatusID = v
+	}
+
+	return &models.Response{
+		StatusCode: 200,
+		Data: map[string]interface{}{
+			"status":    order.Status,
+			"status_id": order.StatusID,
+		},
 	}, nil
 }
