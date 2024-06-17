@@ -3656,6 +3656,7 @@ const docTemplate = `{
                 "operationId": "createProduct",
                 "parameters": [
                     {
+                        "maxLength": 250,
                         "type": "string",
                         "name": "articul",
                         "in": "formData",
@@ -3691,12 +3692,14 @@ const docTemplate = `{
                         "required": true
                     },
                     {
+                        "maxLength": 250,
                         "type": "string",
                         "name": "name_ru",
                         "in": "formData",
                         "required": true
                     },
                     {
+                        "maxLength": 250,
                         "type": "string",
                         "name": "name_uz",
                         "in": "formData",
@@ -5617,7 +5620,7 @@ const docTemplate = `{
                 "name_uz": {
                     "type": "string"
                 },
-                "outcome_price": {
+                "price": {
                     "type": "number"
                 },
                 "status": {

@@ -135,7 +135,7 @@ func (db *BrandRepo) GetAll(ctx context.Context, pagination models.Pagination) (
 			&m.Image,
 			&m.CreatedAt,
 			&m.UpdatedAt,
-			&m.DeletedAt,
+			m.DeletedAt,
 			&count,
 		); err != nil {
 			return nil, 0, err
