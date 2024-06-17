@@ -110,7 +110,7 @@ func (db *BrandRepo) GetAll(ctx context.Context, pagination models.Pagination) (
 
 	q := fmt.Sprintf(`select 
 			id, name, image, created_at,
-			updated_at, deleted_at,
+			updated_at,
 			(
 				select count(*) from brands
 				where %s
@@ -135,7 +135,6 @@ func (db *BrandRepo) GetAll(ctx context.Context, pagination models.Pagination) (
 			&m.Image,
 			&m.CreatedAt,
 			&m.UpdatedAt,
-			m.DeletedAt,
 			&count,
 		); err != nil {
 			return nil, 0, err
