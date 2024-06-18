@@ -13,7 +13,7 @@ type Category struct {
 	Sub       []*Category `json:"subcategories,omitempty"`
 
 	CreatedAt time.Time  `db:"created_at" json:"created_at"`
-	UpdatedAt time.Time  `db:"updated_at" json:"updated_at"`
+	UpdatedAt *time.Time `db:"updated_at" json:"updated_at"`
 	DeletedAt *time.Time `db:"deleted_at" json:"deleted_at,omitempty"`
 }
 
@@ -27,7 +27,7 @@ type CategorySwagger struct {
 	Sub      []*SubCategorySwagger `json:"subcategories,omitempty"`
 
 	CreatedAt time.Time  `json:"created_at"`
-	UpdatedAt time.Time  `json:"updated_at"`
+	UpdatedAt *time.Time `json:"updated_at"`
 	DeletedAt *time.Time `json:"deleted_at,omitempty"`
 }
 
@@ -40,6 +40,6 @@ type SubCategorySwagger struct {
 	ParentID *string `json:"parent_id,omitempty"`
 
 	CreatedAt time.Time  `json:"created_at"`
-	UpdatedAt time.Time  `json:"updated_at"`
+	UpdatedAt *time.Time `json:"updated_at"`
 	DeletedAt *time.Time `json:"deleted_at,omitempty"`
 }
