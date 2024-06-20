@@ -357,7 +357,9 @@ func (srv OrderService) GetNewList(ctx context.Context, pagination models.Pagina
 			}
 
 			for i := range products {
-				products[i].ProductMainImage = models.GetStringAddress(srv.filestorage.GetURL(*products[i].ProductMainImage))
+				if products[i].ProductMainImage != nil {
+					products[i].ProductMainImage = models.GetStringAddress(srv.filestorage.GetURL(*products[i].ProductMainImage))
+				}
 			}
 
 			model[i].Products = products
