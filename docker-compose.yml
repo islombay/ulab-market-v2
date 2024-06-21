@@ -21,6 +21,7 @@ services:
       - DB_PWD=${DB_PWD}
       - secret=${SECRET}
       - ENV=docker
+      - FIREBASE_TYPE=${FIREBASE_TYPE}
     labels:
       - "app=ulab-market"
       - "service=ulab-market-server"
