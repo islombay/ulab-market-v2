@@ -22,6 +22,8 @@ services:
       - secret=${SECRET}
       - ENV=docker
       - FIREBASE_TYPE=${FIREBASE_TYPE}
+      - ROOT_EMAIL=${ROOT_EMAIL}
+      - ROOT_PWD=${ROOT_PWD}
     labels:
       - "app=ulab-market"
       - "service=ulab-market-server"
