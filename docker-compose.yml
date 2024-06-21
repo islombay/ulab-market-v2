@@ -24,6 +24,11 @@ services:
     labels:
       - "app=ulab-market"
       - "service=ulab-market-server"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8123/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
   redis:
     restart: always
