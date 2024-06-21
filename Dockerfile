@@ -13,25 +13,25 @@ RUN apt-get update && apt-get install -y make
 # Build the application
 RUN make install
 
-# ENV ENV=docker
-# EXPOSE 8123
-
-# CMD ["make", "run"]
-
-# Stage 2: Runtime stage
-FROM alpine:latest AS runtime
-
-WORKDIR /app
-
-# # Copy the built binary from the builder stage
-COPY --from=builder /app/app /app/bin/app
-
-# # Set environment variables
 ENV ENV=docker
 EXPOSE 8123
 
-RUN ls /app/bin/
-RUN ls /app/
+CMD ["make", "run"]
 
-# # Run the application
-CMD ["/app/bin/app"]
+# Stage 2: Runtime stage
+# FROM alpine:latest AS runtime
+
+# WORKDIR /app
+
+# # # Copy the built binary from the builder stage
+# COPY --from=builder /app/app /app/bin/app
+
+# # # Set environment variables
+# ENV ENV=docker
+# EXPOSE 8123
+
+# RUN ls /app/bin/
+# RUN ls /app/
+
+# # # Run the application
+# CMD ["/app/bin/app"]
