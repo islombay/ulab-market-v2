@@ -19,11 +19,11 @@ FROM alpine:latest AS runtime
 WORKDIR /app
 
 # Copy the built binary from the builder stage
-COPY --from=builder /app/app /app/bin/myapp
+COPY --from=builder /app/app /app/bin/app
 
 # Set environment variables
 ENV ENV=docker
 EXPOSE 8123
 
 # Run the application
-CMD ["/app/bin/myapp"]
+CMD ["/app/bin/app"]
