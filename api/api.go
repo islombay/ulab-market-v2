@@ -34,6 +34,11 @@ func NewApi(
 	docs.SwaggerInfo.Version = "1.0"
 
 	r.Use(customCORSMiddleware())
+
+	r.GET("/health", func(ctx *gin.Context) {
+		ctx.AbortWithStatus(200)
+	})
+
 	api := r.Group("/api")
 	NewV1(api, cfg, store, log, smtp, cache, filestore, service)
 
