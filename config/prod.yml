@@ -8,7 +8,7 @@ db:
   port: "5434"
   # dbname: "ulab_market_busa"
   dbname: "ulab-market-v2"
-  sslmode: "require"
+  sslmode: "disable"
   migrations: "migrations"
 redis:
   host: "red-cp3e81vsc6pc73fn8qfg"
