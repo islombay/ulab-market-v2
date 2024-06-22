@@ -36,15 +36,17 @@ func Init(cfg *config.DBConfig, log logs.LoggerInterface, isDown bool, rolesDB s
 
 func migration(cfg *config.DBConfig, log logs.LoggerInterface, isDown bool) error {
 	var dbURL string
-	if os.Getenv("ENV") == config.LocalMode || os.Getenv("ENV") == config.DockerMode {
-		dbURL = fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=%s",
-			os.Getenv("DB_USER"), os.Getenv("DB_PWD"),
-			cfg.Host, cfg.Port, cfg.DBName, cfg.SSLMode)
-	} else if os.Getenv("ENV") == config.ProdMode {
-		dbURL = fmt.Sprintf("postgres://%s:%s@%s:%s/%s",
-			os.Getenv("DB_USER"), os.Getenv("DB_PWD"),
-			cfg.Host, cfg.Port, cfg.DBName)
-	}
+	// if os.Getenv("ENV") == config.LocalMode || os.Getenv("ENV") == config.DockerMode {
+	// 	dbURL = fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=%s",
+	// 		os.Getenv("DB_USER"), os.Getenv("DB_PWD"),
+	// 		cfg.Host, cfg.Port, cfg.DBName, cfg.SSLMode)
+	// } else if os.Getenv("ENV") == config.ProdMode {
+	// 	dbURL = fmt.Sprintf("postgres://%s:%s@%s:%s/%s",
+	// 		os.Getenv("DB_USER"), os.Getenv("DB_PWD"),
+	// 		cfg.Host, cfg.Port, cfg.DBName)
+	// }
+
+	dbURL = fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=%s", os.Getenv("DB_USER"), os.Getenv("DB_PWD"), cfg.Host, cfg.Port, cfg.DBName, cfg.SSLMode)
 
 	migrationsPath := fmt.Sprintf("file://%s", cfg.MigrationsPath)
 
