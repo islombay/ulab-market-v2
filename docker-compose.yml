@@ -12,7 +12,7 @@ services:
       - 8.8.8.8
     networks:
       default:
-        dns:
+        nameservers:
           - 8.8.8.8
     depends_on:
       redis:
