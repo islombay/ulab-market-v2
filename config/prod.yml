@@ -3,9 +3,11 @@ server:
   port: "10000"
   public_host: "https://ulab-market-v2-n6zf.onrender.com"
 db:
-  host: "dpg-cp3e7jvsc6pc73fn8kq0-a.oregon-postgres.render.com" 
-  port: "5432"
-  dbname: "ulab_market_busa"
+  # host: "dpg-cp3e7jvsc6pc73fn8kq0-a.oregon-postgres.render.com"
+  host: "128.140.40.52"
+  port: "5434"
+  # dbname: "ulab_market_busa"
+  dbname: "ulab-market-v2"
   sslmode: "require"
   migrations: "migrations"
 redis:
