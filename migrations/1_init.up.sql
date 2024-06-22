@@ -2,7 +2,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 create table if not exists roles (
     id uuid primary key,
-    name varchar(40) not null,
+    name varchar(40) not null unique,
     description varchar(255),
     created_at timestamp default now() not null,
     updated_at timestamp default now() not null,
@@ -11,7 +11,7 @@ create table if not exists roles (
 
 create table if not exists permissions (
     id uuid primary key,
-    name varchar(40) not null,
+    name varchar(40) not null unique,
     description varchar(255),
 
     created_at timestamp default now() not null,
@@ -28,7 +28,9 @@ create table if not exists permission_to_role (
     deleted_at timestamp default null,
 
     foreign key (role_id) references roles(id) on delete cascade,
-    foreign key (permission_id) references permissions(id) on delete cascade
+    foreign key (permission_id) references permissions(id) on delete cascade,
+
+    unique (role_id, permission_id)
 );
 
 create table if not exists clients (

@@ -1,9 +1,9 @@
 create table if not exists products (
-    id uuid primary key,
+    id uuid primary key unique,
     articul varchar(20) not null ,
 
-    name_uz varchar(255) not null default '',
-    name_ru varchar(255) not null default '',
+    name_uz varchar(255) not null,
+    name_ru varchar(255) not null,
 
     description_uz text not null default '',
     description_ru text not null default '',
