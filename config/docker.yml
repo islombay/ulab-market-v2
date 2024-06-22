@@ -1,7 +1,7 @@
 server:
-  host: "localhost"
+  host: "0.0.0.0"
   port: "8123"
-  public_host: "http://localhost:8123"
+  public_host: "http://0.0.0.0:8123"
 db:
   host: "postgres"
   port: "5432"
