@@ -10,6 +10,10 @@ services:
       driver: "json-file"
     dns:
       - 8.8.8.8
+    networks:
+      default:
+        dns:
+          - 8.8.8.8
     depends_on:
       redis:
         condition: service_started
