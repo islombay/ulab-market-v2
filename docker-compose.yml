@@ -1,7 +1,7 @@
 version: '3.8'
 
 networks:
-  ulab-market-network:
+  ulab-market_network:
     driver: bridge
 
 services:
@@ -55,7 +55,7 @@ services:
       - "app=ulab-market"
       - "service=ulab-market-server"
     networks:
-      - ulab-market-network
+      - ulab-market_network
     # healthcheck:
     #   test: ["CMD-SHELL", "curl -f http://localhost:8123/health || exit 1"]
     #   interval: 10s
@@ -68,7 +68,7 @@ services:
     ports:
       - "127.0.0.1:6378:6379"
     networks:
-      - ulab-market-network
+      - ulab-market_network
 
   postgres:
     restart: always
@@ -80,7 +80,7 @@ services:
     ports:
       - "5434:5432"
     networks:
-      - ulab-market-network
+      - ulab-market_network
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
