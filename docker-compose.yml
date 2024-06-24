@@ -1,5 +1,9 @@
 version: '3.8'
 
+networks:
+  ulab_market_network:
+    driver: bridge
+
 services:
   app:
     image: "${DOCKER_USERNAME}/${DOCKER_PROJECTNAME}:${DOCKER_TAG}"
@@ -50,6 +54,8 @@ services:
     labels:
       - "app=ulab-market"
       - "service=ulab-market-server"
+    networks:
+      - ulab_market_network
     # healthcheck:
     #   test: ["CMD-SHELL", "curl -f http://localhost:8123/health || exit 1"]
     #   interval: 10s
@@ -61,6 +67,8 @@ services:
     image: "redis:alpine"
     ports:
       - "127.0.0.1:6378:6379"
+    networks:
+      - ulab_market_network
 
   postgres:
     restart: always
@@ -71,6 +79,8 @@ services:
       POSTGRES_DB: ulab-market-v2
     ports:
       - "5434:5432"
+    networks:
+      - ulab_market_network
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
