@@ -3,6 +3,7 @@ version: '3.8'
 networks:
   ulab-market_network:
     driver: bridge
+    external: true
 
 services:
   app:
@@ -12,12 +13,6 @@ services:
     restart: always
     logging:
       driver: "json-file"
-    # dns:
-    #   - 8.8.8.8
-    # networks:
-    #   default:
-    #     nameservers:
-    #       - 8.8.8.8
     depends_on:
       redis:
         condition: service_started
@@ -56,11 +51,6 @@ services:
       - "service=ulab-market-server"
     networks:
       - ulab-market_network
-    # healthcheck:
-    #   test: ["CMD-SHELL", "curl -f http://localhost:8123/health || exit 1"]
-    #   interval: 10s
-    #   timeout: 5s
-    #   retries: 3
 
   redis:
     restart: always
