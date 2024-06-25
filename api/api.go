@@ -7,7 +7,6 @@ import (
 	"app/pkg/smtp"
 	"app/service"
 	"app/storage"
-	"fmt"
 	"os"
 
 	"github.com/gin-gonic/gin"
@@ -34,7 +33,7 @@ func NewApi(
 	docs.SwaggerInfo.Description = "This is a sample server e-commerce server."
 	docs.SwaggerInfo.Version = "1.0"
 
-	r.Use(customCORSMiddleware())
+	r.Use(customCORSMiddleware(log))
 
 	r.GET("/health", func(ctx *gin.Context) {
 		ctx.AbortWithStatus(200)
@@ -55,7 +54,7 @@ func NewApi(
 	))
 }
 
-func customCORSMiddleware() gin.HandlerFunc {
+func customCORSMiddleware(log logs.LoggerInterface) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Header("Access-Control-Allow-Origin", "*")
 		c.Header("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT, PATCH, DELETE, HEAD")
@@ -66,7 +65,7 @@ func customCORSMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		fmt.Println("~~~~~~> Entered")
+		log.Info("Request", logs.String("url", c.Request.RequestURI), logs.String("method", c.Request.Method))
 
 		c.Next()
 	}
