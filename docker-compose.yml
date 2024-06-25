@@ -27,7 +27,7 @@ services:
       - SECRET=${SECRET}
       - ENV=docker
 
-      - SMTP_EMAIL_PWD= ${SMTP_EMAIL_PWD}
+      - SMTP_EMAIL_PWD=${SMTP_EMAIL_PWD}
 
       - FIREBASE_TYPE=${FIREBASE_TYPE}
       - FIREBASE_PROJECT_ID=${FIREBASE_PROJECT_ID}

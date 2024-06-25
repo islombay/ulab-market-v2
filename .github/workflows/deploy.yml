@@ -39,11 +39,6 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Set up Go
-      uses: actions/setup-go@v2
-      with:
-        go-version: 1.21.4
-
     - name: Build Docker image
       run: docker build --no-cache -t ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_PROJECTNAME }}:${{ github.sha }} .
 
