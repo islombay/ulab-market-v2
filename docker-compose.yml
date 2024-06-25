@@ -63,6 +63,9 @@ services:
   postgres:
     restart: always
     image: "postgres:alpine"
+    labels:
+      - "app=ulab-market"
+      - "service=postgres"
     environment:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PWD}

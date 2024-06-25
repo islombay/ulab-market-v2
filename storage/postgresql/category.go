@@ -96,8 +96,6 @@ func (db *CategoryRepo) GetAll(ctx context.Context, pagination models.Pagination
 		ORDER BY c.created_at DESC
 		LIMIT %d OFFSET %d`, whereClause.String(), pagination.Limit, pagination.Offset)
 
-	fmt.Println(q)
-
 	m := []*models.Category{}
 	rows, err := db.db.Query(ctx, q)
 	if err != nil {
