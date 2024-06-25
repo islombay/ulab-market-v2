@@ -7,6 +7,7 @@ import (
 	"app/pkg/smtp"
 	"app/service"
 	"app/storage"
+	"fmt"
 	"os"
 
 	"github.com/gin-gonic/gin"
@@ -64,6 +65,8 @@ func customCORSMiddleware() gin.HandlerFunc {
 			c.AbortWithStatus(204)
 			return
 		}
+
+		fmt.Println("~~~~~~> Entered")
 
 		c.Next()
 	}

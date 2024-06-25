@@ -8,6 +8,7 @@ import (
 	"app/pkg/smtp"
 	"app/service"
 	"app/storage"
+	"fmt"
 	"net/http"
 	"os"
 
@@ -412,6 +413,7 @@ func NewV1(
 	}
 
 	v1.GET("/ping", func(c *gin.Context) {
+		fmt.Println("entered")
 		c.JSON(http.StatusOK, gin.H{"ping": "pong"})
 	})
 }

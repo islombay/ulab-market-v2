@@ -167,12 +167,14 @@ func (v1 *Handlers) ChangeBranch(c *gin.Context) {
 // @success 200 {object} []models.BranchModel "branch returned"
 // @failure 500 {object} models_v1.Response "Internal error"
 func (v1 *Handlers) GetAllBranches(c *gin.Context) {
+	v1.log.Info("Entered branch")
 	res, err := v1.storage.Branch().GetAll(context.Background())
 	if err != nil {
 		v1.log.Error("could not get all branches", logs.Error(err))
 		v1.error(c, status.StatusInternal)
 		return
 	}
+	v1.log.Info("got response")
 	v1.response(c, http.StatusOK, res)
 }
 

@@ -5,6 +5,7 @@ import (
 	"app/storage"
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/jackc/pgconn"
 	"github.com/jackc/pgx/v4/pgxpool"
@@ -92,6 +93,8 @@ func (db *branchRepo) GetAll(ctx context.Context) ([]*models.BranchModel, error)
 	q := `select
 			id, name, created_at, updated_at, deleted_at, open_time, close_time
 		from branches where deleted_at is null`
+
+	fmt.Println("sending query to db")
 	rows, _ := db.db.Query(ctx, q)
 	if rows.Err() != nil {
 		return nil, rows.Err()
